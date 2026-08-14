@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import FormField from "../../components/form/FormField";
 import {EyeIcon,EyeOffIcon,LockIcon,SignInIcon,UserIcon} from "../../components/icons/AuthIcons";
 import { loginAdmin } from "../../services/adminAuthService";
@@ -16,6 +17,7 @@ const getErrorMessage = (error: unknown): string => {
 };
 
 const AdminLoginPage = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(true);
@@ -40,6 +42,7 @@ const AdminLoginPage = () => {
                 type: "success",
                 text: `Welcome back, ${result.data.user.name}.`,
             });
+            navigate(result.data.user.role === "super_admin" ? "/super-admin/dashboard" : "/admin/dashboard", { replace: true });
         } catch (error) {
             setMessage({ type: "error", text: getErrorMessage(error) });
         } finally {
