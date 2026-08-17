@@ -19,6 +19,14 @@ export interface SaveEmployeeLeaveInput {
   reason: string | null;
   status: EmployeeLeaveStatus;
 }
+
+export type EmployeeLeaveFormValues = Omit<
+  SaveEmployeeLeaveInput,
+  "employeeId" | "reason"
+> & {
+  employeeId: string;
+  reason: string;
+};
 export interface EmployeeLeaveResponseData {
   leave: EmployeeLeave;
 }

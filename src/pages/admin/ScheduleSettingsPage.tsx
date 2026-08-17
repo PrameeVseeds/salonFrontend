@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   Asterisk,
   CalendarOff,
@@ -20,14 +19,12 @@ import {
   updateClosedDate,
 } from "../../services/scheduleSettingsService";
 import type { BusinessBreak, ClosedDate } from "../../types/scheduleSettings";
+import { getApiErrorMessage } from "../../utils/apiError";
+import { markFieldsTouched } from "../../utils/form";
 import "./scheduleSettingsPage.css";
 
 type Modal = "break" | "closed" | null;
 type Field = "date" | "startTime" | "endTime";
-const errorFrom = (error: unknown) =>
-  axios.isAxiosError<{ message?: string }>(error)
-    ? (error.response?.data?.message ?? "Request failed.")
-    : "Request failed.";
 const RequiredLabel = ({ children }: { children: string }) => (
   <span className="schedule-required">
     {children}
@@ -61,7 +58,7 @@ const ScheduleSettingsPage = () => {
         setBreaks(breakResponse.data.businessBreaks);
         setClosedDates(dateResponse.data.closedDates);
       })
-      .catch((requestError) => setError(errorFrom(requestError)));
+      .catch((requestError) => setError(getApiErrorMessage(requestError)));
   }, []);
   const reset = () => {
     setDate("");
@@ -120,7 +117,7 @@ const ScheduleSettingsPage = () => {
     event.preventDefault();
     const required: Field[] =
       modal === "break" ? ["date", "startTime", "endTime"] : ["date"];
-    setTouched(Object.fromEntries(required.map((field) => [field, true])));
+    setTouched(markFieldsTouched(required));
     if (required.some((field) => errors[field])) return;
     setBusy(true);
     setError(null);
@@ -160,7 +157,7 @@ const ScheduleSettingsPage = () => {
       }
       close();
     } catch (requestError) {
-      setError(errorFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     } finally {
       setBusy(false);
     }
@@ -171,7 +168,7 @@ const ScheduleSettingsPage = () => {
       await deleteBusinessBreak(item.id);
       setBreaks((current) => current.filter((value) => value.id !== item.id));
     } catch (requestError) {
-      setError(errorFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     }
   };
   const removeClosed = async (item: ClosedDate) => {
@@ -187,7 +184,7 @@ const ScheduleSettingsPage = () => {
         current.filter((value) => value.id !== item.id),
       );
     } catch (requestError) {
-      setError(errorFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     }
   };
 

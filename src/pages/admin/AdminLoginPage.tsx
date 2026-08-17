@@ -1,20 +1,13 @@
-import axios from "axios";
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import FormField from "../../components/form/FormField";
 import {EyeIcon,EyeOffIcon,LockIcon,SignInIcon,UserIcon} from "../../components/icons/AuthIcons";
 import { loginAdmin } from "../../services/adminAuthService";
+import { getApiErrorMessage } from "../../utils/apiError";
 import "./adminLoginPage.css";
 
-const getErrorMessage = (error: unknown): string => {
-    if (axios.isAxiosError<{ message?: string }>(error)) {
-        return (
-            error.response?.data?.message ??
-            "Unable to connect to the server. Please try again."
-        );
-    }
-    return "Something went wrong. Please try again.";
-};
+const getErrorMessage = (error: unknown) =>
+    getApiErrorMessage(error, "Unable to connect to the server. Please try again.");
 
 const AdminLoginPage = () => {
     const navigate = useNavigate();

@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useEffect, useState, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { getAdminProfile } from "../../services/adminAuthService";
 import type { Admin, AdminRole } from "../../types/admin";
 import { removeAdminToken } from "../../utils/adminToken";
+import { hasApiStatus } from "../../utils/apiError";
 import DashboardShell from "./DashboardShell";
 
 interface ProtectedDashboardProps {
@@ -34,7 +34,7 @@ const ProtectedDashboard = ({
             })
             .catch((error: unknown) => {
                 if (!active) return;
-                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                if (hasApiStatus(error, 401)) {
                     removeAdminToken();
                     setStatus("unauthenticated");
                     return;

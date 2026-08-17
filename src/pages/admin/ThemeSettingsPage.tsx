@@ -1,14 +1,11 @@
-import axios from "axios";
 import { Image, Palette, Save, Trash2, Upload, Video } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import {deleteHeroMedia,getThemeSettings,updateHeroMedia,updateThemeSettings,} from "../../services/themeSettingsService";
 import type { HeroMediaType, ThemeSettings } from "../../types/themeSettings";
+import { getApiErrorMessage, hasApiStatus } from "../../utils/apiError";
 import "./themeSettingsPage.css";
 
-const errorMessage = (e: unknown) =>
-  axios.isAxiosError<{ message?: string }>(e)
-    ? (e.response?.data?.message ?? "Request failed.")
-    : "Request failed.";
+const errorMessage = getApiErrorMessage;
 const ThemeSettingsPage = () => {
   const [settings, setSettings] = useState<ThemeSettings | null>(null);
   const [primary, setPrimary] = useState("#7A2E8E");
@@ -31,7 +28,7 @@ const ThemeSettingsPage = () => {
     getThemeSettings()
       .then(({ data }) => applySettings(data.themeSettings))
       .catch(async (e: unknown) => {
-        if (axios.isAxiosError(e) && e.response?.status === 404) {
+        if (hasApiStatus(e, 404)) {
           try {
             const { data } = await updateThemeSettings({
               primaryColor: "#7A2E8E",

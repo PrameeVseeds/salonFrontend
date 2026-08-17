@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   Asterisk,
   Clock3,
@@ -21,12 +20,9 @@ import {
   uploadSalonServiceImage,
 } from "../../services/salonService";
 import type { SalonService } from "../../types/service";
+import { getApiErrorMessage } from "../../utils/apiError";
+import { markFieldsTouched } from "../../utils/form";
 import "./serviceManagementPage.css";
-
-const messageFrom = (error: unknown) =>
-  axios.isAxiosError<{ message?: string }>(error)
-    ? (error.response?.data?.message ?? "Request failed.")
-    : "Request failed.";
 
 type RequiredField = "name" | "duration" | "description" | "price" | "image";
 const requiredFields: RequiredField[] = ["name", "duration", "description", "price", "image"];
@@ -58,7 +54,7 @@ const ServiceManagementPage = () => {
   useEffect(() => {
     getServices()
       .then(({ data }) => setServices(data.services))
-      .catch((e) => setError(messageFrom(e)));
+      .catch((e) => setError(getApiErrorMessage(e)));
   }, []);
   const visible = services.filter((service) =>
     `${service.name} ${service.description}`
@@ -134,7 +130,7 @@ const ServiceManagementPage = () => {
   };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    setTouched(Object.fromEntries(requiredFields.map((field) => [field, true])));
+    setTouched(markFieldsTouched(requiredFields));
     const minutes = Number(duration);
     const amount = Number(price);
     if (requiredFields.some((field) => fieldErrors[field])) {
@@ -171,7 +167,7 @@ const ServiceManagementPage = () => {
       setImagePreview("");
       setError(null);
     } catch (e) {
-      setError(messageFrom(e));
+      setError(getApiErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -186,7 +182,7 @@ const ServiceManagementPage = () => {
         current.map((item) => (item.id === service.id ? data.service : item)),
       );
     } catch (e) {
-      setError(messageFrom(e));
+      setError(getApiErrorMessage(e));
     }
   };
   const remove = async (service: SalonService) => {
@@ -197,7 +193,7 @@ const ServiceManagementPage = () => {
         current.filter((item) => item.id !== service.id),
       );
     } catch (e) {
-      setError(messageFrom(e));
+      setError(getApiErrorMessage(e));
     }
   };
 

@@ -1,8 +1,8 @@
-import axios from "axios";
 import { Asterisk, CalendarDays, Mail, Pencil, Save, ShieldCheck, UserRound, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { updateAdminProfile } from "../../services/adminAuthService";
 import type { Admin } from "../../types/admin";
+import { getApiErrorMessage } from "../../utils/apiError";
 import "./adminProfilePage.css";
 import "./adminProfileEdit.css";
 
@@ -53,11 +53,7 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
             setSuccess("Your profile was updated successfully.");
             setIsEditing(false);
         } catch (requestError) {
-            if (axios.isAxiosError<{ message?: string }>(requestError)) {
-                setError(requestError.response?.data?.message ?? "Unable to update your profile.");
-            } else {
-                setError("Unable to update your profile.");
-            }
+            setError(getApiErrorMessage(requestError, "Unable to update your profile."));
         } finally {
             setIsSaving(false);
         }

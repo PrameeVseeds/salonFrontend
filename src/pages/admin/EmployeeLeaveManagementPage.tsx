@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   Asterisk,
   CalendarClock,
@@ -21,15 +20,13 @@ import type {
   EmployeeLeave,
   EmployeeLeaveStatus,
 } from "../../types/employeeLeave";
+import { getApiErrorMessage } from "../../utils/apiError";
+import { markFieldsTouched } from "../../utils/form";
 import "./employeeLeaveManagementPage.css";
 
 type Field = "employee" | "leaveType" | "date" | "start" | "end";
 const required: Field[] = ["employee", "leaveType", "date", "start", "end"];
 const leaveTypes = ["Annual leave", "Medical leave", "Casual leave", "Unpaid leave", "Other"];
-const messageFrom = (error: unknown) =>
-  axios.isAxiosError<{ message?: string }>(error)
-    ? (error.response?.data?.message ?? "Request failed.")
-    : "Request failed.";
 const RequiredLabel = ({ children }: { children: string }) => (
   <span className="leave-required">
     {children}
@@ -58,7 +55,7 @@ const EmployeeLeaveManagementPage = () => {
         setLeaves(leaveResponse.data.leaves);
         setEmployees(employeeResponse.data.employees);
       })
-      .catch((requestError) => setError(messageFrom(requestError)));
+      .catch((requestError) => setError(getApiErrorMessage(requestError)));
   }, []);
   const employeeName = (id: number) => {
     const employee = employees.find((item) => item.id === id);
@@ -122,7 +119,7 @@ const EmployeeLeaveManagementPage = () => {
     setTouched((current) => ({ ...current, [field]: true }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    setTouched(Object.fromEntries(required.map((field) => [field, true])));
+    setTouched(markFieldsTouched(required));
     if (required.some((field) => errors[field])) return;
     setBusy(true);
     setError(null);
@@ -149,7 +146,7 @@ const EmployeeLeaveManagementPage = () => {
       setEditing(null);
       reset();
     } catch (requestError) {
-      setError(messageFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     } finally {
       setBusy(false);
     }
@@ -161,7 +158,7 @@ const EmployeeLeaveManagementPage = () => {
       await deleteEmployeeLeave(leave.id);
       setLeaves((current) => current.filter((item) => item.id !== leave.id));
     } catch (requestError) {
-      setError(messageFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     }
   };
   return (

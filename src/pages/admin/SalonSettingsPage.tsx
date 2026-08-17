@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Asterisk, Building2, Save, Upload } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import {
@@ -10,6 +9,8 @@ import type {
   SalonSettings,
   UpdateSalonSettingsInput,
 } from "../../types/settings";
+import { getApiErrorMessage, hasApiStatus } from "../../utils/apiError";
+import { markFieldsTouched } from "../../utils/form";
 import "./salonSettingsPage.css";
 
 const defaults: UpdateSalonSettingsInput = {
@@ -25,10 +26,8 @@ const defaults: UpdateSalonSettingsInput = {
   bookingIntervalMinutes: 30,
   appointmentBufferMinutes: 0,
 };
-const getError = (e: unknown) =>
-  axios.isAxiosError<{ message?: string }>(e)
-    ? (e.response?.data?.message ?? "Unable to save settings.")
-    : "Unable to save settings.";
+const getError = (error: unknown) =>
+  getApiErrorMessage(error, "Unable to save settings.");
 
 type RequiredSettingField = "salonName" | "phone" | "email" | "address" | "bookingInterval" | "appointmentBuffer";
 const requiredSettingFields: RequiredSettingField[] = ["salonName", "phone", "email", "address", "bookingInterval", "appointmentBuffer"];
@@ -68,7 +67,7 @@ const SalonSettingsPage = () => {
     getSalonSettings()
       .then(({ data }) => apply(data.settings))
       .catch(async (e: unknown) => {
-        if (axios.isAxiosError(e) && e.response?.status === 404) {
+        if (hasApiStatus(e, 404)) {
           try {
             const { data } = await updateSalonSettings(defaults);
             apply(data.settings);
@@ -108,7 +107,7 @@ const SalonSettingsPage = () => {
   };
   const save = async (e: FormEvent) => {
     e.preventDefault();
-    setTouched(Object.fromEntries(requiredSettingFields.map((field) => [field, true])));
+    setTouched(markFieldsTouched(requiredSettingFields));
     if (requiredSettingFields.some((field) => fieldErrors[field])) {
       setError(null);
       setSuccess(null);

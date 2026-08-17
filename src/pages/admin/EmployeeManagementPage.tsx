@@ -1,6 +1,4 @@
-import axios from "axios";
 import {
-  Asterisk,
   Camera,
   Pencil,
   Plus,
@@ -10,6 +8,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import RequiredLabel from "../../components/form/RequiredLabel";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   deleteEmployee,
@@ -20,20 +19,12 @@ import {
   uploadEmployeeProfileImage,
 } from "../../services/employeeService";
 import type { Employee } from "../../types/employee";
+import { getApiErrorMessage } from "../../utils/apiError";
+import { markFieldsTouched } from "../../utils/form";
 import "./employeeManagementPage.css";
 
 type Field = "firstName" | "lastName" | "phone" | "email";
 const fields: Field[] = ["firstName", "lastName", "phone", "email"];
-const messageFrom = (error: unknown) =>
-  axios.isAxiosError<{ message?: string }>(error)
-    ? (error.response?.data?.message ?? "Request failed.")
-    : "Request failed.";
-const RequiredLabel = ({ children }: { children: string }) => (
-  <span className="employee-required-label">
-    {children}
-    <Asterisk aria-label="required" />
-  </span>
-);
 
 const EmployeeManagementPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -53,7 +44,7 @@ const EmployeeManagementPage = () => {
   useEffect(() => {
     getEmployees()
       .then(({ data }) => setEmployees(data.employees))
-      .catch((e) => setError(messageFrom(e)));
+      .catch((e) => setError(getApiErrorMessage(e)));
   }, []);
   const errors: Partial<Record<Field, string>> = {
     firstName: firstName.trim() ? undefined : "First name is required.",
@@ -122,7 +113,7 @@ const EmployeeManagementPage = () => {
   };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    setTouched(Object.fromEntries(fields.map((field) => [field, true])));
+    setTouched(markFieldsTouched(fields));
     if (fields.some((field) => errors[field])) return;
     setBusy(true);
     setError(null);
@@ -150,7 +141,7 @@ const EmployeeManagementPage = () => {
       setEditing(null);
       reset();
     } catch (requestError) {
-      setError(messageFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     } finally {
       setBusy(false);
     }
@@ -165,7 +156,7 @@ const EmployeeManagementPage = () => {
         current.map((item) => (item.id === employee.id ? data.employee : item)),
       );
     } catch (requestError) {
-      setError(messageFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     }
   };
   const remove = async (employee: Employee) => {
@@ -177,7 +168,7 @@ const EmployeeManagementPage = () => {
         current.filter((item) => item.id !== employee.id),
       );
     } catch (requestError) {
-      setError(messageFrom(requestError));
+      setError(getApiErrorMessage(requestError));
     }
   };
 
@@ -317,7 +308,7 @@ const EmployeeManagementPage = () => {
             </header>
             <form noValidate onSubmit={(event) => void submit(event)}>
               <label>
-                <RequiredLabel>First name</RequiredLabel>
+                <RequiredLabel className="employee-required-label">First name</RequiredLabel>
                 <input
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
@@ -331,7 +322,7 @@ const EmployeeManagementPage = () => {
                 )}
               </label>
               <label>
-                <RequiredLabel>Last name</RequiredLabel>
+                <RequiredLabel className="employee-required-label">Last name</RequiredLabel>
                 <input
                   value={lastName}
                   onChange={(event) => setLastName(event.target.value)}
@@ -345,7 +336,7 @@ const EmployeeManagementPage = () => {
                 )}
               </label>
               <label>
-                <RequiredLabel>Phone</RequiredLabel>
+                <RequiredLabel className="employee-required-label">Phone</RequiredLabel>
                 <input
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
@@ -357,7 +348,7 @@ const EmployeeManagementPage = () => {
                 )}
               </label>
               <label>
-                <RequiredLabel>Email</RequiredLabel>
+                <RequiredLabel className="employee-required-label">Email</RequiredLabel>
                 <input
                   type="email"
                   value={email}

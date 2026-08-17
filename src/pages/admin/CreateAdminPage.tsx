@@ -1,16 +1,12 @@
-import axios from "axios";
 import { Eye, EyeOff, LockKeyhole, Mail, UserPlus, UserRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { createAdmin } from "../../services/adminService";
 import type { Admin } from "../../types/admin";
+import { getApiErrorMessage } from "../../utils/apiError";
 import "./createAdminPage.css";
 
-const getErrorMessage = (error: unknown): string => {
-    if (axios.isAxiosError<{ message?: string }>(error)) {
-        return error.response?.data?.message ?? "Unable to create the admin account.";
-    }
-    return "Something went wrong. Please try again.";
-};
+const getErrorMessage = (error: unknown) =>
+    getApiErrorMessage(error, "Unable to create the admin account.");
 
 const CreateAdminPage = () => {
     const [firstName, setFirstName] = useState("");

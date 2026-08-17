@@ -1,16 +1,12 @@
-import axios from "axios";
 import { Asterisk, Eye, EyeOff, LockKeyhole, Mail, Pencil, Plus, Power, Search, ShieldCheck, Trash2, UserPlus, UserRound, X } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { createAdmin, deleteAdmin, getAdmins, updateAdmin, updateAdminStatus } from "../../services/adminService";
 import type { Admin } from "../../types/admin";
+import { getApiErrorMessage } from "../../utils/apiError";
 import "./adminManagementPage.css";
 
-const getErrorMessage = (error: unknown): string => {
-    if (axios.isAxiosError<{ message?: string }>(error)) {
-        return error.response?.data?.message ?? "Unable to complete the request.";
-    }
-    return "Something went wrong. Please try again.";
-};
+const getErrorMessage = (error: unknown) =>
+    getApiErrorMessage(error, "Unable to complete the request.");
 
 type AdminFormField = "firstName" | "lastName" | "email" | "password" | "confirmPassword";
 type AdminFormErrors = Partial<Record<AdminFormField, string>>;
