@@ -7,7 +7,7 @@ import { removeAdminToken } from "../../utils/adminToken";
 import DashboardShell from "./DashboardShell";
 
 interface ProtectedDashboardProps {
-    allowedRole: AdminRole;
+    allowedRole: AdminRole | AdminRole[];
     children: (user: Admin) => ReactNode;
 }
 
@@ -27,7 +27,10 @@ const ProtectedDashboard = ({
             .then(({ data }) => {
                 if (!active) return;
                 setUser(data.user);
-                setStatus(data.user.role === allowedRole ? "ready" : "forbidden");
+                const hasAccess = Array.isArray(allowedRole)
+                    ? allowedRole.includes(data.user.role)
+                    : data.user.role === allowedRole;
+                setStatus(hasAccess ? "ready" : "forbidden");
             })
             .catch((error: unknown) => {
                 if (!active) return;

@@ -205,6 +205,25 @@
     display: flex !important;
     align-items: center;
     gap: 10px;
+    padding: 7px 9px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease
+}
+
+.dashboard-topbar__identity:hover {
+    border-color: #e6dbea;
+    background: #faf6fc
+}
+
+.dashboard-topbar__identity:focus-visible {
+    outline: 3px solid #963dcc30;
+    outline-offset: 2px
 }
 
 .dashboard-topbar__identity strong,

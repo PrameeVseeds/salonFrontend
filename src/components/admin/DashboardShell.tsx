@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import {
     CalendarDays,
+    CircleUserRound,
     LayoutDashboard,
     LogOut,
     Menu,
@@ -79,6 +80,10 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                             Administrators
                         </NavLink>
                     )}
+                    <NavLink to="/admin/profile" title="View profile" onClick={() => setIsMenuOpen(false)}>
+                        <CircleUserRound aria-hidden="true" />
+                        My profile
+                    </NavLink>
                 </nav>
                 <div className="dashboard-sidebar__user">
                     <span className="dashboard-avatar">{initials}</span>
@@ -108,13 +113,15 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                                 : "Admin Portal"}
                         </strong>
                     </div>
-                    <div className="dashboard-topbar__identity">
+                    <button className="dashboard-topbar__identity" type="button" 
+                    onClick={() => navigate("/admin/profile")} 
+                    aria-label="View your profile" title="View profile">
                         <span className="dashboard-avatar">{initials}</span>
                         <div>
                             <strong>{user.firstName}</strong>
                             <small>{user.email}</small>
                         </div>
-                    </div>
+                    </button>
                 </header>
                 <main className="dashboard-content">{children}</main>
             </div>
