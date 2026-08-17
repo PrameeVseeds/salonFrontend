@@ -26,7 +26,13 @@ import "./employeeLeaveManagementPage.css";
 
 type Field = "employee" | "leaveType" | "date" | "start" | "end";
 const required: Field[] = ["employee", "leaveType", "date", "start", "end"];
-const leaveTypes = ["Annual leave", "Medical leave", "Casual leave", "Unpaid leave", "Other"];
+const leaveTypes = [
+  "Annual leave",
+  "Medical leave",
+  "Casual leave",
+  "Unpaid leave",
+  "Other",
+];
 const RequiredLabel = ({ children }: { children: string }) => (
   <span className="leave-required">
     {children}
@@ -308,7 +314,9 @@ const EmployeeLeaveManagementPage = () => {
                     <option value={leaveType}>{leaveType}</option>
                   )}
                   {leaveTypes.map((type) => (
-                    <option key={type} value={type}>{type}</option>
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
                   ))}
                 </select>
                 {touched.leaveType && errors.leaveType && (

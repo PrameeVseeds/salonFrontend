@@ -3,6 +3,7 @@ import {
     CalendarDays,
     CalendarOff,
     CalendarClock,
+    Clock3,
     Cog,
     LayoutDashboard,
     LogOut,
@@ -73,6 +74,10 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                     <NavLink to="/admin/business-calendar" title="Business calendar" onClick={() => setIsMenuOpen(false)}>
                         <CalendarOff aria-hidden="true" />
                         Business calendar
+                    </NavLink>
+                    <NavLink to="/admin/working-hours" title="Working hours" onClick={() => setIsMenuOpen(false)}>
+                        <Clock3 aria-hidden="true" />
+                        Working hours
                     </NavLink>
                     <button type="button" disabled title="Customers">
                         <Users aria-hidden="true" />

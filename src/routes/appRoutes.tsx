@@ -12,6 +12,7 @@ import SalonSettingsPage from "../pages/admin/SalonSettingsPage";
 import EmployeeManagementPage from "../pages/admin/EmployeeManagementPage";
 import ScheduleSettingsPage from "../pages/admin/ScheduleSettingsPage";
 import EmployeeLeaveManagementPage from "../pages/admin/EmployeeLeaveManagementPage";
+import WorkingHoursPage from "../pages/admin/WorkingHoursPage";
 
 export const appRoutes = createBrowserRouter([
   {
@@ -55,6 +56,14 @@ export const appRoutes = createBrowserRouter([
     element: (
       <ProtectedDashboard allowedRole={["admin", "super_admin"]}>
         {() => <ServiceManagementPage />}
+      </ProtectedDashboard>
+    ),
+  },
+  {
+    path: "/admin/working-hours",
+    element: (
+      <ProtectedDashboard allowedRole={["admin", "super_admin"]}>
+        {() => <WorkingHoursPage />}
       </ProtectedDashboard>
     ),
   },
