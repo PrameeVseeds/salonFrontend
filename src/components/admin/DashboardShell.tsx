@@ -1,12 +1,14 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
     CalendarDays,
     LayoutDashboard,
     LogOut,
+    Menu,
     Scissors,
     Sparkles,
     UserRoundCog,
     Users,
+    X,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutAdmin } from "../../services/adminAuthService";
@@ -20,6 +22,7 @@ interface DashboardShellProps {
 
 const DashboardShell = ({ user, children }: DashboardShellProps) => {
     const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const dashboardPath =
         user.role === "super_admin" ? "/super-admin/dashboard" : "/admin/dashboard";
     const initials =
@@ -42,29 +45,39 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                         <small>Management</small>
                     </div>
                 </div>
-                <nav aria-label="Admin navigation">
-                    <NavLink to={dashboardPath} end>
+                <button
+                    className="dashboard-menu-toggle"
+                    type="button"
+                    aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
+                    aria-expanded={isMenuOpen}
+                    aria-controls="dashboard-navigation"
+                    onClick={() => setIsMenuOpen((open) => !open)}
+                >
+                    {isMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+                </button>
+                <nav id="dashboard-navigation" className={isMenuOpen ? "is-open" : ""} aria-label="Admin navigation">
+                    <NavLink to={dashboardPath} end title="Overview" onClick={() => setIsMenuOpen(false)}>
                         <LayoutDashboard aria-hidden="true" />
                         Overview
                     </NavLink>
                     <span className="dashboard-nav-label">Workspace</span>
-                    <button type="button" disabled>
+                    <button type="button" disabled title="Appointments">
                         <CalendarDays aria-hidden="true" />
                         Appointments
                     </button>
-                    <button type="button" disabled>
+                    <button type="button" disabled title="Customers">
                         <Users aria-hidden="true" />
                         Customers
                     </button>
-                    <button type="button" disabled>
+                    <button type="button" disabled title="Services">
                         <Sparkles aria-hidden="true" />
                         Services
                     </button>
                     {user.role === "super_admin" && (
-                        <button type="button" disabled>
+                        <NavLink to="/super-admin/admins" title="Administrators" onClick={() => setIsMenuOpen(false)}>
                             <UserRoundCog aria-hidden="true" />
                             Administrators
-                        </button>
+                        </NavLink>
                     )}
                 </nav>
                 <div className="dashboard-sidebar__user">
@@ -82,6 +95,8 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                     </button>
                 </div>
             </aside>
+            {isMenuOpen && <button className="dashboard-menu-backdrop" 
+            type="button" aria-label="Close navigation" onClick={() => setIsMenuOpen(false)} />}
 
             <div className="dashboard-main">
                 <header className="dashboard-topbar">
