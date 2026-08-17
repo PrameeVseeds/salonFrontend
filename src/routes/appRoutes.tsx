@@ -11,6 +11,7 @@ import ThemeSettingsPage from "../pages/admin/ThemeSettingsPage";
 import SalonSettingsPage from "../pages/admin/SalonSettingsPage";
 import EmployeeManagementPage from "../pages/admin/EmployeeManagementPage";
 import ScheduleSettingsPage from "../pages/admin/ScheduleSettingsPage";
+import EmployeeLeaveManagementPage from "../pages/admin/EmployeeLeaveManagementPage";
 
 export const appRoutes = createBrowserRouter([
   {
@@ -54,6 +55,14 @@ export const appRoutes = createBrowserRouter([
     element: (
       <ProtectedDashboard allowedRole={["admin", "super_admin"]}>
         {() => <ServiceManagementPage />}
+      </ProtectedDashboard>
+    ),
+  },
+  {
+    path: "/admin/employee-leaves",
+    element: (
+      <ProtectedDashboard allowedRole={["admin", "super_admin"]}>
+        {() => <EmployeeLeaveManagementPage />}
       </ProtectedDashboard>
     ),
   },

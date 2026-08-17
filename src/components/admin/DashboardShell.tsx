@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import {
     CalendarDays,
     CalendarOff,
+    CalendarClock,
     Cog,
     LayoutDashboard,
     LogOut,
@@ -80,6 +81,10 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                     <NavLink to="/admin/employees" title="Employees" onClick={() => setIsMenuOpen(false)}>
                         <UserRoundCheck aria-hidden="true" />
                         Employees
+                    </NavLink>
+                    <NavLink to="/admin/employee-leaves" title="Employee leaves" onClick={() => setIsMenuOpen(false)}>
+                        <CalendarClock aria-hidden="true" />
+                        Employee leaves
                     </NavLink>
                     <NavLink to="/admin/services" title="Services" onClick={() => setIsMenuOpen(false)}>
                         <Sparkles aria-hidden="true" />
