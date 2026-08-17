@@ -1,14 +1,17 @@
 import { useState, type ReactNode } from "react";
 import {
     CalendarDays,
-    CircleUserRound,
+    CalendarOff,
+    Cog,
     LayoutDashboard,
     LogOut,
     Menu,
     Scissors,
+    Settings2,
     Sparkles,
     UserRoundCog,
     Users,
+    UserRoundCheck,
     X,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -66,35 +69,55 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                         <CalendarDays aria-hidden="true" />
                         Appointments
                     </button>
+                    <NavLink to="/admin/business-calendar" title="Business calendar" onClick={() => setIsMenuOpen(false)}>
+                        <CalendarOff aria-hidden="true" />
+                        Business calendar
+                    </NavLink>
                     <button type="button" disabled title="Customers">
                         <Users aria-hidden="true" />
                         Customers
                     </button>
-                    <button type="button" disabled title="Services">
+                    <NavLink to="/admin/employees" title="Employees" onClick={() => setIsMenuOpen(false)}>
+                        <UserRoundCheck aria-hidden="true" />
+                        Employees
+                    </NavLink>
+                    <NavLink to="/admin/services" title="Services" onClick={() => setIsMenuOpen(false)}>
                         <Sparkles aria-hidden="true" />
                         Services
-                    </button>
+                    </NavLink>
                     {user.role === "super_admin" && (
                         <NavLink to="/super-admin/admins" title="Administrators" onClick={() => setIsMenuOpen(false)}>
                             <UserRoundCog aria-hidden="true" />
                             Administrators
                         </NavLink>
                     )}
-                    <NavLink to="/admin/profile" title="View profile" onClick={() => setIsMenuOpen(false)}>
-                        <CircleUserRound aria-hidden="true" />
-                        My profile
+                    <NavLink to="/admin/settings" title="Salon settings" onClick={() => setIsMenuOpen(false)}>
+                        <Cog aria-hidden="true" />
+                        Salon settings
+                    </NavLink>
+                    <NavLink to="/admin/theme-settings" title="Theme settings" onClick={() => setIsMenuOpen(false)}>
+                        <Settings2 aria-hidden="true" />
+                        Theme settings
                     </NavLink>
                 </nav>
                 <div className="dashboard-sidebar__user">
-                    <span className="dashboard-avatar">{initials}</span>
-                    <div>
-                        <strong>
-                            {user.firstName} {user.lastName}
-                        </strong>
-                        <small>
-                            {user.role === "super_admin" ? "Super admin" : "Administrator"}
-                        </small>
-                    </div>
+                    <button
+                        className="dashboard-sidebar__profile"
+                        type="button"
+                        onClick={() => navigate("/admin/profile")}
+                        aria-label="View your profile"
+                        title="View profile"
+                    >
+                        <span className="dashboard-avatar">{initials}</span>
+                        <div>
+                            <strong>
+                                {user.firstName} {user.lastName}
+                            </strong>
+                            <small>
+                                {user.role === "super_admin" ? "Super admin" : "Administrator"}
+                            </small>
+                        </div>
+                    </button>
                     <button type="button" onClick={handleLogout} aria-label="Sign out">
                         <LogOut aria-hidden="true" />
                     </button>

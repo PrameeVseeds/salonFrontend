@@ -119,11 +119,28 @@
 .dashboard-sidebar__user {
     margin-top: auto;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 10px;
     padding: 15px 8px 0;
     border-top: 1px solid #ffffff17;
+}
+
+.dashboard-sidebar__user .dashboard-sidebar__profile {
+    width: auto;
+    height: auto;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    text-align: left;
+    background: transparent;
+}
+
+.dashboard-sidebar__user .dashboard-sidebar__profile:hover {
+    background: transparent;
 }
 
 .dashboard-avatar {
@@ -621,6 +638,10 @@
         width: 40px;
         height: 40px;
         margin: 0
+    }
+
+    .dashboard-sidebar__user .dashboard-sidebar__profile {
+        display: none;
     }
 
     .dashboard-topbar {
