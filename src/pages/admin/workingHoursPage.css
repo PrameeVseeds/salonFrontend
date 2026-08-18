@@ -1,0 +1,229 @@
+.hours-page > header {
+  margin-bottom: 22px;
+}
+.hours-page > header h1 {
+  margin: 4px 0;
+  color: #211b2d;
+  font-size: 2rem;
+}
+.hours-page > header > p:last-child {
+  color: #847b8b;
+  font-size: 0.8rem;
+}
+.hours-message {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+.hours-message.is-error {
+  color: #9c293a;
+  background: #fff1f3;
+}
+.hours-message.is-success {
+  color: #24693f;
+  background: #effaf3;
+}
+.hours-card {
+  overflow: hidden;
+  border: 1px solid #e6e0ea;
+  border-radius: 15px;
+  background: #fff;
+}
+.hours-card > header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #eee9f1;
+}
+.hours-card > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hours-card > header > div > span {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #943ec3;
+  background: #f3e9f9;
+}
+.hours-card > header svg {
+  width: 18px;
+}
+.hours-card h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.hours-card header p {
+  color: #938a99;
+  font-size: 0.67rem;
+}
+.hours-labels,
+.hours-list article {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(135px, 1fr) minmax(
+      135px,
+      1fr
+    ) 100px 90px;
+  gap: 15px;
+  align-items: start;
+}
+.hours-labels {
+  padding: 12px 20px;
+  color: #918797;
+  background: #fbf9fc;
+  font-size: 0.61rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+.hours-labels span {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.hours-labels svg {
+  width: 9px;
+  color: #c83254;
+}
+.hours-list article {
+  min-height: 66px;
+  padding: 14px 20px;
+  border-top: 1px solid #f0ebf2;
+  box-sizing: border-box;
+}
+.hours-list article > strong {
+  padding-top: 12px;
+  font-size: 0.78rem;
+}
+.hours-list article.is-closed {
+  background: #fcfafc;
+}
+.hours-list label {
+  display: grid;
+  gap: 4px;
+}
+.hours-list label > span {
+  display: none;
+}
+.hours-list input[type="time"] {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #ddd6e2;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+}
+.hours-list input:disabled {
+  color: #aaa1ae;
+  background: #f5f2f6;
+}
+.hours-list [aria-invalid="true"] {
+  border-color: #d64a62;
+  box-shadow: 0 0 0 3px #d64a621a;
+}
+.hours-list label > small {
+  color: #bd3049;
+  font-size: 0.6rem;
+}
+.hours-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 7px;
+  padding-top: 11px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.hours-toggle span {
+  display: block !important;
+}
+.hours-toggle input {
+  width: 17px;
+  height: 17px;
+  accent-color: #973dc8;
+}
+.hours-save {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #963dc8;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.hours-save svg {
+  width: 14px;
+}
+.hours-save:disabled {
+  opacity: 0.6;
+}
+@media (max-width: 900px) {
+  .hours-labels,
+  .hours-list article {
+    grid-template-columns: minmax(90px, 0.8fr) minmax(120px, 1fr) minmax(
+        120px,
+        1fr
+      ) 80px 42px;
+    gap: 10px;
+  }
+  .hours-save {
+    width: 40px;
+    font-size: 0;
+  }
+  .hours-save svg {
+    width: 16px;
+  }
+}
+@media (max-width: 650px) {
+  .hours-page > header h1 {
+    font-size: 1.65rem;
+  }
+  .hours-labels {
+    display: none;
+  }
+  .hours-list {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    background: #faf8fb;
+  }
+  .hours-list article {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    min-height: 0;
+    padding: 14px;
+    border: 1px solid #e8e1eb;
+    border-radius: 11px;
+    background: #fff;
+  }
+  .hours-list article > strong {
+    grid-column: 1/-1;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+  .hours-list label > span {
+    display: block;
+    color: #8f8595;
+    font-size: 0.62rem;
+  }
+  .hours-toggle {
+    padding: 0;
+  }
+  .hours-save {
+    justify-self: end;
+    width: 100%;
+    font-size: 0.68rem;
+  }
+  .hours-save svg {
+    width: 14px;
+  }
+}
