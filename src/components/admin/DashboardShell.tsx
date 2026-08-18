@@ -11,6 +11,7 @@ import {
     Scissors,
     Settings2,
     Sparkles,
+    ListChecks,
     UserRoundCog,
     Users,
     UserRoundCheck,
@@ -90,6 +91,10 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                     <NavLink to="/admin/employee-leaves" title="Employee leaves" onClick={() => setIsMenuOpen(false)}>
                         <CalendarClock aria-hidden="true" />
                         Employee leaves
+                    </NavLink>
+                    <NavLink to="/admin/employee-services" title="Employee services" onClick={() => setIsMenuOpen(false)}>
+                        <ListChecks aria-hidden="true" />
+                        Employee services
                     </NavLink>
                     <NavLink to="/admin/services" title="Services" onClick={() => setIsMenuOpen(false)}>
                         <Sparkles aria-hidden="true" />

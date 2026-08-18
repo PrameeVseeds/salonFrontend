@@ -1,0 +1,286 @@
+.assignment-page > header {
+  margin-bottom: 22px;
+}
+.assignment-page > header h1 {
+  margin: 4px 0;
+  color: #211b2d;
+  font-size: 2rem;
+}
+.assignment-page > header > p:last-child {
+  color: #847b8b;
+  font-size: 0.8rem;
+}
+.assignment-controls {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(220px, 0.7fr);
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid #e6e0ea;
+  border-radius: 14px;
+  background: #fff;
+}
+.assignment-controls label {
+  display: grid;
+  gap: 6px;
+  color: #332a3a;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.assignment-controls label > span {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.assignment-controls label > span svg {
+  width: 10px;
+  color: #c83254;
+  stroke-width: 3;
+}
+.assignment-controls select,
+.assignment-controls input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #ddd6e2;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+}
+.assignment-controls [aria-invalid="true"] {
+  border-color: #d64a62;
+  box-shadow: 0 0 0 3px #d64a621a;
+}
+.assignment-controls label > small {
+  color: #bd3049;
+  font-size: 0.63rem;
+}
+.assignment-search {
+  position: relative;
+}
+.assignment-search svg {
+  position: absolute;
+  z-index: 1;
+  bottom: 11px;
+  left: 11px;
+  width: 16px;
+  color: #918797;
+}
+.assignment-search input {
+  padding-left: 35px;
+}
+.assignment-message {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+.assignment-message.is-error {
+  color: #9c293a;
+  background: #fff1f3;
+}
+.assignment-message.is-success {
+  color: #24693f;
+  background: #effaf3;
+}
+.assignment-empty {
+  display: grid;
+  place-items: center;
+  min-height: 270px;
+  padding: 30px;
+  border: 1px dashed #d8cddd;
+  border-radius: 14px;
+  color: #8b7e92;
+  background: #fff;
+  text-align: center;
+}
+.assignment-empty > svg {
+  width: 44px;
+  height: 44px;
+  padding: 12px;
+  border-radius: 13px;
+  color: #963dc8;
+  background: #f3e9f9;
+}
+.assignment-empty h2 {
+  margin: 13px 0 4px;
+  color: #352b3d;
+  font-size: 1rem;
+}
+.assignment-empty p {
+  font-size: 0.72rem;
+}
+.assignment-content {
+  border: 1px solid #e6e0ea;
+  border-radius: 15px;
+  background: #fff;
+  overflow: hidden;
+}
+.assignment-content > header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #eee9f1;
+}
+.assignment-content h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.assignment-content header p {
+  color: #938a99;
+  font-size: 0.67rem;
+}
+.assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  padding: 18px;
+  background: #faf8fb;
+}
+.assignment-service-card {
+  overflow: hidden;
+  border: 1px solid #e5dee9;
+  border-radius: 12px;
+  background: #fff;
+}
+.assignment-service-card.is-assigned {
+  border-color: #cba5dd;
+  box-shadow: 0 0 0 2px #9a40c912;
+}
+.assignment-service-card__image {
+  position: relative;
+  height: 105px;
+  background: #f2edf4;
+}
+.assignment-service-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.assignment-service-card__image > span {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #267048;
+  background: #eaf8ef;
+  font-size: 0.58rem;
+  font-weight: 750;
+}
+.assignment-service-card__image span svg {
+  width: 11px;
+}
+.assignment-service-card__body {
+  padding: 13px;
+}
+.assignment-service-card h3 {
+  margin: 0;
+  color: #302738;
+  font-size: 0.82rem;
+}
+.assignment-service-card__body > p {
+  height: 34px;
+  margin: 5px 0 10px;
+  overflow: hidden;
+  color: #857b8b;
+  font-size: 0.64rem;
+  line-height: 1.4;
+}
+.assignment-service-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 11px;
+  color: #8d8293;
+  font-size: 0.61rem;
+}
+.assignment-service-card__meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.assignment-service-card__meta svg {
+  width: 12px;
+}
+.assignment-service-card__meta strong {
+  color: #4d4055;
+}
+.assignment-service-card button {
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #963dc8;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.assignment-service-card button svg {
+  width: 14px;
+}
+.assignment-service-card button.is-remove {
+  color: #ae3046;
+  background: #fff0f2;
+  border: 1px solid #efc5cc;
+}
+.assignment-service-card button:disabled {
+  opacity: 0.55;
+}
+.assignment-no-results {
+  padding: 30px;
+  text-align: center;
+  color: #918797;
+  font-size: 0.72rem;
+}
+@media (max-width: 1000px) {
+  .assignment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .assignment-page > header h1 {
+    font-size: 1.65rem;
+  }
+  .assignment-controls {
+    grid-template-columns: 1fr;
+  }
+  .assignment-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .assignment-service-card {
+    display: grid;
+    grid-template-columns: 105px minmax(0, 1fr);
+  }
+  .assignment-service-card__image {
+    height: 100%;
+    min-height: 145px;
+  }
+  .assignment-service-card__body > p {
+    height: auto;
+  }
+  .assignment-service-card__meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+@media (max-width: 400px) {
+  .assignment-service-card {
+    display: block;
+  }
+  .assignment-service-card__image {
+    height: 120px;
+    min-height: 0;
+  }
+}
