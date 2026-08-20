@@ -12,6 +12,7 @@ export interface SalonSettings {
     enableOnlinePayment: boolean;
     bookingIntervalMinutes: number;
     appointmentBufferMinutes: number;
+    appointmentGracePeriodMinutes: number;
     createdAt: string;
     updatedAt: string;
 }

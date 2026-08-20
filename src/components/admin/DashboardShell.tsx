@@ -78,10 +78,14 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
             <LayoutDashboard aria-hidden="true" />
             Overview
           </NavLink>
-          <button type="button" disabled title="Appointments">
+          <NavLink
+to="/admin/appointments"
+            title="Appointments"
+            onClick={() => setIsMenuOpen(false)}
+          >
             <CalendarDays aria-hidden="true" />
             Appointments
-          </button>
+          </NavLink>
           <NavLink
             to="/admin/business-calendar"
             title="Business calendar"

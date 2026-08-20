@@ -1,0 +1,121 @@
+.appointment-page>header {
+    margin-bottom: 22px;
+}
+
+.appointment-page>header h1 {
+    margin: 4px 0;
+    color: #211b2d;
+    font-size: 2rem;
+}
+
+.appointment-page>header>p:last-child {
+    color: #847b8b;
+    font-size: .8rem;
+}
+
+.appointment-card {
+    overflow: hidden;
+    border: 1px solid #e6e0ea;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 10px 30px #3b214a0b;
+}
+
+.appointment-table-wrap {
+    overflow-x: auto;
+}
+
+.appointment-card table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .75rem;
+}
+
+.appointment-card th,
+.appointment-card td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee9f1;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.appointment-card th {
+    color: #716779;
+    background: #faf8fb;
+    font-size: .66rem;
+    text-transform: uppercase;
+}
+
+.appointment-status {
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.appointment-status.is-scheduled {
+    color: #765018;
+    background: #fff5dc;
+}
+
+.appointment-status.is-in-progress {
+    color: #663098;
+    background: #f3e9fa;
+}
+
+.appointment-status.is-completed {
+    color: #24693f;
+    background: #eaf8ef;
+}
+
+.appointment-status.is-cancelled {
+    color: #9c293a;
+    background: #fff1f3;
+}
+
+.appointment-card button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 7px;
+    color: #fff;
+    background: #943ec3;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.appointment-card button:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+.appointment-card button svg {
+    width: 14px;
+    height: 14px;
+}
+
+.appointment-empty {
+    padding: 40px !important;
+    color: #847b8b;
+    text-align: center !important;
+}
+
+.appointment-empty svg {
+    width: 18px;
+    margin-right: 7px;
+    vertical-align: middle;
+}
+
+.appointment-message {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: .72rem;
+}
+
+.appointment-message.is-error {
+    color: #9c293a;
+    background: #fff1f3;
+}

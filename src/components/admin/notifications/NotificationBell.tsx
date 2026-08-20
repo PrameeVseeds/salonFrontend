@@ -1,6 +1,16 @@
-import { Bell, Mail, MessageCircle, RefreshCw, Smartphone, X } from "lucide-react";
+import {
+  Bell,
+  Mail,
+  MessageCircle,
+  RefreshCw,
+  Smartphone,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { getAdminNotifications, retryAdminNotification, } from "../../../services/notificationService";
+import {
+  getAdminNotifications,
+  retryAdminNotification,
+} from "../../../services/notificationService";
 import type { AdminNotification } from "../../../types/notification";
 import "./notificationBell.css";
 
@@ -18,18 +28,17 @@ const NotificationBell = () => {
       const { data } = await getAdminNotifications();
       setItems(data.notifications);
       setError(null);
-    }
-    catch {
+    } catch {
       setError("Unable to load notifications.");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {void load();}, []);
   useEffect(() => {
-    if (!open)
+    if (!open) 
       return;
+
     const close = (event: MouseEvent) => {
       if (root.current && !root.current.contains(event.target as Node))
         setOpen(false);
@@ -37,8 +46,7 @@ const NotificationBell = () => {
 
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
-  },
-    [open]);
+  }, [open]);
 
   const retry = async (item: AdminNotification) => {
     setRetrying(item.id);
@@ -49,10 +57,10 @@ const NotificationBell = () => {
           value.id === item.id ? data.notification : value,
         ),
       );
-    }
+    } 
     catch {
       setError("Notification retry failed.");
-    }
+    } 
     finally {
       setRetrying(null);
     }
@@ -68,7 +76,8 @@ const NotificationBell = () => {
         type="button"
         aria-label={`Notifications${attention ? `, ${attention} requiring attention` : ""}`}
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}>
+        onClick={() => setOpen((value) => !value)}
+      >
         <Bell />
         {attention > 0 && <span>{attention > 99 ? "99+" : attention}</span>}
       </button>
@@ -102,7 +111,9 @@ const NotificationBell = () => {
 
                 return (
                   <article key={item.id}>
-                    <span className={`notification-type is-${item.sentStatus.toLowerCase()}`}>
+                    <span
+                      className={`notification-type is-${item.sentStatus.toLowerCase()}`}
+                    >
                       <Icon />
                     </span>
 
@@ -115,7 +126,9 @@ const NotificationBell = () => {
                       </small>
                     </div>
 
-                    <span className={`notification-status is-${item.sentStatus.toLowerCase()}`}>
+                    <span
+                      className={`notification-status is-${item.sentStatus.toLowerCase()}`}
+                    >
                       {item.sentStatus}
                     </span>
 
@@ -139,12 +152,14 @@ const NotificationBell = () => {
           </div>
 
           <footer>
-            <button type="button" onClick={() => {
-              setLoading(true);
-              void load();
-            }
-            }
-              disabled={loading}>
+            <button
+              type="button"
+              onClick={() => {
+                setLoading(true);
+                void load();
+              }}
+              disabled={loading}
+            >
               <RefreshCw />
               Refresh
             </button>

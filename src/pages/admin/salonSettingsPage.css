@@ -81,6 +81,12 @@
   font-size: 0.64rem;
   font-weight: 500;
 }
+.settings-field-hint {
+  color: #847b8b;
+  font-size: 0.66rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
 .settings-form input,
 .settings-form textarea {
   width: 100%;
