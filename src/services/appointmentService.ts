@@ -3,14 +3,16 @@ import type { ApiResponse } from "../types/api";
 import type {
   AppointmentListResponseData,
   AppointmentResponseData,
+  AppointmentFilters,
 } from "../types/appointment";
 
 const ENDPOINT = "/appointments";
 
-export const getAppointments = async (): Promise<ApiResponse<AppointmentListResponseData>> =>
+export const getAppointments = async (filters: AppointmentFilters = {}): Promise<ApiResponse<AppointmentListResponseData>> =>
   (
     await adminAxiosClient.get<ApiResponse<AppointmentListResponseData>>(
       ENDPOINT,
+      { params: filters },
     )
   ).data;
 
@@ -25,5 +27,13 @@ export const completeAppointment = async (id: number,): Promise<ApiResponse<Appo
   (
     await adminAxiosClient.patch<ApiResponse<AppointmentResponseData>>(
       `${ENDPOINT}/${id}/complete`,
+    )
+  ).data;
+
+export const cancelAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
+  (
+    await adminAxiosClient.patch<ApiResponse<AppointmentResponseData>>(
+      `${ENDPOINT}/${id}/cancel`,
+      { reason },
     )
   ).data;

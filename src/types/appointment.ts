@@ -15,6 +15,12 @@ export interface Appointment {
   completedAt: string | null;
   cancelledAt: string | null;
   cancellationReason: string | null;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  employeeName?: string | null;
+  serviceName?: string;
+  serviceDurationMinutes?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,4 +31,10 @@ export interface AppointmentListResponseData {
 
 export interface AppointmentResponseData {
   appointment: Appointment
+}
+
+export interface AppointmentFilters {
+  date?: string;
+  status?: AppointmentStatus | "";
+  search?: string;
 }
