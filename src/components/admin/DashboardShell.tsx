@@ -3,8 +3,6 @@ import {
   CalendarDays,
   CalendarOff,
   CalendarClock,
-  ChevronLeft,
-  ChevronRight,
   Clock3,
   Cog,
   LayoutDashboard,
@@ -35,7 +33,6 @@ interface DashboardShellProps {
 const DashboardShell = ({ user, children }: DashboardShellProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLogoutConfirmationOpen, setIsLogoutConfirmationOpen] = useState(false);
   const dashboardPath =
     user.role === "super_admin" ? "/super-admin/dashboard" : "/admin/dashboard";
@@ -49,7 +46,7 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
   };
 
   return (
-    <div className={`dashboard-layout${isSidebarCollapsed ? " is-sidebar-collapsed" : ""}`}>
+    <div className="dashboard-layout">
       <aside className="dashboard-sidebar">
         <div className="dashboard-brand">
           <span>
@@ -69,16 +66,6 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
           onClick={() => setIsMenuOpen((open) => !open)}
         >
           {isMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-        </button>
-        <button
-          className="dashboard-sidebar-collapse"
-          type="button"
-          aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          onClick={() => setIsSidebarCollapsed((collapsed) => !collapsed)}
-        >
-          {isSidebarCollapsed ? 
-          <ChevronRight aria-hidden="true" /> : <ChevronLeft aria-hidden="true" />}
         </button>
         <nav
           id="dashboard-navigation"

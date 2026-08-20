@@ -1,6 +1,6 @@
-import { Asterisk, CalendarDays, Mail, Pencil, Save, ShieldCheck, UserRound, X } from "lucide-react";
+import { Asterisk, CalendarDays, KeyRound, Mail, Pencil, Save, ShieldCheck, UserRound, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { updateAdminProfile } from "../../services/adminAuthService";
+import { changeAdminPassword, updateAdminProfile } from "../../services/adminAuthService";
 import type { Admin } from "../../types/admin";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./adminProfilePage.css";
@@ -19,6 +19,10 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
     const initials = `${profile.firstName[0] ?? ""}${profile.lastName[0] ?? ""}`.toUpperCase();
 
     const cancelEditing = () => {
@@ -59,6 +63,26 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
         }
     };
 
+    const handlePasswordChange = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault(); setError(null); setSuccess(null);
+        if (!currentPassword || newPassword.length < 8 || newPassword !== confirmPassword) {
+            setError(!currentPassword ? "Current password is required." :
+                newPassword.length < 8 ? "New password must contain at least 8 characters." :
+                    "New passwords do not match.");
+            return;
+        }
+        setIsChangingPassword(true);
+        try {
+            const response = await changeAdminPassword({ currentPassword, newPassword, confirmPassword });
+            setCurrentPassword(""); setNewPassword(""); setConfirmPassword(""); setSuccess(response.message);
+        } catch (requestError) {
+            setError(getApiErrorMessage(requestError, "Unable to change your password."));
+        }
+        finally {
+            setIsChangingPassword(false);
+        }
+    };
+
     return (
         <div className="admin-profile-page">
             <header className="admin-profile-heading">
@@ -74,6 +98,7 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
             </header>
 
             {success && <p className="admin-profile-message is-success" role="status">{success}</p>}
+            {error && <p className="admin-profile-message is-error" role="alert">{error}</p>}
 
             <section className="admin-profile-card" aria-labelledby="profile-name">
                 <div className="admin-profile-card_summary">
@@ -115,8 +140,6 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
                                 onChange={(event) => setEmail(event.target.value)}
                                 autoComplete="email" />
                         </label>
-                        {error &&
-                            <p className="admin-profile-message is-error" role="alert">{error}</p>}
                         <footer>
                             <button type="button" className="is-secondary" onClick={cancelEditing} disabled={isSaving}>
                                 <X />
@@ -161,6 +184,15 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
                         </div>
                     </dl>
                 )}
+            </section>
+            <section className="admin-profile-card admin-password-change" aria-labelledby="change-password-title">
+                <div className="admin-password-change-heading"><KeyRound /><div><h2 id="change-password-title">Change password</h2><p>Confirm your current password before choosing a new one.</p></div></div>
+                <form onSubmit={(event) => void handlePasswordChange(event)}>
+                    <label><span>Current password</span><input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" /></label>
+                    <label><span>New password</span><input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" /></label>
+                    <label><span>Confirm new password</span><input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" /></label>
+                    <button type="submit" disabled={isChangingPassword}><KeyRound />{isChangingPassword ? "Changing..." : "Change password"}</button>
+                </form>
             </section>
         </div>
     );

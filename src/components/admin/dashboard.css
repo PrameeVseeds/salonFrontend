@@ -20,81 +20,6 @@
   background: linear-gradient(175deg, #25122f, #32153d 58%, #211029);
 }
 
-.dashboard-sidebar-collapse {
-  position: absolute;
-  z-index: 3;
-  top: 84px;
-  right: -13px;
-  width: 27px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid #d9cce0;
-  border-radius: 7px;
-  color: #8f3bc6;
-  background: #fff;
-  box-shadow: 0 5px 14px #2b123526;
-  cursor: pointer;
-}
-
-.dashboard-sidebar-collapse svg {
-  width: 16px;
-  height: 16px;
-}
-
-.dashboard-layout
-.is-sidebar-collapsed {
-  grid-template-columns: 82px minmax(0, 1fr);
-}
-
-.dashboard-layout
-.is-sidebar-collapsed .dashboard-sidebar {
-  padding-inline: 12px;
-}
-
-.dashboard-layout.is-sidebar-collapsed .dashboard-brand {
-  justify-content: center;
-  padding-inline: 0;
-}
-
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-brand div,
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-sidebar nav a span,
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-sidebar nav button span,
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-sidebar_user div,
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-nav-label {
-  display: none;
-}
-
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-sidebar nav a,
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-sidebar nav button {
-  width: 46px;
-  justify-content: center;
-  gap: 0;
-  padding: 0;
-  font-size: 0;
-}
-
-.dashboard-layout
-.is-sidebar-collapsed 
-.dashboard-sidebar_user {
-  grid-template-columns: 1fr;
-  justify-items: center;
-}
 
 .dashboard-brand {
   display: flex;
@@ -747,10 +672,6 @@
 }
 
 @media (max-width: 1050px) {
-  .dashboard-sidebar-collapse {
-    display: none;
-  }
-
   .dashboard-layout {
     grid-template-columns: 82px minmax(0, 1fr);
   }
@@ -933,7 +854,9 @@
     margin: 0 0 0 8px;
     padding: 0;
     border: 0;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .dashboard-sidebar_user button {
@@ -943,7 +866,27 @@
   }
 
   .dashboard-sidebar_user .dashboard-sidebar_profile {
-    display: none;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+  }
+
+  .dashboard-sidebar_user .dashboard-sidebar_profile:hover {
+    background: transparent;
+  }
+
+  .dashboard-sidebar_user .dashboard-sidebar_profile .dashboard-avatar {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    font-size: .68rem;
   }
 
   .dashboard-topbar {

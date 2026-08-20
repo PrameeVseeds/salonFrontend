@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormField from "../../components/form/FormField";
-import {EyeIcon,EyeOffIcon,LockIcon,SignInIcon,UserIcon} from "../../components/icons/AuthIcons";
+import { EyeIcon, EyeOffIcon, LockIcon, SignInIcon, UserIcon } from "../../components/icons/AuthIcons";
 import { loginAdmin } from "../../services/adminAuthService";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./adminLoginPage.css";
@@ -97,6 +97,9 @@ const AdminLoginPage = () => {
                         />
                         <span>Remember me</span>
                     </label>
+                    <Link className="admin-forgot-link" to="/admin/forgot-password">
+                        Forgot password?
+                    </Link>
 
                     {message && (
                         <p
