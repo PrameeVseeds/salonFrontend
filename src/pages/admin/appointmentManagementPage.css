@@ -468,3 +468,102 @@
         grid-column: auto;
     }
 }
+
+@media (max-width: 700px) {
+    .appointment-table-wrap {
+        overflow: visible;
+    }
+
+    .appointment-card table,
+    .appointment-card tbody,
+    .appointment-card tr,
+    .appointment-card td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .appointment-card thead {
+        display: none;
+    }
+
+    .appointment-card tbody {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f6fa;
+    }
+
+    .appointment-card tbody tr {
+        overflow: hidden;
+        border: 1px solid #e6e0ea;
+        border-radius: 11px;
+        background: #fff;
+    }
+
+    .appointment-card tbody td {
+        min-height: 42px;
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-bottom: 1px solid #f0ebf2;
+        white-space: normal;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .appointment-card tbody td:last-child {
+        border-bottom: 0;
+    }
+
+    .appointment-card tbody td::before {
+        content: attr(data-label);
+        color: #8c8292;
+        font-size: .62rem;
+        font-weight: 800;
+        text-align: left;
+        text-transform: uppercase;
+    }
+
+    .appointment-card td>strong,
+    .appointment-card td>small {
+        grid-column: 2;
+    }
+
+    .appointment-card td>small {
+        margin-top: -6px;
+    }
+
+    .appointment-actions {
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .appointment-empty {
+        min-height: 110px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 24px 12px !important;
+        border: 0 !important;
+        text-align: center !important;
+        white-space: normal !important;
+    }
+
+    .appointment-empty::before {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .appointment-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-card tbody td {
+        grid-template-columns: 78px minmax(0, 1fr);
+    }
+}

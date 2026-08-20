@@ -164,19 +164,19 @@ const AppointmentManagementPage = () => {
             <tbody>
               {appointments.map((appointment) => (
                 <tr key={appointment.id}>
-                  <td><strong>{appointment.appointmentDate}</strong><small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small></td>
-                  <td>
+                  <td data-label="Date & time"><strong>{appointment.appointmentDate}</strong><small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small></td>
+                  <td data-label="Customer">
                     <strong>{appointment.customerName ?? `Customer #${appointment.customerId}`}</strong><small>{appointment.customerPhone ?? appointment.customerEmail}</small>
                   </td>
-                  <td>
+                  <td data-label="Service">
                     <strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
                     <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small>
                   </td>
-                  <td>{appointment.employeeName ?? (appointment.employeeId ? `Employee #${appointment.employeeId}` : "Unassigned")}</td>
-                  <td>{Number(appointment.totalAmount).toFixed(2)}</td>
-                  <td>
+                  <td data-label="Employee">{appointment.employeeName ?? (appointment.employeeId ? `Employee #${appointment.employeeId}` : "Unassigned")}</td>
+                  <td data-label="Amount">{Number(appointment.totalAmount).toFixed(2)}</td>
+                  <td data-label="Status">
                     <span className={`appointment-status is-${appointment.status.toLowerCase().replace(" ", "-")}`}>{appointment.status}</span></td>
-                  <td>
+                  <td data-label="Actions">
                     <div className="appointment-actions">
                       <button className="is-view" title="View details" onClick={() => setSelected(appointment)}><Eye /></button>
                       {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button disabled={busyId === appointment.id} onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> : <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
