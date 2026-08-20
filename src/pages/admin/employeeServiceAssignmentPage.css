@@ -148,17 +148,17 @@
   border-color: #cba5dd;
   box-shadow: 0 0 0 2px #9a40c912;
 }
-.assignment-service-card__image {
+.assignment-service-card_image {
   position: relative;
   height: 105px;
   background: #f2edf4;
 }
-.assignment-service-card__image img {
+.assignment-service-card_image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.assignment-service-card__image > span {
+.assignment-service-card_image > span {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -172,10 +172,10 @@
   font-size: 0.58rem;
   font-weight: 750;
 }
-.assignment-service-card__image span svg {
+.assignment-service-card_image span svg {
   width: 11px;
 }
-.assignment-service-card__body {
+.assignment-service-card_body {
   padding: 13px;
 }
 .assignment-service-card h3 {
@@ -183,7 +183,7 @@
   color: #302738;
   font-size: 0.82rem;
 }
-.assignment-service-card__body > p {
+.assignment-service-card_body > p {
   height: 34px;
   margin: 5px 0 10px;
   overflow: hidden;
@@ -191,7 +191,7 @@
   font-size: 0.64rem;
   line-height: 1.4;
 }
-.assignment-service-card__meta {
+.assignment-service-card_meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -199,15 +199,15 @@
   color: #8d8293;
   font-size: 0.61rem;
 }
-.assignment-service-card__meta span {
+.assignment-service-card_meta span {
   display: flex;
   align-items: center;
   gap: 4px;
 }
-.assignment-service-card__meta svg {
+.assignment-service-card_meta svg {
   width: 12px;
 }
-.assignment-service-card__meta strong {
+.assignment-service-card_meta strong {
   color: #4d4055;
 }
 .assignment-service-card button {
@@ -262,14 +262,14 @@
     display: grid;
     grid-template-columns: 105px minmax(0, 1fr);
   }
-  .assignment-service-card__image {
+  .assignment-service-card_image {
     height: 100%;
     min-height: 145px;
   }
-  .assignment-service-card__body > p {
+  .assignment-service-card_body > p {
     height: auto;
   }
-  .assignment-service-card__meta {
+  .assignment-service-card_meta {
     align-items: flex-start;
     flex-direction: column;
     gap: 4px;
@@ -279,7 +279,7 @@
   .assignment-service-card {
     display: block;
   }
-  .assignment-service-card__image {
+  .assignment-service-card_image {
     height: 120px;
     min-height: 0;
   }

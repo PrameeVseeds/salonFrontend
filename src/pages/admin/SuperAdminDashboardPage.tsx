@@ -64,7 +64,7 @@ const SuperAdminDashboardPage = ({ user }: SuperAdminDashboardPageProps) => {
         </div>
         <div className="dashboard-card-grid dashboard-card-grid--three">
           <article className="dashboard-card">
-            <span className="dashboard-card__icon">
+            <span className="dashboard-card_icon">
               <UserRoundCog aria-hidden="true" />
             </span>
             <h3>Admin accounts</h3>
@@ -72,7 +72,7 @@ const SuperAdminDashboardPage = ({ user }: SuperAdminDashboardPageProps) => {
             <small>Account management</small>
           </article>
           <article className="dashboard-card">
-            <span className="dashboard-card__icon">
+            <span className="dashboard-card_icon">
               <Settings2 aria-hidden="true" />
             </span>
             <h3>Salon settings</h3>
@@ -80,7 +80,7 @@ const SuperAdminDashboardPage = ({ user }: SuperAdminDashboardPageProps) => {
             <small>System configuration</small>
           </article>
           <article className="dashboard-card">
-            <span className="dashboard-card__icon">
+            <span className="dashboard-card_icon">
               <ShieldCheck aria-hidden="true" />
             </span>
             <h3>Full operations</h3>

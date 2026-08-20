@@ -76,7 +76,7 @@ const AdminProfilePage = ({ user }: AdminProfilePageProps) => {
             {success && <p className="admin-profile-message is-success" role="status">{success}</p>}
 
             <section className="admin-profile-card" aria-labelledby="profile-name">
-                <div className="admin-profile-card__summary">
+                <div className="admin-profile-card_summary">
                     <span className="admin-profile-avatar">{initials}</span>
                     <div>
                         <h2 id="profile-name">{profile.firstName} {profile.lastName}</h2>

@@ -1,20 +1,20 @@
-.service-page__heading {
+.service-page_heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
   margin-bottom: 22px;
 }
-.service-page__heading h1 {
+.service-page_heading h1 {
   margin: 4px 0;
   color: #211b2d;
   font-size: 2rem;
 }
-.service-page__heading > div > p:last-child {
+.service-page_heading > div > p:last-child {
   color: #847b8b;
   font-size: 0.8rem;
 }
-.service-page__heading > button {
+.service-page_heading > button {
   height: 44px;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
   font-size: 0.75rem;
   font-weight: 750;
 }
-.service-page__heading button svg {
+.service-page_heading button svg {
   width: 17px;
 }
 .service-panel {
@@ -90,64 +90,64 @@
   object-fit: cover;
   background: #f3edf6;
 }
-.service-card__body {
+.service-card_body {
   padding: 15px;
 }
-.service-card__body > span {
+.service-card_body > span {
   padding: 4px 7px;
   border-radius: 999px;
   font-size: 0.58rem;
   font-weight: 700;
 }
-.service-card__body > .is-active {
+.service-card_body > .is-active {
   color: #277048;
   background: #eaf8ef;
 }
-.service-card__body > .is-inactive {
+.service-card_body > .is-inactive {
   color: #9c3a48;
   background: #fcecef;
 }
-.service-card__body h3 {
+.service-card_body h3 {
   margin: 10px 0 5px;
   color: #292231;
   font-size: 0.9rem;
 }
-.service-card__body > p {
+.service-card_body > p {
   height: 42px;
   overflow: hidden;
   color: #817887;
   font-size: 0.68rem;
   line-height: 1.45;
 }
-.service-card__body dl {
+.service-card_body dl {
   display: grid;
   grid-template-columns: 1fr 1fr;
   margin: 13px 0;
 }
-.service-card__body dt {
+.service-card_body dt {
   display: flex;
   align-items: center;
   gap: 4px;
   color: #978e9d;
   font-size: 0.58rem;
 }
-.service-card__body dt svg {
+.service-card_body dt svg {
   width: 12px;
 }
-.service-card__body dd {
+.service-card_body dd {
   margin: 2px 0 0;
   color: #322939;
   font-size: 0.7rem;
   font-weight: 700;
 }
-.service-card__body footer {
+.service-card_body footer {
   display: flex;
   justify-content: flex-end;
   gap: 6px;
   border-top: 1px solid #f0ecf2;
   padding-top: 11px;
 }
-.service-card__body footer button {
+.service-card_body footer button {
   width: 32px;
   height: 31px;
   display: grid;
@@ -157,10 +157,10 @@
   color: #873dae;
   background: #f7effa;
 }
-.service-card__body footer button svg {
+.service-card_body footer button svg {
   width: 15px;
 }
-.service-card__body footer .is-delete {
+.service-card_body footer .is-delete {
   color: #b22f45;
   background: #fff0f2;
 }
@@ -350,10 +350,10 @@
   }
 }
 @media (max-width: 600px) {
-  .service-page__heading {
+  .service-page_heading {
     display: grid;
   }
-  .service-page__heading > button {
+  .service-page_heading > button {
     justify-self: start;
   }
   .service-panel > header {

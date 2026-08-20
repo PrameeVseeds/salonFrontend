@@ -199,7 +199,7 @@ const ServiceManagementPage = () => {
 
   return (
     <div className="service-page">
-      <header className="service-page__heading">
+      <header className="service-page_heading">
         <div>
           <p className="dashboard-eyebrow">Salon catalogue</p>
           <h1>Services</h1>
@@ -237,7 +237,7 @@ const ServiceManagementPage = () => {
           {visible.map((service) => (
             <article key={service.id}>
               <img src={service.imageUrl} alt="" />
-              <div className="service-card__body">
+              <div className="service-card_body">
                 <span
                   className={service.isActive ? "is-active" : "is-inactive"}
                 >

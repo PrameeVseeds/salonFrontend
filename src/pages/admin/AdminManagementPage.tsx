@@ -244,7 +244,7 @@ const AdminManagementPage = () => {
             {successMessage && <p className="admin-management-notice" role="status"><ShieldCheck aria-hidden="true" />{successMessage}</p>}
 
             <section className="admin-list-panel" aria-labelledby="registered-admins-title">
-                <div className="admin-list-panel__header">
+                <div className="admin-list-panel_header">
                     <div>
                         <h2 id="registered-admins-title">Registered admins</h2>
                         <p>{isLoading ? "Loading accounts..." : `${admins.length} administrator account${admins.length === 1 ? "" : "s"}`}</p>
@@ -281,13 +281,13 @@ const AdminManagementPage = () => {
                                     <th>Administrator</th>
                                     <th>Status</th>
                                     <th>Registered</th>
-                                    <th className="admin-table__actions-heading">Actions</th>
+                                    <th className="admin-table_actions-heading">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>{filteredAdmins.map((admin) => (
                                 <tr key={admin.id}>
                                     <td>
-                                        <div className="admin-table__identity">
+                                        <div className="admin-table_identity">
                                             <div>
                                                 <strong>{admin.firstName} {admin.lastName}</strong>
                                                 <small>{admin.email}</small>
@@ -305,7 +305,7 @@ const AdminManagementPage = () => {
                                         </time>
                                     </td>
                                     <td>
-                                        <div className="admin-table__actions">
+                                        <div className="admin-table_actions">
                                             <button type="button" className="is-edit" onClick={() =>
                                                 openEditModal(admin)} aria-label={`Edit ${admin.firstName} ${admin.lastName}`} title="Edit admin">
                                                 <Pencil />
@@ -332,7 +332,7 @@ const AdminManagementPage = () => {
 
             {isModalOpen && (
                 <div className="admin-modal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
-                    <section className="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="register-admin-title">
+                    <section className="admin-modal_dialog" role="dialog" aria-modal="true" aria-labelledby="register-admin-title">
                         <header>
                             <div>
                                 <h2 id="register-admin-title">{editingAdmin ? "Edit administrator" : "Register new admin"}</h2>
@@ -457,7 +457,7 @@ const AdminManagementPage = () => {
                     <section className="admin-delete-dialog"
                         role="alertdialog" aria-modal="true"
                         aria-labelledby="delete-admin-title" aria-describedby="delete-admin-description">
-                        <span className="admin-delete-dialog__icon"><Trash2 aria-hidden="true" /></span>
+                        <span className="admin-delete-dialog_icon"><Trash2 aria-hidden="true" /></span>
                         <h2 id="delete-admin-title">Delete administrator?</h2>
                         <p id="delete-admin-description">
                             <strong>{deleteTarget.firstName} {deleteTarget.lastName}</strong>

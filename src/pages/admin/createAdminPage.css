@@ -53,19 +53,19 @@
     box-shadow: 0 10px 30px #3b214a0b;
 }
 
-.create-admin-panel__header {
+.create-admin-panel_header {
     padding: 23px 26px;
     border-bottom: 1px solid #eee9f1;
 }
 
-.create-admin-panel__header h2 {
+.create-admin-panel_header h2 {
     margin: 0 0 5px;
     color: #211b2d;
     font-size: 1.1rem;
     font-weight: 750;
 }
 
-.create-admin-panel__header p {
+.create-admin-panel_header p {
     color: #89818f;
     font-size: .78rem;
 }
@@ -153,7 +153,7 @@
     height: 18px;
 }
 
-.create-admin-form__wide,
+.create-admin-form_wide,
 .create-admin-message,
 .create-admin-actions {
     grid-column: 1/-1;
@@ -232,7 +232,7 @@
         height: 48px
     }
 
-    .create-admin-panel__header {
+    .create-admin-panel_header {
         padding: 20px
     }
 
@@ -242,7 +242,7 @@
         padding: 20px
     }
 
-    .create-admin-form__wide,
+    .create-admin-form_wide,
     .create-admin-message,
     .create-admin-actions {
         grid-column: auto

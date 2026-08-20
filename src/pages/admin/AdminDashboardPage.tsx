@@ -52,7 +52,7 @@ const AdminDashboardPage = ({ user }: AdminDashboardPageProps) => (
       <div className="dashboard-card-grid">
         {workspaces.map(({ icon: Icon, title, description }) => (
           <article className="dashboard-card" key={title}>
-            <span className="dashboard-card__icon">
+            <span className="dashboard-card_icon">
               <Icon aria-hidden="true" />
             </span>
             <h3>{title}</h3>

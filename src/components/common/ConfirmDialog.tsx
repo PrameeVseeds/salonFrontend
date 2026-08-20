@@ -37,7 +37,7 @@ const ConfirmDialog = ({open, title, message, confirmLabel = "Confirm", busy = f
         aria-describedby="confirm-dialog-message"
       >
         <button
-          className="confirm-dialog__close"
+          className="confirm-dialog_close"
           type="button"
           onClick={onCancel}
           disabled={busy}
@@ -45,7 +45,7 @@ const ConfirmDialog = ({open, title, message, confirmLabel = "Confirm", busy = f
         >
           <X />
         </button>
-        <span className="confirm-dialog__icon">
+        <span className="confirm-dialog_icon">
           <AlertTriangle />
         </span>
         <h2 id="confirm-dialog-title">{title}</h2>

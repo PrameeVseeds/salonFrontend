@@ -77,7 +77,7 @@ const CreateAdminPage = () => {
             </header>
 
             <section className="create-admin-panel" aria-labelledby="admin-details-title">
-                <div className="create-admin-panel__header">
+                <div className="create-admin-panel_header">
                     <h2 id="admin-details-title">Account details</h2>
                     <p>All fields are required. The new account will be active immediately.</p>
                 </div>
@@ -99,7 +99,7 @@ const CreateAdminPage = () => {
                                 autoComplete="family-name" placeholder="Enter last name" required />
                         </div>
                     </label>
-                    <label className="create-admin-form__wide">
+                    <label className="create-admin-form_wide">
                         <span>Email address</span>
                         <div>
                             <Mail aria-hidden="true" />

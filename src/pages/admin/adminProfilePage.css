@@ -27,7 +27,7 @@
     box-shadow: 0 12px 34px #3b214a0d
 }
 
-.admin-profile-card__summary {
+.admin-profile-card_summary {
     display: flex;
     align-items: center;
     gap: 18px;
@@ -50,13 +50,13 @@
     box-shadow: 0 10px 24px #913bbd30
 }
 
-.admin-profile-card__summary h2 {
+.admin-profile-card_summary h2 {
     margin: 0 0 3px;
     color: #251f2d;
     font-size: 1.25rem
 }
 
-.admin-profile-card__summary p {
+.admin-profile-card_summary p {
     margin-bottom: 9px;
     color: #837a89;
     font-size: .78rem
@@ -127,7 +127,7 @@
 }
 
 @media(max-width:600px) {
-    .admin-profile-card__summary {
+    .admin-profile-card_summary {
         padding: 22px
     }
 

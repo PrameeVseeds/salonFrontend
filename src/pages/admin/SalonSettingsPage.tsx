@@ -162,7 +162,7 @@ const SalonSettingsPage = () => {
           className="settings-card settings-form"
           onSubmit={(e) => void save(e)}
         >
-          <div className="settings-card__title">
+          <div className="settings-card_title">
             <Building2 />
             <div>
               <h2>Business details</h2>
@@ -289,14 +289,14 @@ const SalonSettingsPage = () => {
           </button>
         </form>
         <section className="settings-card settings-logo">
-          <div className="settings-card__title">
+          <div className="settings-card_title">
             <Upload />
             <div>
               <h2>Salon logo</h2>
               <p>JPG, PNG, WEBP, or SVG up to 5 MB.</p>
             </div>
           </div>
-          <div className="settings-logo__preview">
+          <div className="settings-logo_preview">
             {settings?.logoUrl ? (
               <img src={settings.logoUrl} alt="Current salon logo" />
             ) : (

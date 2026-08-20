@@ -12,7 +12,7 @@ interface EmployeeServiceCardProps {
 const EmployeeServiceCard = ({ service, assigned, busy, onAssign, onRemove }: EmployeeServiceCardProps) => (
   <article
     className={`assignment-service-card${assigned ? " is-assigned" : ""}`}>
-    <div className="assignment-service-card__image">
+    <div className="assignment-service-card_image">
       <img src={service.imageUrl} alt="" />
       {assigned && (
         <span>
@@ -21,10 +21,10 @@ const EmployeeServiceCard = ({ service, assigned, busy, onAssign, onRemove }: Em
         </span>
       )}
     </div>
-    <div className="assignment-service-card__body">
+    <div className="assignment-service-card_body">
       <h3>{service.name}</h3>
       <p>{service.description}</p>
-      <div className="assignment-service-card__meta">
+      <div className="assignment-service-card_meta">
         <span>
           <Clock3 />
           {service.durationMinutes} min
