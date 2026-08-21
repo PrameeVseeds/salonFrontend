@@ -4,6 +4,8 @@ import { superAdminRoutes } from "./superAdminRoutes";
 import CustomerLoginPage from "../pages/customer/CustomerLoginPage";
 import CustomerRegisterPage from "../pages/customer/CustomerRegisterPage";
 import CustomerForgotPasswordPage from "../pages/customer/CustomerForgotPasswordPage";
+import CustomerDashboardPage from "../pages/customer/CustomerDashboardPage";
+import ProtectedCustomer from "../components/customer/ProtectedCustomer";
 
 export const appRoutes = createBrowserRouter([
   ...adminRoutes,
@@ -11,4 +13,5 @@ export const appRoutes = createBrowserRouter([
   { path: "/", element: <CustomerLoginPage /> },
   { path: "/register", element: <CustomerRegisterPage /> },
   { path: "/forgot-password", element: <CustomerForgotPasswordPage /> },
+  { path: "/dashboard", element: <ProtectedCustomer><CustomerDashboardPage /></ProtectedCustomer> },
 ]);

@@ -1,4 +1,5 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
+import { customerAxiosClient } from "../api/customerAxiosClient";
 import type { ApiResponse } from "../types/api";
 import type {
   AppointmentListResponseData,
@@ -7,6 +8,9 @@ import type {
 } from "../types/appointment";
 
 const ENDPOINT = "/appointments";
+
+export const getCustomerAppointments = async (): Promise<ApiResponse<AppointmentListResponseData>> =>
+  (await customerAxiosClient.get<ApiResponse<AppointmentListResponseData>>(ENDPOINT)).data;
 
 export const getAppointments = async (filters: AppointmentFilters = {}): Promise<ApiResponse<AppointmentListResponseData>> =>
   (

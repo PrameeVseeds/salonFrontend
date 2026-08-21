@@ -19,7 +19,7 @@ const CustomerLoginPage = () => {
     setError(null);
     try {
       await loginCustomer({ email: email.trim(), password });
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
 
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Unable to sign in."));
