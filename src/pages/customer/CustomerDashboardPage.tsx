@@ -294,6 +294,7 @@ const CustomerDashboardPage = () => {
               <p>Our work</p>
               <h2>Style gallery</h2>
             </div>
+            <Link className="customer-section-link" to="/gallery">See all <ChevronRight /></Link>
           </header>
           {loading ? (
             <div className="customer-dashboard_skeleton" />

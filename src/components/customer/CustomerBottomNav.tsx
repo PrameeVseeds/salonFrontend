@@ -27,7 +27,7 @@ const CustomerBottomNav = ({
     </NavLink>
     <NavLink
       className={active === "gallery" ? "is-active" : ""}
-      to="/dashboard#gallery"
+      to="/gallery"
     >
       <Images />
       <span>Gallery</span>
