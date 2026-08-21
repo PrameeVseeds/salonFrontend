@@ -1,0 +1,185 @@
+.support-contact-backdrop {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #21162d70;
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+}
+
+.support-contact-modal {
+  width: min(100%, 600px);
+  overflow: hidden;
+  border: 1px solid #ebe4ee;
+  border-radius: 18px;
+  color: #322b3b;
+  background: #fff;
+  box-shadow: 0 28px 80px #1c102b4d;
+}
+
+.support-contact-modal_header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 13px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #eee8f1;
+}
+
+.support-contact-modal_icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: #963dcc;
+  background: #f2e7fa;
+}
+
+.support-contact-modal_icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.support-contact-modal h2 {
+  margin: 1px 0 4px;
+  font-size: 1.08rem;
+}
+
+.support-contact-modal header p {
+  margin: 0;
+  color: #82798b;
+  font-size: 0.76rem;
+}
+
+.support-contact-modal_header > button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  color: #706778;
+  background: #f6f2f7;
+  cursor: pointer;
+}
+
+.support-contact-modal_header > button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.support-contact-form {
+  display: grid;
+  gap: 17px;
+  padding: 22px 24px 24px;
+}
+
+.support-contact-form_row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.support-contact-form label {
+  display: grid;
+  gap: 7px;
+  color: #3a3242;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.support-contact-form label b {
+  color: #c9365a;
+}
+
+.support-contact-form input,
+.support-contact-form textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #ddd5e2;
+  border-radius: 8px;
+  outline: none;
+  color: #292230;
+  background: #fff;
+  font: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.support-contact-form input:focus,
+.support-contact-form textarea:focus {
+  border-color: #a348d2;
+  box-shadow: 0 0 0 3px #963dcc18;
+}
+
+.support-contact-form_message {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+}
+.support-contact-form_message.is-success {
+  border: 1px solid #c8ead4;
+  color: #267044;
+  background: #eefaf2;
+}
+.support-contact-form_message.is-error {
+  border: 1px solid #f2c8d1;
+  color: #a42e47;
+  background: #fff0f3;
+}
+.support-contact-form footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.support-contact-form footer button {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(100deg, #8f3ed1, #cf42ad);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.support-contact-form footer button svg {
+  width: 16px;
+  height: 16px;
+}
+.support-contact-form footer button.is-secondary {
+  border: 1px solid #ddd5e2;
+  color: #564e5e;
+  background: #fff;
+}
+.support-contact-form footer button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+@media (max-width: 560px) {
+  .support-contact-backdrop {
+    padding: 12px;
+  }
+  .support-contact-form_row {
+    grid-template-columns: 1fr;
+  }
+  .support-contact-modal_header,
+  .support-contact-form {
+    padding-inline: 18px;
+  }
+  .support-contact-form footer button {
+    flex: 1;
+    padding-inline: 10px;
+  }
+}

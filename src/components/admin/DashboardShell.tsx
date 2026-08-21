@@ -33,7 +33,8 @@ interface DashboardShellProps {
 const DashboardShell = ({ user, children }: DashboardShellProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLogoutConfirmationOpen, setIsLogoutConfirmationOpen] = useState(false);
+  const [isLogoutConfirmationOpen, setIsLogoutConfirmationOpen] =
+    useState(false);
   const dashboardPath =
     user.role === "super_admin" ? "/super-admin/dashboard" : "/admin/dashboard";
   const initials =
@@ -82,7 +83,7 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
             Overview
           </NavLink>
           <NavLink
-to="/admin/appointments"
+            to="/admin/appointments"
             title="Appointments"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -105,10 +106,14 @@ to="/admin/appointments"
             <Clock3 aria-hidden="true" />
             Working hours
           </NavLink>
-          <button type="button" disabled title="Customers">
+          <NavLink
+            to="/admin/customers"
+            title="Customers"
+            onClick={() => setIsMenuOpen(false)}
+          >
             <Users aria-hidden="true" />
             Customers
-          </button>
+          </NavLink>
           <NavLink
             to="/admin/employees"
             title="Employees"
