@@ -7,11 +7,11 @@
 }
 .service-page_heading h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 .service-page_heading > div > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 .service-page_heading > button {
@@ -23,7 +23,7 @@
   border: 0;
   border-radius: 9px;
   color: #fff;
-  background: linear-gradient(100deg, #8f3bd0, #cd42ac);
+  background: linear-gradient(100deg, #c4932f, #d2a43e);
   font: inherit;
   font-size: 0.75rem;
   font-weight: 750;
@@ -32,7 +32,7 @@
   width: 17px;
 }
 .service-panel {
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
   overflow: hidden;
@@ -42,7 +42,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 21px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .service-panel h2 {
   margin: 0;
@@ -50,7 +50,7 @@
   font-size: 1rem;
 }
 .service-panel header p {
-  color: #948b9a;
+  color: #928a80;
   font-size: 0.68rem;
 }
 .service-panel header label {
@@ -62,12 +62,12 @@
   position: absolute;
   left: 11px;
   width: 15px;
-  color: #918797;
+  color: #8e867b;
 }
 .service-panel header input {
   height: 38px;
   padding: 0 12px 0 34px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   font: inherit;
   font-size: 0.7rem;
@@ -109,13 +109,13 @@
 }
 .service-card_body h3 {
   margin: 10px 0 5px;
-  color: #292231;
+  color: #292824;
   font-size: 0.9rem;
 }
 .service-card_body > p {
   height: 42px;
   overflow: hidden;
-  color: #817887;
+  color: #817a70;
   font-size: 0.68rem;
   line-height: 1.45;
 }
@@ -128,7 +128,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #978e9d;
+  color: #958d83;
   font-size: 0.58rem;
 }
 .service-card_body dt svg {
@@ -152,10 +152,10 @@
   height: 31px;
   display: grid;
   place-items: center;
-  border: 1px solid #e4d5eb;
+  border: 1px solid #dfd3bd;
   border-radius: 7px;
-  color: #873dae;
-  background: #f7effa;
+  color: #a97820;
+  background: #fcf7e9;
 }
 .service-card_body footer button svg {
   width: 15px;
@@ -193,15 +193,15 @@
   display: flex;
   justify-content: space-between;
   padding: 20px 22px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .service-modal h2 {
   margin: 0;
-  color: #292231;
+  color: #292824;
   font-size: 1.1rem;
 }
 .service-modal header p {
-  color: #918895;
+  color: #8e867c;
   font-size: 0.7rem;
 }
 .service-modal header button {
@@ -222,7 +222,7 @@
 .service-modal label {
   display: grid;
   gap: 6px;
-  color: #332a3a;
+  color: #37342e;
   font-size: 0.7rem;
   font-weight: 700;
 }
@@ -251,7 +251,7 @@
 .service-modal textarea {
   width: 100%;
   padding: 0 12px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   font: inherit;
   font-size: 0.76rem;
@@ -281,7 +281,7 @@
   height: 17px;
 }
 .service-image-field small {
-  color: #918895;
+  color: #8e867c;
   font-size: 0.62rem;
   font-weight: 400;
 }
@@ -291,10 +291,10 @@
   align-items: center;
   gap: 10px;
   padding: 7px 10px;
-  border: 1px dashed #cfaee0;
+  border: 1px dashed #dec47f;
   border-radius: 8px;
-  color: #8f3bd0;
-  background: #fcf8fe;
+  color: #c4932f;
+  background: #fdf9ef;
   cursor: pointer;
   box-sizing: border-box;
   overflow: hidden;
@@ -329,7 +329,7 @@
 .service-modal form > footer button {
   height: 42px;
   padding: 0 15px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   background: #fff;
 }
@@ -339,7 +339,7 @@
   gap: 7px;
   border: 0;
   color: #fff;
-  background: #993ecc;
+  background: #b88624;
 }
 .service-modal form > footer svg {
   width: 15px;

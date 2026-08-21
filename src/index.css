@@ -1,13 +1,22 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
+  --sidebar: #1c1c1a;
+  --primary: #2b2924;
+  --gold: #c5962e;
+  --dark-gold: #9a721d;
+  --background: #f6f4ef;
+  --card: #ffffff;
+  --border: #e5e0d6;
+  --primary-text: #171717;
+  --secondary-text: #78716c;
+
+  --text: var(--secondary-text);
+  --text-h: var(--primary-text);
+  --bg: var(--background);
+  --code-bg: var(--background);
+  --accent: var(--gold);
+  --accent-bg: rgb(197 150 46 / 10%);
+  --accent-border: rgb(197 150 46 / 50%);
+  --social-bg: rgb(246 244 239 / 70%);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
@@ -19,7 +28,7 @@
   letter-spacing: 0.18px;
   color-scheme: light;
   color: var(--text);
-  background: #fff;
+  background: var(--background);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -36,6 +45,7 @@
 
 body {
   margin: 0;
+  background: var(--background);
 }
 
 h1,

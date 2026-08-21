@@ -26,7 +26,7 @@
   align-items: start;
   gap: 13px;
   padding: 22px 24px;
-  border-bottom: 1px solid #eee8f1;
+  border-bottom: 1px solid #ece5d8;
 }
 
 .support-contact-modal_icon {
@@ -35,7 +35,7 @@
   display: grid;
   place-items: center;
   border-radius: 11px;
-  color: #963dcc;
+  color: #b88624;
   background: #f2e7fa;
 }
 
@@ -88,7 +88,7 @@
 .support-contact-form label {
   display: grid;
   gap: 7px;
-  color: #3a3242;
+  color: #3d3932;
   font-size: 0.76rem;
   font-weight: 700;
 }
@@ -101,7 +101,7 @@
 .support-contact-form textarea {
   width: 100%;
   padding: 11px 12px;
-  border: 1px solid #ddd5e2;
+  border: 1px solid #ddd6ca;
   border-radius: 8px;
   outline: none;
   color: #292230;
@@ -113,8 +113,8 @@
 
 .support-contact-form input:focus,
 .support-contact-form textarea:focus {
-  border-color: #a348d2;
-  box-shadow: 0 0 0 3px #963dcc18;
+  border-color: #c4932f;
+  box-shadow: 0 0 0 3px #b8862418;
 }
 
 .support-contact-form_message {
@@ -148,7 +148,7 @@
   border: 0;
   border-radius: 8px;
   color: #fff;
-  background: linear-gradient(100deg, #8f3ed1, #cf42ad);
+  background: linear-gradient(100deg, #c4932f, #d2a43e);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 750;
@@ -159,7 +159,7 @@
   height: 16px;
 }
 .support-contact-form footer button.is-secondary {
-  border: 1px solid #ddd5e2;
+  border: 1px solid #ddd6ca;
   color: #564e5e;
   background: #fff;
 }

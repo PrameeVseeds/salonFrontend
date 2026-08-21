@@ -4,12 +4,12 @@
 
 .customer-page_heading h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 
 .customer-page_heading > div > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 
@@ -25,7 +25,7 @@
   align-items: center;
   gap: 13px;
   padding: 18px;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 13px;
   background: #fff;
 }
@@ -37,8 +37,8 @@
   place-items: center;
   flex: none;
   border-radius: 10px;
-  color: #8f3bd0;
-  background: #f2e8f8;
+  color: #c4932f;
+  background: #fbf4df;
 }
 
 .customer-stats article > span.is-active {
@@ -60,7 +60,7 @@
 }
 
 .customer-stats small {
-  color: #8b828f;
+  color: #898176;
   font-size: 0.66rem;
 }
 
@@ -71,7 +71,7 @@
 
 .customer-panel {
   overflow: hidden;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
 }
@@ -82,7 +82,7 @@
   align-items: center;
   gap: 18px;
   padding: 18px 21px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 
 .customer-panel h2 {
@@ -91,7 +91,7 @@
 }
 
 .customer-panel header p {
-  color: #948b9a;
+  color: #928a80;
   font-size: 0.68rem;
 }
 
@@ -110,13 +110,13 @@
   position: absolute;
   left: 11px;
   width: 15px;
-  color: #918797;
+  color: #8e867b;
 }
 
 .customer-filters input,
 .customer-filters select {
   height: 38px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   background: #fff;
   font: inherit;
@@ -131,7 +131,7 @@
 
 .customer-filters select {
   padding: 0 30px 0 10px;
-  color: #62596a;
+  color: #665f55;
 }
 
 .customer-table-wrap {
@@ -147,19 +147,19 @@
 .customer-panel th,
 .customer-panel td {
   padding: 14px 18px;
-  border-bottom: 1px solid #f0ebf2;
+  border-bottom: 1px solid #eee8dc;
   text-align: left;
 }
 
 .customer-panel th {
-  color: #918797;
-  background: #fbf9fc;
+  color: #8e867b;
+  background: #faf8f3;
   font-size: 0.62rem;
   text-transform: uppercase;
 }
 
 .customer-panel td {
-  color: #655b6c;
+  color: #696157;
   font-size: 0.72rem;
 }
 
@@ -182,8 +182,8 @@
 .customer-person > span {
   display: grid;
   place-items: center;
-  color: #963dc7;
-  background: #f2e8f8;
+  color: #b88624;
+  background: #fbf4df;
   font-weight: 800;
 }
 
@@ -193,13 +193,13 @@
 }
 
 .customer-person strong {
-  color: #2c2433;
+  color: #2d2b26;
   font-size: 0.76rem;
 }
 
 .customer-person small {
   overflow: hidden;
-  color: #968d9b;
+  color: #938c82;
   font-size: 0.63rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -233,10 +233,10 @@
   height: 32px;
   display: grid;
   place-items: center;
-  border: 1px solid #e4d5eb;
+  border: 1px solid #dfd3bd;
   border-radius: 7px;
-  color: #873dae;
-  background: #f7effa;
+  color: #a97820;
+  background: #fcf7e9;
   cursor: pointer;
 }
 
@@ -259,7 +259,7 @@
 .customer-empty {
   margin: 0;
   padding: 32px;
-  color: #918797;
+  color: #8e867b;
   font-size: 0.75rem;
   text-align: center;
 }
@@ -298,17 +298,17 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 20px 22px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 
 .customer-detail-modal h2 {
   margin: 0;
-  color: #292130;
+  color: #292824;
   font-size: 1.08rem;
 }
 
 .customer-detail-modal header p {
-  color: #918895;
+  color: #8e867c;
   font-size: 0.7rem;
 }
 
@@ -347,15 +347,15 @@
 .customer-detail-profile > span {
   display: grid;
   place-items: center;
-  color: #963dc7;
-  background: #f2e8f8;
+  color: #b88624;
+  background: #fbf4df;
   font-weight: 800;
   font-size: 1.15rem;
 }
 
 .customer-detail-profile h3 {
   margin: 0 0 7px;
-  color: #2c2433;
+  color: #2d2b26;
   font-size: 1rem;
 }
 
@@ -372,12 +372,12 @@
   padding: 13px;
   border: 1px solid #ece6ef;
   border-radius: 9px;
-  background: #fcfafc;
+  background: #fbf9f4;
 }
 
 .customer-detail-modal dt {
   margin-bottom: 5px;
-  color: #978e9c;
+  color: #958d83;
   font-size: 0.62rem;
   text-transform: uppercase;
 }
@@ -385,7 +385,7 @@
 .customer-detail-modal dd {
   overflow: hidden;
   margin: 0;
-  color: #433949;
+  color: #464139;
   font-size: 0.73rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -395,7 +395,7 @@
   display: flex;
   justify-content: flex-end;
   padding: 16px 22px;
-  border-top: 1px solid #eee9f1;
+  border-top: 1px solid #ece6da;
 }
 
 .customer-detail-modal footer button {
@@ -406,8 +406,8 @@
   padding: 0 14px;
   border: 1px solid #e1d3e7;
   border-radius: 8px;
-  color: #843ca9;
-  background: #f8f1fb;
+  color: #9b6d18;
+  background: #fcf7e9;
   font: inherit;
   font-size: 0.7rem;
   font-weight: 700;
@@ -472,7 +472,7 @@
   .customer-table-wrap {
     overflow: visible;
     padding: 12px;
-    background: #faf8fb;
+    background: #f8f6f1;
   }
 
   .customer-panel table,
@@ -529,7 +529,7 @@
   .customer-panel td:nth-child(5) {
     grid-column: 1 / -1;
     padding-top: 11px;
-    border-top: 1px solid #f0ebf2;
+    border-top: 1px solid #eee8dc;
   }
 
   .customer-actions {
@@ -553,7 +553,7 @@
   .customer-filters {
     grid-template-columns: 1fr;
   }
-  
+
   .customer-filters select {
     width: 100%;
   }

@@ -7,11 +7,11 @@
 }
 .employee-page_heading h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 .employee-page_heading > div > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 .employee-page_heading > button {
@@ -23,7 +23,7 @@
   border: 0;
   border-radius: 9px;
   color: #fff;
-  background: linear-gradient(100deg, #8f3bd0, #cd42ac);
+  background: linear-gradient(100deg, #c4932f, #d2a43e);
   font: inherit;
   font-size: 0.75rem;
   font-weight: 750;
@@ -33,7 +33,7 @@
 }
 .employee-panel {
   overflow: hidden;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
 }
@@ -42,14 +42,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 21px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .employee-panel h2 {
   margin: 0;
   font-size: 1rem;
 }
 .employee-panel header p {
-  color: #948b9a;
+  color: #928a80;
   font-size: 0.68rem;
 }
 .employee-panel header label {
@@ -61,12 +61,12 @@
   position: absolute;
   left: 11px;
   width: 15px;
-  color: #918797;
+  color: #8e867b;
 }
 .employee-panel header input {
   height: 38px;
   padding: 0 12px 0 34px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   font: inherit;
   font-size: 0.7rem;
@@ -82,17 +82,17 @@
 .employee-panel th,
 .employee-panel td {
   padding: 14px 18px;
-  border-bottom: 1px solid #f0ebf2;
+  border-bottom: 1px solid #eee8dc;
   text-align: left;
 }
 .employee-panel th {
-  color: #918797;
-  background: #fbf9fc;
+  color: #8e867b;
+  background: #faf8f3;
   font-size: 0.62rem;
   text-transform: uppercase;
 }
 .employee-panel td {
-  color: #655b6c;
+  color: #696157;
   font-size: 0.72rem;
 }
 .employee-person {
@@ -110,19 +110,19 @@
 .employee-person > span {
   display: grid;
   place-items: center;
-  color: #963dc7;
-  background: #f2e8f8;
+  color: #b88624;
+  background: #fbf4df;
   font-weight: 800;
 }
 .employee-person > div {
   display: grid;
 }
 .employee-person strong {
-  color: #2c2433;
+  color: #2d2b26;
   font-size: 0.76rem;
 }
 .employee-person small {
-  color: #968d9b;
+  color: #938c82;
   font-size: 0.63rem;
 }
 .employee-panel td > span {
@@ -148,10 +148,10 @@
   height: 31px;
   display: grid;
   place-items: center;
-  border: 1px solid #e4d5eb;
+  border: 1px solid #dfd3bd;
   border-radius: 7px;
-  color: #873dae;
-  background: #f7effa;
+  color: #a97820;
+  background: #fcf7e9;
 }
 .employee-actions svg {
   width: 14px;
@@ -163,7 +163,7 @@
 .employee-empty {
   text-align: center;
   padding: 28px;
-  color: #918797;
+  color: #8e867b;
   font-size: 0.75rem;
 }
 .employee-message {
@@ -196,14 +196,14 @@
   display: flex;
   justify-content: space-between;
   padding: 20px 22px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .employee-modal h2 {
   margin: 0;
   font-size: 1.1rem;
 }
 .employee-modal header p {
-  color: #918895;
+  color: #8e867c;
   font-size: 0.7rem;
 }
 .employee-modal header button {
@@ -224,7 +224,7 @@
 .employee-modal label {
   display: grid;
   gap: 6px;
-  color: #332a3a;
+  color: #37342e;
   font-size: 0.7rem;
   font-weight: 700;
 }
@@ -232,7 +232,7 @@
   height: 45px;
   width: 100%;
   padding: 0 12px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   box-sizing: border-box;
   font: inherit;
@@ -267,7 +267,7 @@
 }
 .employee-photo > span:first-child small,
 .employee-photo > small {
-  color: #918895;
+  color: #8e867c;
   font-weight: 400;
 }
 .employee-photo_picker {
@@ -276,10 +276,10 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border: 1px dashed #cfaee0;
+  border: 1px dashed #dec47f;
   border-radius: 9px;
-  color: #8f3bd0;
-  background: #fcf8fe;
+  color: #c4932f;
+  background: #fdf9ef;
   cursor: pointer;
 }
 .employee-photo_picker img {
@@ -313,14 +313,14 @@
 .employee-modal footer button {
   height: 42px;
   padding: 0 15px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   background: #fff;
 }
 .employee-modal footer .is-primary {
   border: 0;
   color: #fff;
-  background: #993ecc;
+  background: #b88624;
 }
 @media (max-width: 1000px) {
   .employee-panel table {
@@ -361,7 +361,7 @@
   .employee-table-wrap {
     overflow: visible;
     padding: 12px;
-    background: #faf8fb;
+    background: #f8f6f1;
   }
   .employee-panel table,
   .employee-panel tbody {
@@ -404,7 +404,7 @@
   .employee-panel td:nth-child(2)::before {
     content: "Phone";
     color: #9a909f;
-    font-size: .6rem;
+    font-size: 0.6rem;
     font-weight: 700;
     text-transform: uppercase;
   }
@@ -414,7 +414,7 @@
   .employee-panel td:nth-child(5) {
     grid-column: 1/-1;
     padding-top: 11px;
-    border-top: 1px solid #f0ebf2;
+    border-top: 1px solid #eee8dc;
   }
   .employee-person,
   .employee-person > div {

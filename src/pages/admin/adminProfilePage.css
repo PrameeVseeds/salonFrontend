@@ -17,7 +17,7 @@
   height: 38px;
   padding: 9px;
   border-radius: 10px;
-  color: #943ec3;
+  color: #b88624;
   background: #f3e9f9;
   box-sizing: border-box;
 }
@@ -26,12 +26,12 @@
   margin: 0;
 }
 .admin-password-change-heading h2 {
-  color: #292231;
+  color: #292824;
   font-size: 1rem;
 }
 .admin-password-change-heading p {
   margin-top: 3px;
-  color: #8d8393;
+  color: #8b8277;
   font-size: 0.7rem;
 }
 .admin-password-change form {
@@ -51,7 +51,7 @@
   width: 100%;
   height: 40px;
   padding: 0 10px;
-  border: 1px solid #ddd5e2;
+  border: 1px solid #ddd6ca;
   border-radius: 8px;
   box-sizing: border-box;
 }
@@ -64,7 +64,7 @@
   border: 0;
   border-radius: 8px;
   color: #fff;
-  background: #943ec3;
+  background: #b88624;
   font: inherit;
   font-size: 0.7rem;
   font-weight: 700;
@@ -87,19 +87,19 @@
 
 .admin-profile-heading h1 {
   margin: 4px 0 6px;
-  color: #211b2d;
+  color: #24231f;
   font-size: clamp(1.7rem, 3vw, 2.2rem);
   line-height: 1.15;
 }
 
 .admin-profile-heading > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.82rem;
 }
 
 .admin-profile-card {
   overflow: hidden;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 12px 34px #3b214a0d;
@@ -110,8 +110,8 @@
   align-items: center;
   gap: 18px;
   padding: 28px;
-  border-bottom: 1px solid #eee9f1;
-  background: linear-gradient(115deg, #faf6fc, #fff);
+  border-bottom: 1px solid #ece6da;
+  background: linear-gradient(115deg, #fdf9ef, #fff);
 }
 
 .admin-profile-avatar {
@@ -122,10 +122,10 @@
   flex: none;
   border-radius: 18px;
   color: #fff;
-  background: linear-gradient(145deg, #8d3dcc, #ce42ad);
+  background: linear-gradient(145deg, #a97820, #d2a43e);
   font-size: 1rem;
   font-weight: 800;
-  box-shadow: 0 10px 24px #913bbd30;
+  box-shadow: 0 10px 24px #9b6d1830;
 }
 
 .admin-profile-card_summary h2 {
@@ -136,7 +136,7 @@
 
 .admin-profile-card_summary p {
   margin-bottom: 9px;
-  color: #837a89;
+  color: #837c72;
   font-size: 0.78rem;
 }
 
@@ -185,7 +185,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 7px;
-  color: #918896;
+  color: #8e867c;
   font-size: 0.68rem;
   font-weight: 700;
 }
@@ -193,7 +193,7 @@
 .admin-profile-details dt svg {
   width: 16px;
   height: 16px;
-  color: #9b43ca;
+  color: #b88624;
 }
 
 .admin-profile-details dd {
@@ -237,7 +237,7 @@
 .admin-password-change-heading {
   margin-bottom: 22px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 
 .admin-password-change form {
@@ -258,15 +258,15 @@
   height: 46px;
   padding: 0 13px;
   outline: 0;
-  color: #211b2d;
+  color: #24231f;
   background: #fff;
   font: inherit;
   font-size: 0.8rem;
 }
 
 .admin-password-change input:focus {
-  border-color: #9b42cd;
-  box-shadow: 0 0 0 4px #9940cb12;
+  border-color: #b88624;
+  box-shadow: 0 0 0 4px #b8862412;
 }
 
 .admin-password-change button {
@@ -276,7 +276,7 @@
   justify-content: center;
   justify-self: end;
   padding-inline: 18px;
-  background: linear-gradient(100deg, #8f3bd0, #cd42ac);
+  background: linear-gradient(100deg, #c4932f, #d2a43e);
   cursor: pointer;
 }
 

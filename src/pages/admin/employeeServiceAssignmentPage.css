@@ -3,11 +3,11 @@
 }
 .assignment-page > header h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 .assignment-page > header > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 .assignment-controls {
@@ -17,14 +17,14 @@
   gap: 16px;
   margin-bottom: 16px;
   padding: 18px;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 14px;
   background: #fff;
 }
 .assignment-controls label {
   display: grid;
   gap: 6px;
-  color: #332a3a;
+  color: #37342e;
   font-size: 0.7rem;
   font-weight: 700;
 }
@@ -43,7 +43,7 @@
   width: 100%;
   height: 42px;
   padding: 0 12px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   box-sizing: border-box;
   background: #fff;
@@ -67,7 +67,7 @@
   bottom: 11px;
   left: 11px;
   width: 16px;
-  color: #918797;
+  color: #8e867b;
 }
 .assignment-search input {
   padding-left: 35px;
@@ -102,7 +102,7 @@
   height: 44px;
   padding: 12px;
   border-radius: 13px;
-  color: #963dc8;
+  color: #b88624;
   background: #f3e9f9;
 }
 .assignment-empty h2 {
@@ -114,21 +114,21 @@
   font-size: 0.72rem;
 }
 .assignment-content {
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
   overflow: hidden;
 }
 .assignment-content > header {
   padding: 18px 20px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .assignment-content h2 {
   margin: 0;
   font-size: 1rem;
 }
 .assignment-content header p {
-  color: #938a99;
+  color: #90887e;
   font-size: 0.67rem;
 }
 .assignment-grid {
@@ -136,7 +136,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 15px;
   padding: 18px;
-  background: #faf8fb;
+  background: #f8f6f1;
 }
 .assignment-service-card {
   overflow: hidden;
@@ -146,7 +146,7 @@
 }
 .assignment-service-card.is-assigned {
   border-color: #cba5dd;
-  box-shadow: 0 0 0 2px #9a40c912;
+  box-shadow: 0 0 0 2px #b8862412;
 }
 .assignment-service-card_image {
   position: relative;
@@ -187,7 +187,7 @@
   height: 34px;
   margin: 5px 0 10px;
   overflow: hidden;
-  color: #857b8b;
+  color: #837a70;
   font-size: 0.64rem;
   line-height: 1.4;
 }
@@ -196,7 +196,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 11px;
-  color: #8d8293;
+  color: #8a8176;
   font-size: 0.61rem;
 }
 .assignment-service-card_meta span {
@@ -220,7 +220,7 @@
   border: 0;
   border-radius: 8px;
   color: #fff;
-  background: #963dc8;
+  background: #b88624;
   font: inherit;
   font-size: 0.65rem;
   font-weight: 700;
@@ -239,7 +239,7 @@
 .assignment-no-results {
   padding: 30px;
   text-align: center;
-  color: #918797;
+  color: #8e867b;
   font-size: 0.72rem;
 }
 @media (max-width: 1000px) {

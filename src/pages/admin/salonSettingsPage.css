@@ -3,11 +3,11 @@
 }
 .salon-settings-page > header h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 .salon-settings-page > header > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 .settings-layout {
@@ -17,7 +17,7 @@
 }
 .settings-card {
   padding: 22px;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
   box-shadow: 0 10px 30px #3b214a0b;
@@ -28,24 +28,24 @@
   gap: 10px;
   grid-column: 1/-1;
   padding-bottom: 15px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .settings-card_title > svg {
   width: 38px;
   height: 38px;
   padding: 9px;
   border-radius: 10px;
-  color: #943ec3;
+  color: #b88624;
   background: #f3e9f9;
   box-sizing: border-box;
 }
 .settings-card_title h2 {
   margin: 0;
-  color: #292231;
+  color: #292824;
   font-size: 1rem;
 }
 .settings-card_title p {
-  color: #938a99;
+  color: #90887e;
   font-size: 0.67rem;
 }
 .settings-form {
@@ -56,7 +56,7 @@
 .settings-form label {
   display: grid;
   gap: 6px;
-  color: #332a3a;
+  color: #37342e;
   font-size: 0.7rem;
   font-weight: 700;
 }
@@ -82,7 +82,7 @@
   font-weight: 500;
 }
 .settings-field-hint {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.66rem;
   font-weight: 500;
   line-height: 1.45;
@@ -91,7 +91,7 @@
 .settings-form textarea {
   width: 100%;
   padding: 0 11px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   font: inherit;
   font-size: 0.75rem;
@@ -108,8 +108,8 @@
 .settings-form input:focus,
 .settings-form textarea:focus {
   outline: 0;
-  border-color: #9a40c9;
-  box-shadow: 0 0 0 3px #9940cb12;
+  border-color: #b88624;
+  box-shadow: 0 0 0 3px #b8862412;
 }
 .settings-form .is-wide {
   grid-column: 1/-1;
@@ -123,7 +123,7 @@
 .settings-toggle input {
   width: 17px;
   height: 17px;
-  accent-color: #973dc8;
+  accent-color: #b88624;
 }
 .settings-primary {
   height: 43px;
@@ -134,7 +134,7 @@
   border: 0;
   border-radius: 8px;
   color: #fff;
-  background: linear-gradient(100deg, #8f3bd0, #cd42ac);
+  background: linear-gradient(100deg, #c4932f, #d2a43e);
   font: inherit;
   font-size: 0.74rem;
   font-weight: 750;
@@ -176,7 +176,7 @@
 }
 .settings-logo_preview > svg {
   width: 45px;
-  color: #b18abe;
+  color: #c9b57e;
 }
 .settings-logo > label {
   height: 65px;
@@ -184,7 +184,7 @@
   place-items: center;
   border: 1px dashed #cdbbd5;
   border-radius: 9px;
-  color: #84778c;
+  color: #81766a;
   background: #fcf9fd;
   font-size: 0.7rem;
   cursor: pointer;
