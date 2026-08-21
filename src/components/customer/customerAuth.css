@@ -163,6 +163,64 @@
   gap: 17px;
 }
 
+.customer-register-photo {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.customer-register-photo > div {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--customer-accent) 55%, #fff);
+  border-radius: 50%;
+  color: var(--customer-accent);
+  background: #f0ede6;
+  box-shadow: 0 0 0 5px #fff;
+}
+
+.customer-register-photo > div img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.customer-register-photo > div svg { width: 28px; }
+
+.customer-register-photo > label {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: var(--customer-primary);
+  background: #fff;
+  cursor: pointer;
+}
+
+.customer-register-photo > label svg {
+  width: 15px;
+  color: var(--customer-accent);
+}
+
+.customer-register-photo > label input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.customer-register-photo > small {
+  color: #8c857c;
+  font-size: 0.58rem;
+}
+
 .customer-auth_form label {
   display: grid;
   gap: 7px;

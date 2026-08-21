@@ -1,13 +1,16 @@
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CustomerAuthShell from "../../components/customer/CustomerAuthShell";
-import { loginCustomer } from "../../services/customerAuthService";
+import { loginCustomer, updateCustomerProfileImage } from "../../services/customerAuthService";
 import { getApiErrorMessage } from "../../utils/apiError";
 
 const CustomerLoginPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const registrationState = typeof location.state === "object" && location.state !== null ? location.state as 
+  { email?: unknown; pendingProfileImage?: unknown } : null;
+  const [email, setEmail] = useState(typeof registrationState?.email === "string" ? registrationState.email : "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -19,6 +22,9 @@ const CustomerLoginPage = () => {
     setError(null);
     try {
       await loginCustomer({ email: email.trim(), password });
+      if (registrationState?.pendingProfileImage instanceof File) {
+        await updateCustomerProfileImage(registrationState.pendingProfileImage).catch(() => undefined);
+      }
       navigate("/dashboard", { replace: true });
 
     } catch (requestError) {

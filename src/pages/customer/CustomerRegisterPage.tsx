@@ -1,5 +1,5 @@
-import { Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { Camera, Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CustomerAuthShell from "../../components/customer/CustomerAuthShell";
 import { registerCustomer } from "../../services/customerAuthService";
@@ -10,14 +10,34 @@ const CustomerRegisterPage = () => {
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", password: "", confirmPassword: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const update = (name: keyof typeof form, value: string) => setForm((current) => ({ ...current, [name]: value }));
+  useEffect(() => () => { if (profilePreview) URL.revokeObjectURL(profilePreview); }, [profilePreview]);
+  const selectProfileImage = (file: File | null) => {
+    if (profilePreview) 
+      URL.revokeObjectURL(profilePreview);
+
+    if (!file) { 
+      setProfileImage(null); 
+      setProfilePreview(null); 
+      return; 
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      setError("Choose a JPG, PNG, or WEBP image up to 5 MB."); return;
+    }
+    setProfileImage(file); 
+    setProfilePreview(URL.createObjectURL(file)); 
+    setError(null);
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setError(null);
     if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match."); return;
+      setError("Passwords do not match."); 
+      return;
     }
 
     setBusy(true);
@@ -29,7 +49,7 @@ const CustomerRegisterPage = () => {
         phone: form.phone.trim(),
         email: form.email.trim()
       });
-      navigate("/", { replace: true });
+      navigate("/", { replace: true, state: { email: form.email.trim(), pendingProfileImage: profileImage } });
     }
     catch (requestError) {
       setError(getApiErrorMessage(
@@ -46,6 +66,11 @@ const CustomerRegisterPage = () => {
     title="Create your account"
     description="A few details and you’ll be ready to book your next visit.">
     <form className="customer-auth_form" onSubmit={(event) => void submit(event)}>
+      <div className="customer-register-photo">
+        <div>{profilePreview ? <img src={profilePreview} alt="Selected profile preview" /> : <UserRound />}</div>
+        <label><Camera /><span>{profileImage ? "Change profile photo" : "Add profile photo"}</span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => selectProfileImage(event.target.files?.[0] ?? null)} /></label>
+        <small>Optional · JPG, PNG or WEBP · Max 5 MB</small>
+      </div>
       <div className="customer-auth_grid">
         <label>
           <span>First name</span>
