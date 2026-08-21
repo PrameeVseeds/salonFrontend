@@ -29,7 +29,7 @@
   gap: 10px;
 }
 
-.customer-dashboard_brand>span {
+.customer-dashboard_brand > span {
   width: 38px;
   height: 38px;
   display: grid;
@@ -63,7 +63,7 @@
   gap: 8px;
 }
 
-.customer-dashboard_header-actions>button {
+.customer-dashboard_header-actions > button {
   width: 40px;
   height: 40px;
   display: grid;
@@ -74,7 +74,7 @@
   background: #fff;
 }
 
-.customer-dashboard_header-actions>button svg {
+.customer-dashboard_header-actions > button svg {
   width: 18px;
 }
 
@@ -127,7 +127,7 @@
   width: 14px;
 }
 
-.customer-profile-popover>span {
+.customer-profile-popover > span {
   width: 48px;
   height: 48px;
   display: grid;
@@ -139,17 +139,17 @@
   background: #f0ede6;
 }
 
-.customer-profile-popover>span img {
+.customer-profile-popover > span img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.customer-profile-popover>span svg {
+.customer-profile-popover > span svg {
   width: 21px;
 }
 
-.customer-profile-popover>div {
+.customer-profile-popover > div {
   min-width: 0;
   display: grid;
   gap: 3px;
@@ -208,8 +208,17 @@
   border-radius: 20px;
   color: #fff;
   background:
-    radial-gradient(circle at 92% 105%, color-mix(in srgb, var(--customer-accent) 22%, transparent) 0, transparent 42%),
-    linear-gradient(118deg, color-mix(in srgb, var(--customer-secondary) 28%, #171717) 0%, #1c1c1a 58%, color-mix(in srgb, var(--customer-accent) 20%, #24221d) 100%);
+    radial-gradient(
+      circle at 92% 105%,
+      color-mix(in srgb, var(--customer-accent) 22%, transparent) 0,
+      transparent 42%
+    ),
+    linear-gradient(
+      118deg,
+      color-mix(in srgb, var(--customer-secondary) 28%, #171717) 0%,
+      #1c1c1a 58%,
+      color-mix(in srgb, var(--customer-accent) 20%, #24221d) 100%
+    );
   box-shadow: 0 18px 38px rgb(43 41 36 / 15%);
 }
 
@@ -237,7 +246,7 @@
   border: 1px solid color-mix(in srgb, var(--customer-accent) 24%, transparent);
 }
 
-.customer-dashboard_welcome>* {
+.customer-dashboard_welcome > * {
   position: relative;
   z-index: 1;
 }
@@ -261,7 +270,7 @@
   overflow-wrap: anywhere;
 }
 
-.customer-dashboard_welcome>span {
+.customer-dashboard_welcome > span {
   color: rgb(255 255 255 / 68%);
   font-size: 0.76rem;
 }
@@ -282,7 +291,9 @@
   font-weight: 780;
   box-shadow: 0 8px 20px rgb(0 0 0 / 14%);
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .customer-dashboard_welcome button:hover {
@@ -300,14 +311,14 @@
   scroll-margin-top: 84px;
 }
 
-.customer-dashboard_section>header {
+.customer-dashboard_section > header {
   display: flex;
   align-items: end;
   justify-content: space-between;
   margin-bottom: 14px;
 }
 
-.customer-dashboard_section>header p {
+.customer-dashboard_section > header p {
   color: var(--customer-accent);
   font-size: 0.6rem;
   font-weight: 800;
@@ -315,14 +326,14 @@
   text-transform: uppercase;
 }
 
-.customer-dashboard_section>header h2 {
+.customer-dashboard_section > header h2 {
   margin: 3px 0 0;
   color: var(--customer-primary);
   font-size: 1.15rem;
   font-weight: 730;
 }
 
-.customer-dashboard_section>header>span {
+.customer-dashboard_section > header > span {
   min-width: 27px;
   height: 27px;
   display: grid;
@@ -332,6 +343,19 @@
   background: #eee7d8;
   font-size: 0.65rem;
   font-weight: 800;
+}
+
+.customer-section-link {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--customer-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.customer-section-link svg {
+  width: 14px;
 }
 
 .customer-bookings {
@@ -373,13 +397,13 @@
   text-transform: uppercase;
 }
 
-.customer-bookings article>div {
+.customer-bookings article > div {
   min-width: 0;
   display: grid;
   gap: 5px;
 }
 
-.customer-bookings article>div strong {
+.customer-bookings article > div strong {
   overflow: hidden;
   color: var(--customer-primary);
   font-size: 0.76rem;
@@ -387,7 +411,7 @@
   white-space: nowrap;
 }
 
-.customer-bookings article>div span {
+.customer-bookings article > div span {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -398,13 +422,13 @@
   white-space: nowrap;
 }
 
-.customer-bookings article>div svg {
+.customer-bookings article > div svg {
   width: 13px;
   flex: none;
   color: var(--customer-accent);
 }
 
-.customer-bookings article>svg {
+.customer-bookings article > svg {
   width: 17px;
   color: #b5aea4;
 }
@@ -450,7 +474,7 @@
   width: 28px;
 }
 
-.customer-services article>div:last-child {
+.customer-services article > div:last-child {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 5px;
@@ -563,7 +587,7 @@
   scroll-margin-top: 84px;
 }
 
-.customer-dashboard_profile>span {
+.customer-dashboard_profile > span {
   width: 44px;
   height: 44px;
   display: grid;
@@ -627,7 +651,7 @@
   box-sizing: border-box;
 }
 
-.customer-bottom-nav button {
+.customer-bottom-nav a {
   display: grid;
   place-content: center;
   justify-items: center;
@@ -637,14 +661,15 @@
   background: transparent;
   font: inherit;
   font-size: 0.55rem;
+  text-decoration: none;
 }
 
-.customer-bottom-nav button svg {
+.customer-bottom-nav a svg {
   width: 20px;
   height: 20px;
 }
 
-.customer-bottom-nav button.is-active {
+.customer-bottom-nav a.is-active {
   color: var(--customer-accent);
   font-weight: 800;
 }

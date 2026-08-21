@@ -2,7 +2,6 @@ import {
   CalendarDays,
   ChevronRight,
   Clock3,
-  Home,
   Images,
   LogOut,
   Scissors,
@@ -11,9 +10,10 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
+import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import { getCustomerAppointments } from "../../services/appointmentService";
 import {
@@ -65,6 +65,11 @@ const CustomerDashboardPage = () => {
         );
       setLoading(false);
     });
+  }, []);
+
+  useEffect(() => {
+    if (!window.location.hash) return;
+    requestAnimationFrame(() => document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ behavior: "smooth" }));
   }, []);
 
   const upcoming = useMemo(
@@ -246,11 +251,12 @@ const CustomerDashboardPage = () => {
 
         <section className="customer-dashboard_section" id="services">
           <header>
-            <div>
-              <p>Made for you</p>
-              <h2>Popular services</h2>
-            </div>
-          </header>
+          <div>
+            <p>Made for you</p>
+            <h2>Popular services</h2>
+          </div>
+          <Link className="customer-section-link" to="/services">See all <ChevronRight /></Link>
+        </header>
           {loading ? (
             <div className="customer-dashboard_skeleton" />
           ) : (
@@ -310,28 +316,7 @@ const CustomerDashboardPage = () => {
         </section>
       </div>
 
-      <nav className="customer-bottom-nav" aria-label="Customer navigation">
-        <button
-          className="is-active"
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
-          <Home />
-          <span>Home</span>
-        </button>
-        <button type="button" onClick={() => scrollTo("appointments")}>
-          <CalendarDays />
-          <span>Bookings</span>
-        </button>
-        <button type="button" onClick={() => scrollTo("services")}>
-          <Sparkles />
-          <span>Services</span>
-        </button>
-        <button type="button" onClick={() => scrollTo("gallery")}>
-          <Images />
-          <span>Gallery</span>
-        </button>
-      </nav>
+      <CustomerBottomNav active="home" />
       <ConfirmDialog
         open={logoutConfirmationOpen}
         title="Sign out?"
