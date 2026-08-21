@@ -56,7 +56,14 @@
   font-size: 0.82rem;
 }
 
-.customer-dashboard_header>button {
+.customer-dashboard_header-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.customer-dashboard_header-actions>button {
   width: 40px;
   height: 40px;
   display: grid;
@@ -67,8 +74,120 @@
   background: #fff;
 }
 
-.customer-dashboard_header>button svg {
+.customer-dashboard_header-actions>button svg {
   width: 18px;
+}
+
+.customer-dashboard_header-actions .customer-profile-trigger {
+  overflow: hidden;
+  border-radius: 50%;
+  color: var(--customer-accent);
+  background: #f0ede6;
+}
+
+.customer-profile-trigger img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.customer-profile-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: min(280px, calc(100vw - 36px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #e5e0d6;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgb(43 41 36 / 18%);
+  box-sizing: border-box;
+}
+
+.customer-profile-popover_close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  color: #78716c;
+  background: #f0ede6;
+  cursor: pointer;
+}
+
+.customer-profile-popover_close svg {
+  width: 14px;
+}
+
+.customer-profile-popover>span {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+  color: var(--customer-accent);
+  background: #f0ede6;
+}
+
+.customer-profile-popover>span img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.customer-profile-popover>span svg {
+  width: 21px;
+}
+
+.customer-profile-popover>div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.customer-profile-popover strong {
+  overflow: hidden;
+  color: var(--customer-primary);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer-profile-popover small {
+  overflow: hidden;
+  color: #78716c;
+  font-size: 0.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer-profile-popover footer {
+  display: flex;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.customer-profile-popover footer button {
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid #e5e0d6;
+  border-radius: 7px;
+  color: var(--customer-primary);
+  background: #f8f6f1;
+  font: inherit;
+  font-size: 0.56rem;
+  font-weight: 750;
+  cursor: pointer;
 }
 
 .customer-dashboard_content {
@@ -79,23 +198,48 @@
 .customer-dashboard_welcome {
   position: relative;
   overflow: hidden;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   margin: 20px 0 28px;
-  padding: 27px 24px;
+  padding: 30px 26px;
   border-radius: 20px;
   color: #fff;
-  background: linear-gradient(125deg, var(--customer-secondary), var(--customer-primary) 65%, color-mix(in srgb, var(--customer-primary) 62%, var(--customer-accent)));
+  background:
+    radial-gradient(circle at 92% 105%, color-mix(in srgb, var(--customer-accent) 22%, transparent) 0, transparent 42%),
+    linear-gradient(118deg, color-mix(in srgb, var(--customer-secondary) 28%, #171717) 0%, #1c1c1a 58%, color-mix(in srgb, var(--customer-accent) 20%, #24221d) 100%);
   box-shadow: 0 18px 38px rgb(43 41 36 / 15%);
 }
 
+.customer-dashboard_welcome::before,
 .customer-dashboard_welcome::after {
   content: "";
   position: absolute;
-  width: 150px;
-  height: 150px;
-  right: -55px;
-  bottom: -72px;
-  border: 28px solid rgb(255 255 255 / 6%);
   border-radius: 50%;
+  pointer-events: none;
+}
+
+.customer-dashboard_welcome::before {
+  width: 185px;
+  height: 185px;
+  right: -69px;
+  bottom: -92px;
+  border: 26px solid rgb(255 255 255 / 5%);
+}
+
+.customer-dashboard_welcome::after {
+  width: 84px;
+  height: 84px;
+  right: -18px;
+  bottom: -30px;
+  border: 1px solid color-mix(in srgb, var(--customer-accent) 24%, transparent);
+}
+
+.customer-dashboard_welcome>* {
+  position: relative;
+  z-index: 1;
 }
 
 .customer-dashboard_welcome p {
@@ -107,11 +251,14 @@
 }
 
 .customer-dashboard_welcome h1 {
-  margin: 5px 0;
+  max-width: calc(100% - 58px);
+  margin: 6px 0 4px;
   color: #fff;
   font-size: clamp(1.65rem, 5vw, 2.5rem);
   font-weight: 680;
+  line-height: 1.08;
   letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 
 .customer-dashboard_welcome>span {
@@ -120,8 +267,6 @@
 }
 
 .customer-dashboard_welcome button {
-  position: relative;
-  z-index: 1;
   min-height: 44px;
   display: flex;
   align-items: center;
@@ -135,6 +280,14 @@
   font: inherit;
   font-size: 0.7rem;
   font-weight: 780;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 14%);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.customer-dashboard_welcome button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 24px rgb(0 0 0 / 20%);
 }
 
 .customer-dashboard_welcome button svg {
@@ -321,6 +474,53 @@
 .customer-services article b {
   color: var(--customer-accent);
   font-size: 0.68rem;
+}
+
+.customer-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer-gallery-grid figure {
+  position: relative;
+  overflow: hidden;
+  min-height: 145px;
+  margin: 0;
+  border-radius: 13px;
+  background: #ebe7df;
+}
+
+.customer-gallery-grid figure:first-child {
+  grid-row: span 2;
+}
+
+.customer-gallery-grid img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 220ms ease;
+}
+
+.customer-gallery-grid figure:hover img {
+  transform: scale(1.035);
+}
+
+.customer-gallery-grid figcaption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  padding: 24px 10px 9px;
+  color: #fff;
+  background: linear-gradient(transparent, rgb(23 23 23 / 78%));
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .customer-dashboard_empty {

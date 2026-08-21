@@ -1,4 +1,5 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
+import { axiosClient } from "../api/axiosClient";
 import type { ApiMessageResponse, ApiResponse } from "../types/api";
 import type {
   GalleryImageResponseData,
@@ -6,6 +7,8 @@ import type {
   GalleryMetadataInput,
 } from "../types/gallery";
 const ENDPOINT = "/gallery";
+export const getPublicGalleryImages = async (): Promise<ApiResponse<GalleryImagesResponseData>> =>
+  (await axiosClient.get<ApiResponse<GalleryImagesResponseData>>(ENDPOINT)).data;
 const galleryForm = (input: GalleryMetadataInput, image?: File) => {
   const form = new FormData();
   form.append("title", input.title);

@@ -12,7 +12,7 @@ const ProtectedCustomer = ({ children }: { children: ReactNode }) => {
     getCustomerProfile().then(() => setState("ready")).catch(() => { logoutCustomer(); setState("guest"); });
   }, []);
   if (state === "guest")
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
 
   if (state === "loading")
     return <main className="customer-dashboard-loading">
