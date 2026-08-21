@@ -1,18 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
-import PublicLayout from "../layouts/publicLayout";
 import { adminRoutes } from "./adminRoutes";
 import { superAdminRoutes } from "./superAdminRoutes";
+import CustomerLoginPage from "../pages/customer/CustomerLoginPage";
+import CustomerRegisterPage from "../pages/customer/CustomerRegisterPage";
+import CustomerForgotPasswordPage from "../pages/customer/CustomerForgotPasswordPage";
 
 export const appRoutes = createBrowserRouter([
   ...adminRoutes,
   ...superAdminRoutes,
-  {
-    element: <PublicLayout />,
-    children: [
-      {
-        index: true,
-        element: <h2>Home Page</h2>,
-      },
-    ],
-  },
+  { path: "/", element: <CustomerLoginPage /> },
+  { path: "/register", element: <CustomerRegisterPage /> },
+  { path: "/forgot-password", element: <CustomerForgotPasswordPage /> },
 ]);
