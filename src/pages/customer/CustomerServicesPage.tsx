@@ -143,6 +143,10 @@ const CustomerServicesPage = () => {
                     </span>
                     <strong>{Number(service.price).toFixed(2)}</strong>
                   </footer>
+                  <button className="customer-service-book" 
+                  type="button" onClick={() => navigate(`/appointments?service=${service.id}`)}>
+                    Book appointment
+                    </button>
                 </div>
               </article>
             ))}

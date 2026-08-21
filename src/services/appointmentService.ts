@@ -5,12 +5,26 @@ import type {
   AppointmentListResponseData,
   AppointmentResponseData,
   AppointmentFilters,
+  CreateCustomerAppointmentInput,
 } from "../types/appointment";
 
 const ENDPOINT = "/appointments";
 
 export const getCustomerAppointments = async (): Promise<ApiResponse<AppointmentListResponseData>> =>
   (await customerAxiosClient.get<ApiResponse<AppointmentListResponseData>>(ENDPOINT)).data;
+
+export const createCustomerAppointment = async (input: CreateCustomerAppointmentInput): Promise<ApiResponse<AppointmentResponseData>> =>
+  (await customerAxiosClient.post<ApiResponse<AppointmentResponseData>>(ENDPOINT, input)).data;
+
+export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
+  (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/${id}/cancel`, { reason })).data;
+
+export const getAvailableAppointmentSlots = async (serviceId: number, employeeId: number, date: string): Promise<string[]> => {
+  const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[] }>>(`${ENDPOINT}/available-slots`, {
+    params: { serviceId, employeeId, date },
+  });
+  return response.data.data.availableSlots ?? response.data.data.slots ?? [];
+};
 
 export const getAppointments = async (filters: AppointmentFilters = {}): Promise<ApiResponse<AppointmentListResponseData>> =>
   (

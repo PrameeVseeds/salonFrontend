@@ -1,0 +1,446 @@
+.customer-appointments-page {
+    --customer-primary: #2b2924;
+    --customer-accent: #c5962e;
+    min-height: 100svh;
+    padding-bottom: 88px;
+    background: #f6f4ef;
+}
+
+.customer-appointments-content {
+    width: min(100% - 36px, 900px);
+    margin: 0 auto;
+    padding: 28px 0 45px;
+}
+
+.customer-appointments-heading p {
+    color: var(--customer-accent);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.customer-appointments-heading h1 {
+    margin: 4px 0 5px;
+    color: var(--customer-primary);
+    font-size: 1.75rem;
+    letter-spacing: -0.04em;
+}
+
+.customer-appointments-heading span {
+    color: #78716c;
+    font-size: 0.72rem;
+}
+
+.customer-booking-form {
+    display: grid;
+    gap: 14px;
+    margin: 22px 0 30px;
+    padding: 18px;
+    border: 1px solid #e5e0d6;
+    border-radius: 15px;
+    background: #fff;
+}
+
+.customer-booking-form>header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 13px;
+    border-bottom: 1px solid #eeeae2;
+}
+
+.customer-booking-form>header>svg {
+    width: 35px;
+    height: 35px;
+    padding: 8px;
+    border-radius: 9px;
+    color: var(--customer-accent);
+    background: #f0ede6;
+    box-sizing: border-box;
+}
+
+.customer-booking-form h2 {
+    margin: 0;
+    color: var(--customer-primary);
+    font-size: 0.82rem;
+}
+
+.customer-booking-form header p {
+    color: #78716c;
+    font-size: 0.6rem;
+}
+
+.customer-booking-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--customer-primary);
+    font-size: 0.63rem;
+    font-weight: 750;
+}
+
+.customer-booking-form input,
+.customer-booking-form select,
+.customer-booking-form textarea {
+    width: 100%;
+    min-height: 43px;
+    padding: 0 11px;
+    border: 1px solid #ddd6c9;
+    border-radius: 8px;
+    outline: 0;
+    background: #fff;
+    font: inherit;
+    font-size: 0.68rem;
+    box-sizing: border-box;
+}
+
+.customer-booking-form textarea {
+    min-height: 72px;
+    padding-block: 10px;
+    resize: vertical;
+}
+
+.customer-booking-form input:focus,
+.customer-booking-form select:focus,
+.customer-booking-form textarea:focus {
+    border-color: var(--customer-accent);
+    box-shadow: 0 0 0 3px rgb(197 150 46 / 12%);
+}
+
+.customer-booking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+}
+
+.customer-booking-form>button {
+    min-height: 43px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--customer-primary);
+    font: inherit;
+    font-size: 0.67rem;
+    font-weight: 780;
+}
+
+.customer-booking-message {
+    padding: 9px 10px;
+    border-radius: 7px;
+    font-size: 0.63rem;
+}
+
+.customer-booking-message.is-error {
+    color: #9c293a;
+    background: #fff1f3;
+}
+
+.customer-booking-message.is-success {
+    color: #24693f;
+    background: #effaf3;
+}
+
+.customer-professional-field {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.customer-professional-field legend {
+    margin-bottom: 7px;
+    color: var(--customer-primary);
+    font-size: 0.63rem;
+    font-weight: 750;
+}
+
+.customer-professional-field legend small {
+    color: #78716c;
+    font-size: inherit;
+    font-weight: 500;
+}
+
+.customer-professional-options {
+    display: flex;
+    gap: 8px;
+    padding: 2px 2px 5px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.customer-professional-options>button {
+    min-width: 126px;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    border: 1px solid #ddd6c9;
+    border-radius: 10px;
+    color: var(--customer-primary);
+    background: #fff;
+    font: inherit;
+}
+
+.customer-professional-options>button.is-selected {
+    border-color: var(--customer-accent);
+    background: #fcf8ed;
+    box-shadow: 0 0 0 2px rgb(197 150 46 / 14%);
+}
+
+.customer-professional-options button>span {
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    color: var(--customer-accent);
+    background: #f0ede6;
+}
+
+.customer-professional-options button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.customer-professional-options button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.customer-professional-options button strong {
+    max-width: 112px;
+    overflow: hidden;
+    font-size: 0.62rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-professional-options button small {
+    color: #78716c;
+    font-size: 0.52rem;
+}
+
+.customer-professional-empty {
+    margin: 0;
+    padding: 12px;
+    border-radius: 8px;
+    color: #78716c;
+    background: #f6f4ef;
+    font-size: 0.62rem;
+    text-align: center;
+}
+
+.customer-time-slots {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.customer-time-slots legend {
+    margin-bottom: 7px;
+    color: var(--customer-primary);
+    font-size: 0.63rem;
+    font-weight: 750;
+}
+
+.customer-time-slots>p {
+    margin: 0;
+    padding: 12px;
+    border-radius: 8px;
+    color: #78716c;
+    background: #f6f4ef;
+    font-size: 0.62rem;
+    text-align: center;
+}
+
+.customer-time-slots>p.is-error {
+    color: #9c293a;
+    background: #fff1f3;
+}
+
+.customer-time-slots>div {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.customer-time-slots button {
+    min-height: 38px;
+    padding: 0 5px;
+    border: 1px solid #ddd6c9;
+    border-radius: 8px;
+    color: var(--customer-primary);
+    background: #fff;
+    font: inherit;
+    font-size: 0.62rem;
+    font-weight: 700;
+}
+
+.customer-time-slots button.is-selected {
+    border-color: var(--customer-accent);
+    color: #fff;
+    background: var(--customer-primary);
+    box-shadow: 0 0 0 2px rgb(197 150 46 / 15%);
+}
+
+.customer-booking-form>button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.customer-appointments-list {
+    margin-bottom: 27px;
+}
+
+.customer-appointments-list>header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 11px;
+}
+
+.customer-appointments-list>header h2 {
+    margin: 0;
+    color: var(--customer-primary);
+    font-size: 1rem;
+}
+
+.customer-appointments-list>header span {
+    min-width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--customer-primary);
+    background: #eee7d8;
+    font-size: 0.6rem;
+    font-weight: 800;
+}
+
+.customer-appointment-card {
+    display: grid;
+    grid-template-columns: 47px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 9px;
+    padding: 13px;
+    border: 1px solid #e5e0d6;
+    border-radius: 13px;
+    background: #fff;
+}
+
+.customer-appointment-card time {
+    height: 47px;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    border-radius: 10px;
+    color: #fff;
+    background: var(--customer-primary);
+}
+
+.customer-appointment-card time strong {
+    line-height: 1;
+    font-size: 0.9rem;
+}
+
+.customer-appointment-card time span {
+    margin-top: 3px;
+    color: var(--customer-accent);
+    font-size: 0.52rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.customer-appointment-card>div {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.customer-appointment-card>div strong {
+    overflow: hidden;
+    color: var(--customer-primary);
+    font-size: 0.7rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-appointment-card>div span,
+.customer-appointment-card>div small {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    color: #78716c;
+    font-size: 0.56rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-appointment-card>div svg {
+    width: 12px;
+    color: var(--customer-accent);
+}
+
+.customer-appointment-card>b {
+    padding: 5px 7px;
+    border-radius: 999px;
+    color: #765018;
+    background: #fff5dc;
+    font-size: 0.52rem;
+}
+
+.customer-appointment-card>b.is-completed {
+    color: #24693f;
+    background: #eaf8ef;
+}
+
+.customer-appointment-card>b.is-cancelled {
+    color: #9c293a;
+    background: #fff1f3;
+}
+
+.customer-appointment-card>button {
+    grid-column: 2 / -1;
+    justify-self: end;
+    padding: 5px 8px;
+    border: 1px solid #efc9cf;
+    border-radius: 6px;
+    color: #a53a4a;
+    background: #fff5f6;
+    font: inherit;
+    font-size: 0.55rem;
+    font-weight: 700;
+}
+
+.customer-appointment-empty {
+    padding: 24px;
+    border: 1px dashed #d9d2c5;
+    border-radius: 13px;
+    color: #78716c;
+    font-size: 0.66rem;
+    text-align: center;
+}
+
+@media (max-width: 430px) {
+    .customer-booking-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-time-slots>div {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .customer-appointment-card {
+        grid-template-columns: 45px minmax(0, 1fr);
+    }
+
+    .customer-appointment-card>b {
+        grid-column: 2;
+        justify-self: start;
+    }
+}

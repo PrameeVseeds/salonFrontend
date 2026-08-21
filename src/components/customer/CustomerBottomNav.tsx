@@ -13,7 +13,7 @@ const CustomerBottomNav = ({
     </NavLink>
     <NavLink
       className={active === "bookings" ? "is-active" : ""}
-      to="/dashboard#appointments"
+      to="/appointments"
     >
       <CalendarDays />
       <span>Bookings</span>

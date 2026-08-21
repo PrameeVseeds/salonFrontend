@@ -8,6 +8,7 @@ import CustomerDashboardPage from "../pages/customer/CustomerDashboardPage";
 import ProtectedCustomer from "../components/customer/ProtectedCustomer";
 import CustomerServicesPage from "../pages/customer/CustomerServicesPage";
 import CustomerGalleryPage from "../pages/customer/CustomerGalleryPage";
+import CustomerAppointmentsPage from "../pages/customer/CustomerAppointmentsPage";
 
 export const appRoutes = createBrowserRouter([
   ...adminRoutes,
@@ -18,4 +19,5 @@ export const appRoutes = createBrowserRouter([
   { path: "/dashboard", element: <ProtectedCustomer><CustomerDashboardPage /></ProtectedCustomer> },
   { path: "/services", element: <ProtectedCustomer><CustomerServicesPage /></ProtectedCustomer> },
   { path: "/gallery", element: <ProtectedCustomer><CustomerGalleryPage /></ProtectedCustomer> },
+  { path: "/appointments", element: <ProtectedCustomer><CustomerAppointmentsPage /></ProtectedCustomer> },
 ]);
