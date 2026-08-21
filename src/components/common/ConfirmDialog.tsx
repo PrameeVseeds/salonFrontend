@@ -7,12 +7,24 @@ interface ConfirmDialogProps {
   title: string;
   message: string;
   confirmLabel?: string;
+  busyLabel?: string;
+  tone?: "danger" | "primary";
   busy?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-const ConfirmDialog = ({open, title, message, confirmLabel = "Confirm", busy = false, onConfirm, onCancel}: ConfirmDialogProps) => {
+const ConfirmDialog = ({
+  open,
+  title,
+  message,
+  confirmLabel = "Confirm",
+  busyLabel = "Working...",
+  tone = "danger",
+  busy = false,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) => {
   useEffect(() => {
     if (!open) return;
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -55,12 +67,12 @@ const ConfirmDialog = ({open, title, message, confirmLabel = "Confirm", busy = f
             Cancel
           </button>
           <button
-            className="is-danger"
+            className={`is-${tone}`}
             type="button"
             onClick={onConfirm}
             disabled={busy}
           >
-            {busy ? "Removing..." : confirmLabel}
+            {busy ? busyLabel : confirmLabel}
           </button>
         </footer>
       </section>

@@ -17,13 +17,13 @@ const AUTH_ENDPOINT = "/auth";
 
 export const loginAdmin = async (
   input: AdminLoginInput,
-  rememberMe = true,
+  rememberMe = false,
 ): Promise<ApiResponse<AdminLoginResult>> => {
   const response = await axiosClient.post<ApiResponse<AdminLoginResult>>(
     `${AUTH_ENDPOINT}/login`,
     input,
   );
-  setAdminToken(response.data.data.token, rememberMe);
+  setAdminToken(response.data.data.token, rememberMe, input.email);
   return response.data;
 };
 
@@ -55,7 +55,9 @@ export const changeAdminPassword = async (
   return response.data;
 };
 
-export const forgotAdminPassword = async (input: ForgotAdminPasswordInput,): Promise<ApiMessageResponse> =>
+export const forgotAdminPassword = async (
+  input: ForgotAdminPasswordInput,
+): Promise<ApiMessageResponse> =>
   (
     await axiosClient.post<ApiMessageResponse>(
       `${AUTH_ENDPOINT}/forgot-password`,
@@ -63,7 +65,9 @@ export const forgotAdminPassword = async (input: ForgotAdminPasswordInput,): Pro
     )
   ).data;
 
-export const resetOwnAdminPassword = async (input: ResetOwnAdminPasswordInput,): Promise<ApiMessageResponse> =>
+export const resetOwnAdminPassword = async (
+  input: ResetOwnAdminPasswordInput,
+): Promise<ApiMessageResponse> =>
   (
     await axiosClient.post<ApiMessageResponse>(
       `${AUTH_ENDPOINT}/reset-password`,

@@ -79,6 +79,11 @@
   color: #fff;
   background: #c83c54;
 }
+.confirm-dialog footer .is-primary {
+  border-color: #8f3bd0;
+  color: #fff;
+  background: #8f3bd0;
+}
 .confirm-dialog button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
@@ -91,6 +96,9 @@
     grid-template-columns: 1fr;
   }
   .confirm-dialog footer .is-danger {
+    grid-row: 1;
+  }
+  .confirm-dialog footer .is-primary {
     grid-row: 1;
   }
 }
