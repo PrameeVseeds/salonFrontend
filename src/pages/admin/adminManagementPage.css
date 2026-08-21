@@ -70,7 +70,7 @@
     box-shadow: 0 10px 30px #3b214a0b
 }
 
-.admin-list-panel__header {
+.admin-list-panel_header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -78,13 +78,13 @@
     border-bottom: 1px solid #eee9f1
 }
 
-.admin-list-panel__header h2 {
+.admin-list-panel_header h2 {
     margin: 0 0 3px;
     color: #211b2d;
     font-size: 1.05rem
 }
 
-.admin-list-panel__header p {
+.admin-list-panel_header p {
     color: #958c9b;
     font-size: .72rem
 }
@@ -118,11 +118,11 @@
     font-weight: 800
 }
 
-.admin-list-item__identity {
+.admin-list-item_identity {
     min-width: 0
 }
 
-.admin-list-item__identity h3 {
+.admin-list-item_identity h3 {
     margin: 0 0 2px;
     overflow: hidden;
     color: #292231;
@@ -131,7 +131,7 @@
     white-space: nowrap
 }
 
-.admin-list-item__identity p {
+.admin-list-item_identity p {
     overflow: hidden;
     color: #8b8292;
     font-size: .7rem;
@@ -208,7 +208,7 @@
     box-sizing: border-box
 }
 
-.admin-modal__dialog {
+.admin-modal_dialog {
     width: min(100%, 680px);
     max-height: calc(100svh - 40px);
     overflow: auto;
@@ -218,7 +218,7 @@
     box-shadow: 0 30px 90px #16091f70
 }
 
-.admin-modal__dialog>header {
+.admin-modal_dialog>header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -227,18 +227,18 @@
     border-bottom: 1px solid #eee9f1
 }
 
-.admin-modal__dialog>header h2 {
+.admin-modal_dialog>header h2 {
     margin: 0 0 4px;
     color: #211b2d;
     font-size: 1.15rem
 }
 
-.admin-modal__dialog>header p {
+.admin-modal_dialog>header p {
     color: #8d8593;
     font-size: .74rem
 }
 
-.admin-modal__dialog>header button {
+.admin-modal_dialog>header button {
     width: 36px;
     height: 36px;
     display: grid;
@@ -251,7 +251,7 @@
     cursor: pointer
 }
 
-.admin-modal__dialog>header button svg {
+.admin-modal_dialog>header button svg {
     width: 18px
 }
 
@@ -437,7 +437,7 @@
         padding: 10px
     }
 
-    .admin-modal__dialog {
+    .admin-modal_dialog {
         max-height: calc(100svh - 20px)
     }
 
@@ -484,19 +484,19 @@
     background: #fcfafd
 }
 
-.admin-table__identity {
+.admin-table_identity {
     min-width: 210px;
     display: flex;
     align-items: center;
     gap: 12px
 }
 
-.admin-table__identity>div {
+.admin-table_identity>div {
     display: grid;
     min-width: 0
 }
 
-.admin-table__identity strong {
+.admin-table_identity strong {
     overflow: hidden;
     color: #292231;
     font-size: .8rem;
@@ -504,7 +504,7 @@
     white-space: nowrap
 }
 
-.admin-table__identity small {
+.admin-table_identity small {
     overflow: hidden;
     color: #8b8292;
     font-size: .68rem;
@@ -517,18 +517,18 @@
     white-space: nowrap
 }
 
-.admin-table__actions-heading {
+.admin-table_actions-heading {
     text-align: right !important
 }
 
-.admin-table__actions {
+.admin-table_actions {
     display: flex;
     justify-content: flex-end;
     gap: 7px;
     min-width: 82px
 }
 
-.admin-table__actions button {
+.admin-table_actions button {
     width: 34px;
     height: 34px;
     display: grid;
@@ -539,34 +539,34 @@
     cursor: pointer
 }
 
-.admin-table__actions button svg {
+.admin-table_actions button svg {
     width: 16px;
     height: 16px
 }
 
-.admin-table__actions .is-edit {
+.admin-table_actions .is-edit {
     color: #823db0;
     border-color: #e4d3ed;
     background: #f5ecfa
 }
 
-.admin-table__actions .is-edit:hover {
+.admin-table_actions .is-edit:hover {
     background: #ead9f3
 }
 
-.admin-table__actions .is-deactivate {
+.admin-table_actions .is-deactivate {
     color: #a53a4a;
     border-color: #f1d3d8;
     background: #fff0f2
 }
 
-.admin-table__actions .is-activate {
+.admin-table_actions .is-activate {
     color: #247043;
     border-color: #cde6d6;
     background: #eff9f2
 }
 
-.admin-table__actions button:disabled {
+.admin-table_actions button:disabled {
     opacity: .5;
     cursor: wait
 }
@@ -615,7 +615,7 @@
         width: 24%
     }
 
-    .admin-table__identity {
+    .admin-table_identity {
         min-width: 0;
         gap: 9px
     }
@@ -626,12 +626,12 @@
         flex: none
     }
 
-    .admin-table__actions {
+    .admin-table_actions {
         min-width: 0;
         gap: 5px
     }
 
-    .admin-table__actions button {
+    .admin-table_actions button {
         width: 32px;
         height: 32px
     }
@@ -654,7 +654,7 @@
         white-space: nowrap
     }
 
-    .admin-list-panel__header {
+    .admin-list-panel_header {
         padding: 17px 18px
     }
 
@@ -721,23 +721,23 @@
         justify-self: end
     }
 
-    .admin-table__identity {
+    .admin-table_identity {
         min-width: 0;
         gap: 10px
     }
 
-    .admin-table__identity>div {
+    .admin-table_identity>div {
         max-width: 100%;
         overflow: hidden
     }
 
-    .admin-table__actions {
+    .admin-table_actions {
         justify-content: flex-end;
         min-width: 0;
         padding-top: 2px
     }
 
-    .admin-table__actions button {
+    .admin-table_actions button {
         width: 36px;
         height: 34px
     }
@@ -766,11 +766,11 @@
         padding-inline: 12px
     }
 
-    .admin-table__identity strong {
+    .admin-table_identity strong {
         font-size: .76rem
     }
 
-    .admin-table__identity small {
+    .admin-table_identity small {
         font-size: .63rem
     }
 
@@ -842,13 +842,13 @@
     box-shadow: 0 0 0 3px #9941ca12
 }
 
-.admin-table__actions .is-delete {
+.admin-table_actions .is-delete {
     color: #b22f45;
     border-color: #f0cbd2;
     background: #fff0f2
 }
 
-.admin-table__actions .is-delete:hover:not(:disabled) {
+.admin-table_actions .is-delete:hover:not(:disabled) {
     background: #fbdde2
 }
 
@@ -862,7 +862,7 @@
     box-sizing: border-box
 }
 
-.admin-delete-dialog__icon {
+.admin-delete-dialog_icon {
     width: 52px;
     height: 52px;
     display: grid;
@@ -873,7 +873,7 @@
     background: #fff0f2
 }
 
-.admin-delete-dialog__icon svg {
+.admin-delete-dialog_icon svg {
     width: 24px
 }
 
@@ -931,7 +931,7 @@
 }
 
 @media(max-width:700px) {
-    .admin-list-panel__header {
+    .admin-list-panel_header {
         display: grid;
         gap: 13px
     }

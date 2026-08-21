@@ -13,11 +13,16 @@ import ThemeSettingsPage from "../pages/admin/ThemeSettingsPage";
 import WorkingHoursPage from "../pages/admin/WorkingHoursPage";
 import GalleryManagementPage from "../pages/admin/GalleryManagementPage";
 import type { AdminRole } from "../types/admin";
+import AdminForgotPasswordPage from "../pages/admin/AdminForgotPasswordPage";
+import AdminResetPasswordPage from "../pages/admin/AdminResetPasswordPage";
+import AppointmentManagementPage from "../pages/admin/AppointmentManagementPage";
 
 const sharedDashboardRoles: AdminRole[] = ["admin", "super_admin"];
 
 export const adminRoutes: RouteObject[] = [
   { path: "/admin/login", element: <AdminLoginPage /> },
+  { path: "/admin/forgot-password", element: <AdminForgotPasswordPage /> },
+  { path: "/admin/reset-password", element: <AdminResetPasswordPage /> },
   {
     path: "/admin/dashboard",
     element: (
@@ -31,6 +36,14 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <ProtectedDashboard allowedRole={sharedDashboardRoles}>
         {(user) => <AdminProfilePage user={user} />}
+      </ProtectedDashboard>
+    ),
+  },
+  {
+    path: "/admin/appointments",
+    element: (
+      <ProtectedDashboard allowedRole={sharedDashboardRoles}>
+        {() => <AppointmentManagementPage />}
       </ProtectedDashboard>
     ),
   },

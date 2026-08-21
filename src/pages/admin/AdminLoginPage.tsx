@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormField from "../../components/form/FormField";
-import {EyeIcon,EyeOffIcon,LockIcon,SignInIcon,UserIcon} from "../../components/icons/AuthIcons";
+import { EyeIcon, EyeOffIcon, LockIcon, SignInIcon, UserIcon } from "../../components/icons/AuthIcons";
 import { loginAdmin } from "../../services/adminAuthService";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./adminLoginPage.css";
@@ -46,11 +46,11 @@ const AdminLoginPage = () => {
     return (
         <main className="admin-login-page">
             <section className="admin-login-card" aria-labelledby="admin-login-title">
-                <div className="admin-login-card__badge">
+                <div className="admin-login-card_badge">
                     <LockIcon />
                 </div>
-                <header className="admin-login-card__header">
-                    <p className="admin-login-card__eyebrow">Salon management</p>
+                <header className="admin-login-card_header">
+                    <p className="admin-login-card_eyebrow">Salon management</p>
                     <h1 id="admin-login-title">Admin Login</h1>
                     <p>Enter your credentials to access the admin panel</p>
                 </header>
@@ -97,6 +97,9 @@ const AdminLoginPage = () => {
                         />
                         <span>Remember me</span>
                     </label>
+                    <Link className="admin-forgot-link" to="/admin/forgot-password">
+                        Forgot password?
+                    </Link>
 
                     {message && (
                         <p
@@ -117,7 +120,7 @@ const AdminLoginPage = () => {
                     </button>
                 </form>
 
-                <p className="admin-login-card__help">
+                <p className="admin-login-card_help">
                     Need help?{" "}
                     <a href="mailto:dithmiprameesha@gmail.com">
                         Contact your system administrator

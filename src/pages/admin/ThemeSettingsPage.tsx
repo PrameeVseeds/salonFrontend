@@ -159,7 +159,7 @@ const ThemeSettingsPage = () => {
       {success && <p className="theme-message is-success">{success}</p>}
       <div className="theme-layout">
         <form className="theme-card" onSubmit={(e) => void save(e)}>
-          <div className="theme-card__title">
+          <div className="theme-card_title">
             <Palette />
             <div>
               <h2>Brand colors</h2>
@@ -197,7 +197,7 @@ const ThemeSettingsPage = () => {
           </button>
         </form>
         <section className="theme-card">
-          <div className="theme-card__title">
+          <div className="theme-card_title">
             <Upload />
             <div>
               <h2>Hero media</h2>

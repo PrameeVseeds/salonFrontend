@@ -1,20 +1,20 @@
-.employee-page__heading {
+.employee-page_heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
   margin-bottom: 22px;
 }
-.employee-page__heading h1 {
+.employee-page_heading h1 {
   margin: 4px 0;
   color: #211b2d;
   font-size: 2rem;
 }
-.employee-page__heading > div > p:last-child {
+.employee-page_heading > div > p:last-child {
   color: #847b8b;
   font-size: 0.8rem;
 }
-.employee-page__heading > button {
+.employee-page_heading > button {
   height: 44px;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
   font-size: 0.75rem;
   font-weight: 750;
 }
-.employee-page__heading svg {
+.employee-page_heading svg {
   width: 17px;
 }
 .employee-panel {
@@ -270,7 +270,7 @@
   color: #918895;
   font-weight: 400;
 }
-.employee-photo__picker {
+.employee-photo_picker {
   height: 70px;
   display: flex;
   align-items: center;
@@ -282,22 +282,22 @@
   background: #fcf8fe;
   cursor: pointer;
 }
-.employee-photo__picker img {
+.employee-photo_picker img {
   width: 52px;
   height: 52px;
   border-radius: 9px;
   object-fit: cover;
 }
-.employee-photo__picker > svg {
+.employee-photo_picker > svg {
   width: 22px;
 }
-.employee-photo__picker > span {
+.employee-photo_picker > span {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.employee-photo__picker input {
+.employee-photo_picker input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -342,10 +342,10 @@
   }
 }
 @media (max-width: 700px) {
-  .employee-page__heading {
+  .employee-page_heading {
     display: grid;
   }
-  .employee-page__heading > button {
+  .employee-page_heading > button {
     width: 100%;
     justify-content: center;
   }

@@ -25,14 +25,14 @@
   background: #fff;
   box-shadow: 0 10px 30px #3b214a0b;
 }
-.theme-card__title {
+.theme-card_title {
   display: flex;
   align-items: center;
   gap: 11px;
   padding-bottom: 16px;
   border-bottom: 1px solid #eee9f1;
 }
-.theme-card__title > svg {
+.theme-card_title > svg {
   width: 38px;
   height: 38px;
   padding: 9px;
@@ -41,12 +41,12 @@
   background: #f3e9f9;
   box-sizing: border-box;
 }
-.theme-card__title h2 {
+.theme-card_title h2 {
   margin: 0;
   color: #292231;
   font-size: 1rem;
 }
-.theme-card__title p {
+.theme-card_title p {
   color: #938a99;
   font-size: 0.68rem;
 }

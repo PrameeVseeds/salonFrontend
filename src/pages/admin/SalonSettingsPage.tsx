@@ -25,12 +25,13 @@ const defaults: UpdateSalonSettingsInput = {
   enableOnlinePayment: false,
   bookingIntervalMinutes: 30,
   appointmentBufferMinutes: 0,
+  appointmentGracePeriodMinutes: 15,
 };
 const getError = (error: unknown) =>
   getApiErrorMessage(error, "Unable to save settings.");
 
-type RequiredSettingField = "salonName" | "phone" | "email" | "address" | "bookingInterval" | "appointmentBuffer";
-const requiredSettingFields: RequiredSettingField[] = ["salonName", "phone", "email", "address", "bookingInterval", "appointmentBuffer"];
+type RequiredSettingField = "salonName" | "phone" | "email" | "address" | "bookingInterval" | "appointmentBuffer" | "appointmentGracePeriod";
+const requiredSettingFields: RequiredSettingField[] = ["salonName", "phone", "email", "address", "bookingInterval", "appointmentBuffer", "appointmentGracePeriod"];
 const RequiredLabel = ({ children }: { children: string }) => (
   <span className="settings-required-label">{children}<Asterisk aria-label="required" /></span>
 );
@@ -44,6 +45,7 @@ const SalonSettingsPage = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [bookingInterval, setBookingInterval] = useState(String(defaults.bookingIntervalMinutes));
   const [appointmentBuffer, setAppointmentBuffer] = useState(String(defaults.appointmentBufferMinutes));
+  const [appointmentGracePeriod, setAppointmentGracePeriod] = useState(String(defaults.appointmentGracePeriodMinutes));
   const [touched, setTouched] = useState<Partial<Record<RequiredSettingField, boolean>>>({});
   const apply = (value: SalonSettings) => {
     setSettings(value);
@@ -59,9 +61,11 @@ const SalonSettingsPage = () => {
       enableOnlinePayment: value.enableOnlinePayment,
       bookingIntervalMinutes: value.bookingIntervalMinutes,
       appointmentBufferMinutes: value.appointmentBufferMinutes,
+      appointmentGracePeriodMinutes: value.appointmentGracePeriodMinutes,
     });
     setBookingInterval(String(value.bookingIntervalMinutes));
     setAppointmentBuffer(String(value.appointmentBufferMinutes));
+    setAppointmentGracePeriod(String(value.appointmentGracePeriodMinutes));
   };
   useEffect(() => {
     getSalonSettings()
@@ -104,6 +108,11 @@ const SalonSettingsPage = () => {
       : !Number.isInteger(Number(appointmentBuffer)) || Number(appointmentBuffer) < 0
         ? "Enter zero or a positive whole number."
         : undefined,
+    appointmentGracePeriod: !appointmentGracePeriod
+      ? "Late arrival grace period is required."
+      : !Number.isInteger(Number(appointmentGracePeriod)) || Number(appointmentGracePeriod) < 0
+        ? "Enter zero or a positive whole number."
+        : undefined,
   };
   const save = async (e: FormEvent) => {
     e.preventDefault();
@@ -121,6 +130,7 @@ const SalonSettingsPage = () => {
         ...form,
         bookingIntervalMinutes: Number(bookingInterval),
         appointmentBufferMinutes: Number(appointmentBuffer),
+        appointmentGracePeriodMinutes: Number(appointmentGracePeriod),
       });
       apply(data.settings);
       setSuccess("Salon settings updated successfully.");
@@ -162,7 +172,7 @@ const SalonSettingsPage = () => {
           className="settings-card settings-form"
           onSubmit={(e) => void save(e)}
         >
-          <div className="settings-card__title">
+          <div className="settings-card_title">
             <Building2 />
             <div>
               <h2>Business details</h2>
@@ -265,6 +275,23 @@ const SalonSettingsPage = () => {
             {touched.appointmentBuffer && fieldErrors.appointmentBuffer &&
               <small className="settings-field-error">{fieldErrors.appointmentBuffer}</small>}
           </label>
+          <label className="is-wide">
+            <RequiredLabel>Late arrival grace period (minutes)</RequiredLabel>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={appointmentGracePeriod}
+              onChange={(e) => setAppointmentGracePeriod(e.target.value)}
+              onBlur={() => touch("appointmentGracePeriod")}
+              aria-invalid={Boolean(touched.appointmentGracePeriod && fieldErrors.appointmentGracePeriod)}
+            />
+            <span className="settings-field-hint">
+              A scheduled appointment is cancelled automatically if it has not started this many minutes after its start time.
+            </span>
+            {touched.appointmentGracePeriod && fieldErrors.appointmentGracePeriod &&
+              <small className="settings-field-error">{fieldErrors.appointmentGracePeriod}</small>}
+          </label>
           <label className="settings-toggle">
             <input
               type="checkbox"
@@ -289,14 +316,14 @@ const SalonSettingsPage = () => {
           </button>
         </form>
         <section className="settings-card settings-logo">
-          <div className="settings-card__title">
+          <div className="settings-card_title">
             <Upload />
             <div>
               <h2>Salon logo</h2>
               <p>JPG, PNG, WEBP, or SVG up to 5 MB.</p>
             </div>
           </div>
-          <div className="settings-logo__preview">
+          <div className="settings-logo_preview">
             {settings?.logoUrl ? (
               <img src={settings.logoUrl} alt="Current salon logo" />
             ) : (

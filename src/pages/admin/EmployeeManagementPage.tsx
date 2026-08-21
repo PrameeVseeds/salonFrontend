@@ -174,7 +174,7 @@ const EmployeeManagementPage = () => {
 
   return (
     <div className="employee-page">
-      <header className="employee-page__heading">
+      <header className="employee-page_heading">
         <div>
           <p className="dashboard-eyebrow">Team management</p>
           <h1>Employees</h1>
@@ -364,7 +364,7 @@ const EmployeeManagementPage = () => {
                 <span>
                   Profile photo <small>Optional</small>
                 </span>
-                <span className="employee-photo__picker">
+                <span className="employee-photo_picker">
                   {preview ? (
                     <img src={preview} alt="Employee preview" />
                   ) : (

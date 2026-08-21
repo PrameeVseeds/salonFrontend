@@ -21,6 +21,8 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutAdmin } from "../../services/adminAuthService";
 import type { Admin } from "../../types/admin";
+import NotificationBell from "./notifications/NotificationBell";
+import ConfirmDialog from "../common/ConfirmDialog";
 import "./dashboard.css";
 
 interface DashboardShellProps {
@@ -31,12 +33,14 @@ interface DashboardShellProps {
 const DashboardShell = ({ user, children }: DashboardShellProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLogoutConfirmationOpen, setIsLogoutConfirmationOpen] = useState(false);
   const dashboardPath =
     user.role === "super_admin" ? "/super-admin/dashboard" : "/admin/dashboard";
   const initials =
     `${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase();
 
   const handleLogout = () => {
+    setIsLogoutConfirmationOpen(false);
     logoutAdmin();
     navigate("/admin/login", { replace: true });
   };
@@ -77,11 +81,14 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
             <LayoutDashboard aria-hidden="true" />
             Overview
           </NavLink>
-          <span className="dashboard-nav-label">Workspace</span>
-          <button type="button" disabled title="Appointments">
+          <NavLink
+to="/admin/appointments"
+            title="Appointments"
+            onClick={() => setIsMenuOpen(false)}
+          >
             <CalendarDays aria-hidden="true" />
             Appointments
-          </button>
+          </NavLink>
           <NavLink
             to="/admin/business-calendar"
             title="Business calendar"
@@ -169,9 +176,9 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
             Theme settings
           </NavLink>
         </nav>
-        <div className="dashboard-sidebar__user">
+        <div className="dashboard-sidebar_user">
           <button
-            className="dashboard-sidebar__profile"
+            className="dashboard-sidebar_profile"
             type="button"
             onClick={() => navigate("/admin/profile")}
             aria-label="View your profile"
@@ -187,7 +194,12 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
               </small>
             </div>
           </button>
-          <button type="button" onClick={handleLogout} aria-label="Sign out">
+          <button
+            type="button"
+            onClick={() => setIsLogoutConfirmationOpen(true)}
+            aria-label="Sign out"
+            title="Sign out"
+          >
             <LogOut aria-hidden="true" />
           </button>
         </div>
@@ -211,22 +223,33 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
                 : "Admin Portal"}
             </strong>
           </div>
-          <button
-            className="dashboard-topbar__identity"
-            type="button"
-            onClick={() => navigate("/admin/profile")}
-            aria-label="View your profile"
-            title="View profile"
-          >
-            <span className="dashboard-avatar">{initials}</span>
-            <div>
-              <strong>{user.firstName}</strong>
-              <small>{user.email}</small>
-            </div>
-          </button>
+          <div className="dashboard-topbar_actions">
+            <NotificationBell />
+            <button
+              className="dashboard-topbar_identity"
+              type="button"
+              onClick={() => navigate("/admin/profile")}
+              aria-label="View your profile"
+              title="View profile"
+            >
+              <span className="dashboard-avatar">{initials}</span>
+              <div>
+                <strong>{user.firstName}</strong>
+                <small>{user.email}</small>
+              </div>
+            </button>
+          </div>
         </header>
         <main className="dashboard-content">{children}</main>
       </div>
+      <ConfirmDialog
+        open={isLogoutConfirmationOpen}
+        title="Sign out?"
+        message="Are you sure you want to sign out of the Salon Management System?"
+        confirmLabel="Sign out"
+        onConfirm={handleLogout}
+        onCancel={() => setIsLogoutConfirmationOpen(false)}
+      />
     </div>
   );
 };

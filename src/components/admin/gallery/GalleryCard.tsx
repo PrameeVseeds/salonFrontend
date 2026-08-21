@@ -9,13 +9,13 @@ interface Props {
 }
 const GalleryCard = ({ image, busy, onEdit, onToggle, onDelete }: Props) => (
   <article className="gallery-card">
-    <div className="gallery-card__image">
+    <div className="gallery-card_image">
       <img src={image.imageUrl} alt={image.title} />
       <span className={image.isActive ? "is-active" : "is-inactive"}>
         {image.isActive ? "Visible" : "Hidden"}
       </span>
     </div>
-    <div className="gallery-card__body">
+    <div className="gallery-card_body">
       <div>
         <h3>{image.title}</h3>
         <p>

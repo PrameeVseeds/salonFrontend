@@ -9,8 +9,8 @@ interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 const FormField = ({ label, icon, endAdornment, id, ...inputProps }: FormFieldProps) => (
     <div className="form-field">
         <label htmlFor={id}>{label}</label>
-        <div className="form-field__control">
-            <span className="form-field__icon" aria-hidden="true">{icon}</span>
+        <div className="form-field_control">
+            <span className="form-field_icon" aria-hidden="true">{icon}</span>
             <input id={id} {...inputProps} />
             {endAdornment}
         </div>

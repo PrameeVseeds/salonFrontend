@@ -18,7 +18,7 @@
   box-shadow: 0 24px 70px #160a2040;
   text-align: center;
 }
-.confirm-dialog__close {
+.confirm-dialog_close {
   position: absolute;
   top: 14px;
   right: 14px;
@@ -31,10 +31,10 @@
   color: #786d7e;
   background: #f5f1f6;
 }
-.confirm-dialog__close svg {
+.confirm-dialog_close svg {
   width: 16px;
 }
-.confirm-dialog__icon {
+.confirm-dialog_icon {
   width: 52px;
   height: 52px;
   display: grid;
@@ -44,7 +44,7 @@
   color: #bc3048;
   background: #fff0f2;
 }
-.confirm-dialog__icon svg {
+.confirm-dialog_icon svg {
   width: 23px;
 }
 .confirm-dialog h2 {
