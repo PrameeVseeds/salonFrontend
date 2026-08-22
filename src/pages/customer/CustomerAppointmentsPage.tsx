@@ -83,6 +83,14 @@ const CustomerAppointmentsPage = () => {
         );
       if (bookingResult.status === "fulfilled")
         setAppointments(bookingResult.value.data.appointments);
+      else
+        setMessage({
+          type: "error",
+          text: getApiErrorMessage(
+            bookingResult.reason,
+            "Unable to load your appointments.",
+          ),
+        });
     });
   }, []);
   useEffect(() => {

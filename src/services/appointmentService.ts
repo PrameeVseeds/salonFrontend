@@ -11,7 +11,7 @@ import type {
 const ENDPOINT = "/appointments";
 
 export const getCustomerAppointments = async (): Promise<ApiResponse<AppointmentListResponseData>> =>
-  (await customerAxiosClient.get<ApiResponse<AppointmentListResponseData>>(ENDPOINT)).data;
+  (await customerAxiosClient.get<ApiResponse<AppointmentListResponseData>>(`${ENDPOINT}/my`)).data;
 
 export const createCustomerAppointment = async (input: CreateCustomerAppointmentInput): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.post<ApiResponse<AppointmentResponseData>>(ENDPOINT, input)).data;
