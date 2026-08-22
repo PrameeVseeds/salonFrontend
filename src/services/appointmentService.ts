@@ -17,7 +17,7 @@ export const createCustomerAppointment = async (input: CreateCustomerAppointment
   (await customerAxiosClient.post<ApiResponse<AppointmentResponseData>>(ENDPOINT, input)).data;
 
 export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
-  (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/${id}/cancel`, { reason })).data;
+  (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/my/${id}/cancel`, { reason })).data;
 
 export const getAvailableAppointmentSlots = async (serviceId: number, employeeId: number, date: string): Promise<string[]> => {
   const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[] }>>(`${ENDPOINT}/available-slots`, {

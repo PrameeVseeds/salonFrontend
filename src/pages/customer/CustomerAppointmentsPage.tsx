@@ -6,7 +6,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
@@ -34,6 +34,7 @@ import "./customerAppointmentsPage.css";
 const today = new Date().toISOString().slice(0, 10);
 const CustomerAppointmentsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
   const { brand, style } = usePublicTheme();
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -63,6 +64,7 @@ const CustomerAppointmentsPage = () => {
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
   const initialServiceId = params.get("service") ?? "";
+  const isBookingPage = location.pathname === "/book-appointment";
 
   useEffect(() => {
     Promise.allSettled([
@@ -209,7 +211,8 @@ const CustomerAppointmentsPage = () => {
       appointments
         .filter(
           (item) =>
-            item.status === "Scheduled" || item.status === "In Progress",
+            (item.status === "Scheduled" || item.status === "In Progress") &&
+            item.appointmentDate >= today,
         )
         .sort((a, b) =>
           `${a.appointmentDate}${a.startTime}`.localeCompare(
@@ -218,11 +221,25 @@ const CustomerAppointmentsPage = () => {
         ),
     [appointments],
   );
-  const history = useMemo(
+  const cancelled = useMemo(
+    () =>
+      appointments
+        .filter((item) => item.status === "Cancelled")
+        .sort((a, b) =>
+          `${b.appointmentDate}${b.startTime}`.localeCompare(
+            `${a.appointmentDate}${a.startTime}`,
+          ),
+        ),
+    [appointments],
+  );
+  const past = useMemo(
     () =>
       appointments
         .filter(
-          (item) => item.status === "Completed" || item.status === "Cancelled",
+          (item) =>
+            item.status === "Completed" ||
+            ((item.status === "Scheduled" || item.status === "In Progress") &&
+              item.appointmentDate < today),
         )
         .sort((a, b) =>
           `${b.appointmentDate}${b.startTime}`.localeCompare(
@@ -365,10 +382,11 @@ const CustomerAppointmentsPage = () => {
       </header>
       <div className="customer-appointments-content">
         <section className="customer-appointments-heading">
-          <p>Your schedule</p>
-          <h1>Appointments</h1>
-          <span>Book and manage your salon visits.</span>
+          <p>{isBookingPage ? "Plan your visit" : "Your schedule"}</p>
+          <h1>{isBookingPage ? "Book an appointment" : "Bookings"}</h1>
+          <span>{isBookingPage ? "Choose your preferred service and time." : "View and manage your salon visits."}</span>
         </section>
+        {isBookingPage && (
         <form
           className="customer-booking-form"
           onSubmit={(event) => void book(event)}
@@ -518,6 +536,12 @@ const CustomerAppointmentsPage = () => {
             {busy ? "Booking..." : "Confirm appointment"}
           </button>
         </form>
+        )}
+        {!isBookingPage && (
+          <button className="customer-new-booking" type="button" onClick={() => navigate("/services")}>Book a new appointment</button>
+        )}
+        {!isBookingPage && (
+          <>
         <section className="customer-appointments-list">
           <header>
             <h2>Upcoming</h2>
@@ -531,14 +555,15 @@ const CustomerAppointmentsPage = () => {
             </div>
           )}
         </section>
-        {history.length > 0 && (
-          <section className="customer-appointments-list">
-            <header>
-              <h2>History</h2>
-              <span>{history.length}</span>
-            </header>
-            {history.map((item) => card(item, false))}
-          </section>
+        <section className="customer-appointments-list">
+          <header><h2>Cancelled</h2><span>{cancelled.length}</span></header>
+          {cancelled.length ? cancelled.map((item) => card(item, false)) : <div className="customer-appointment-empty">No cancelled bookings.</div>}
+        </section>
+        <section className="customer-appointments-list">
+          <header><h2>Past bookings</h2><span>{past.length}</span></header>
+          {past.length ? past.map((item) => card(item, false)) : <div className="customer-appointment-empty">No past bookings.</div>}
+        </section>
+          </>
         )}
       </div>
       <CustomerBottomNav active="bookings" />
