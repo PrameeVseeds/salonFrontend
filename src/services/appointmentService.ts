@@ -19,11 +19,14 @@ export const createCustomerAppointment = async (input: CreateCustomerAppointment
 export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/my/${id}/cancel`, { reason })).data;
 
-export const getAvailableAppointmentSlots = async (serviceId: number, employeeId: number, date: string): Promise<string[]> => {
-  const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[] }>>(`${ENDPOINT}/available-slots`, {
-    params: { serviceId, employeeId, date },
+export const getAvailableAppointmentSlots = async (serviceId: number, employeeId: number | null, date: string): Promise<{ slots: string[]; message: string | null }> => {
+  const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[]; availabilityMessage?: string | null }>>(`${ENDPOINT}/available-slots`, {
+    params: { serviceId, ...(employeeId === null ? {} : { employeeId }), date },
   });
-  return response.data.data.availableSlots ?? response.data.data.slots ?? [];
+  return {
+    slots: response.data.data.availableSlots ?? response.data.data.slots ?? [],
+    message: response.data.data.availabilityMessage ?? null,
+  };
 };
 
 export const getAppointments = async (filters: AppointmentFilters = {}): Promise<ApiResponse<AppointmentListResponseData>> =>

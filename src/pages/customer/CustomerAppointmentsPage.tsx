@@ -64,6 +64,7 @@ const CustomerAppointmentsPage = () => {
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
+  const [slotsMessage, setSlotsMessage] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<"upcoming" | "cancelled" | "past">("upcoming");
   const [visibleBookingCount, setVisibleBookingCount] = useState(10);
   const dateInputRef = useRef<HTMLInputElement>(null);
@@ -141,32 +142,37 @@ const CustomerAppointmentsPage = () => {
     }));
     setAvailableSlots([]);
     setSlotsError(null);
+    setSlotsMessage(null);
     setSlotEmployees({});
-    if (!serviceId || !appointmentDate || !staff.length) return;
+    if (!serviceId || !appointmentDate) return;
     setSlotsLoading(true);
     const candidates =
       choice === "any"
         ? staff
         : staff.filter((employee) => employee.id === Number(choice));
     Promise.all(
-      candidates.map(async (employee) => ({
-        employeeId: employee.id,
-        slots: await getAvailableAppointmentSlots(
+      (candidates.length ? candidates : [null]).map(async (employee) => ({
+        employeeId: employee?.id ?? null,
+        availability: await getAvailableAppointmentSlots(
           Number(serviceId),
-          employee.id,
+          employee?.id ?? null,
           appointmentDate,
         ),
       })),
     )
       .then((results) => {
         const slotMap: Record<string, number> = {};
+        const uniqueSlots = new Set<string>();
         results.forEach((result) =>
-          result.slots.forEach((slot) => {
-            if (!slotMap[slot]) slotMap[slot] = result.employeeId;
+          result.availability.slots.forEach((slot) => {
+            uniqueSlots.add(slot);
+            if (result.employeeId !== null && !slotMap[slot]) slotMap[slot] = result.employeeId;
           }),
         );
         setSlotEmployees(slotMap);
-        setAvailableSlots(Object.keys(slotMap).sort());
+        setAvailableSlots([...uniqueSlots].sort());
+        if (!uniqueSlots.size)
+          setSlotsMessage(results.find((result) => result.availability.message)?.availability.message ?? null);
       })
       .catch((error) =>
         setSlotsError(
@@ -180,6 +186,7 @@ const CustomerAppointmentsPage = () => {
     setEmployeeChoice("any");
     setAvailableSlots([]);
     setSlotEmployees({});
+    setSlotsMessage(null);
     setForm((current) => ({
       ...current,
       serviceId,
@@ -301,6 +308,7 @@ const CustomerAppointmentsPage = () => {
       setEmployeeChoice("any");
       setAvailableSlots([]);
       setSlotEmployees({});
+      setSlotsMessage(null);
       setMessage({ type: "success", text: "Appointment booked successfully." });
     } catch (error) {
       setMessage({
@@ -525,7 +533,7 @@ const CustomerAppointmentsPage = () => {
               </div>
             ) : (
               <p className="customer-professional-empty">
-                No professionals are assigned to this service.
+                No professional selection is needed. The salon can assign one later.
               </p>
             )}
           </fieldset>
@@ -566,8 +574,6 @@ const CustomerAppointmentsPage = () => {
             <legend>Available times</legend>
             {!form.appointmentDate || !form.serviceId ? (
               <p>Select a service and date to view times.</p>
-            ) : !assignedEmployees.length ? (
-              <p>No assigned professionals are available for this service.</p>
             ) : slotsLoading ? (
               <p>Checking available times...</p>
             ) : slotsError ? (
@@ -583,7 +589,7 @@ const CustomerAppointmentsPage = () => {
                       setForm({
                         ...form,
                         startTime: slot,
-                        employeeId: String(slotEmployees[slot]),
+                        employeeId: slotEmployees[slot] ? String(slotEmployees[slot]) : "",
                       })
                     }
                   >
@@ -592,7 +598,7 @@ const CustomerAppointmentsPage = () => {
                 ))}
               </div>
             ) : (
-              <p>No available times for this date.</p>
+              <p>{slotsMessage ?? "No available times for this date."}</p>
             )}
           </fieldset>
           <label>
