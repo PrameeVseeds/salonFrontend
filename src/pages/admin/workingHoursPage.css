@@ -3,11 +3,11 @@
 }
 .hours-page > header h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 .hours-page > header > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 .hours-message {
@@ -26,13 +26,13 @@
 }
 .hours-card {
   overflow: hidden;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
 }
 .hours-card > header {
   padding: 18px 20px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .hours-card > header > div {
   display: flex;
@@ -45,7 +45,7 @@
   display: grid;
   place-items: center;
   border-radius: 10px;
-  color: #943ec3;
+  color: #b88624;
   background: #f3e9f9;
 }
 .hours-card > header svg {
@@ -56,23 +56,22 @@
   font-size: 1rem;
 }
 .hours-card header p {
-  color: #938a99;
+  color: #90887e;
   font-size: 0.67rem;
 }
 .hours-labels,
 .hours-list article {
   display: grid;
-  grid-template-columns: minmax(100px, 1fr) minmax(135px, 1fr) minmax(
-      135px,
-      1fr
-    ) 100px 90px;
+  grid-template-columns:
+    minmax(100px, 1fr) minmax(135px, 1fr) minmax(135px, 1fr)
+    100px 90px;
   gap: 15px;
   align-items: start;
 }
 .hours-labels {
   padding: 12px 20px;
-  color: #918797;
-  background: #fbf9fc;
+  color: #8e867b;
+  background: #faf8f3;
   font-size: 0.61rem;
   font-weight: 750;
   text-transform: uppercase;
@@ -89,7 +88,7 @@
 .hours-list article {
   min-height: 66px;
   padding: 14px 20px;
-  border-top: 1px solid #f0ebf2;
+  border-top: 1px solid #eee8dc;
   box-sizing: border-box;
 }
 .hours-list article > strong {
@@ -97,7 +96,7 @@
   font-size: 0.78rem;
 }
 .hours-list article.is-closed {
-  background: #fcfafc;
+  background: #fbf9f4;
 }
 .hours-list label {
   display: grid;
@@ -110,7 +109,7 @@
   width: 100%;
   height: 40px;
   padding: 0 10px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   box-sizing: border-box;
   background: #fff;
@@ -143,7 +142,7 @@
 .hours-toggle input {
   width: 17px;
   height: 17px;
-  accent-color: #973dc8;
+  accent-color: #b88624;
 }
 .hours-save {
   height: 40px;
@@ -154,7 +153,7 @@
   border: 0;
   border-radius: 8px;
   color: #fff;
-  background: #963dc8;
+  background: #b88624;
   font: inherit;
   font-size: 0.68rem;
   font-weight: 700;
@@ -168,10 +167,9 @@
 @media (max-width: 900px) {
   .hours-labels,
   .hours-list article {
-    grid-template-columns: minmax(90px, 0.8fr) minmax(120px, 1fr) minmax(
-        120px,
-        1fr
-      ) 80px 42px;
+    grid-template-columns:
+      minmax(90px, 0.8fr) minmax(120px, 1fr) minmax(120px, 1fr)
+      80px 42px;
     gap: 10px;
   }
   .hours-save {
@@ -193,7 +191,7 @@
     display: grid;
     gap: 10px;
     padding: 12px;
-    background: #faf8fb;
+    background: #f8f6f1;
   }
   .hours-list article {
     display: grid;
@@ -212,7 +210,7 @@
   }
   .hours-list label > span {
     display: block;
-    color: #8f8595;
+    color: #8c8378;
     font-size: 0.62rem;
   }
   .hours-toggle {

@@ -38,3 +38,11 @@ export interface AppointmentFilters {
   status?: AppointmentStatus | "";
   search?: string;
 }
+
+export interface CreateCustomerAppointmentInput {
+  serviceId: number;
+  employeeId: number | null;
+  appointmentDate: string;
+  startTime: string;
+  notes: string | null;
+}

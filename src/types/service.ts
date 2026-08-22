@@ -6,6 +6,8 @@ export interface SalonService {
     price: number;
     imageUrl: string;
     isActive: boolean;
+    maxConcurrentAppointments: number | null;
+    assignedEmployeeCount: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -17,6 +19,7 @@ export interface SaveServiceInput {
     price: number;
     imageUrl: string;
     isActive: boolean;
+    maxConcurrentAppointments: number | null;
 }
 
 export interface ServiceResponseData { service: SalonService; }

@@ -1,4 +1,4 @@
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { forgotAdminPassword } from "../../services/adminAuthService";
@@ -21,12 +21,6 @@ const AdminForgotPasswordPage = () => {
   } | null>(null);
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!email)
-      return setMessage({
-        type: "error",
-        text: "Return to login and enter your registered admin email first.",
-      });
-
     setBusy(true);
     setMessage(null);
     try {
@@ -55,19 +49,13 @@ const AdminForgotPasswordPage = () => {
           </span>
         </header>
         <form onSubmit={(event) => void submit(event)}>
-          {email && (
-            <p className="admin-password-destination">
-              <Mail aria-hidden="true" />
-              Reset instructions will be sent to the registered address.
-            </p>
-          )}
           {message && (
             <p className={`admin-password-message is-${message.type}`}>
               {message.text}
             </p>
           )}
         <button type="submit" disabled={busy || !email}>
-            {busy ? "Sending..." : "Send reset link"}
+            {busy ? "Sending..." : "Send reset instructions"}
           </button>
         </form>
       <Link to="/admin/login">Back to admin login</Link>

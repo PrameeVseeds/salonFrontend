@@ -1,8 +1,11 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
+import { axiosClient } from "../api/axiosClient";
 import type { ApiMessageResponse, ApiResponse } from "../types/api";
 import type {EmployeeImageResponseData,EmployeeResponseData,EmployeesResponseData,SaveEmployeeInput,} from "../types/employee";
 
 const EMPLOYEE_ENDPOINT = "/employees";
+export const getPublicEmployees = async (): Promise<ApiResponse<EmployeesResponseData>> =>
+  (await axiosClient.get<ApiResponse<EmployeesResponseData>>(EMPLOYEE_ENDPOINT)).data;
 
 export const getEmployees = async (): Promise<
   ApiResponse<EmployeesResponseData>

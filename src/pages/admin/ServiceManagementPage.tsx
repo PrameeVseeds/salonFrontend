@@ -43,6 +43,7 @@ const ServiceManagementPage = () => {
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState("");
   const [price, setPrice] = useState("");
+  const [capacity, setCapacity] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -75,6 +76,7 @@ const ServiceManagementPage = () => {
     setDescription("");
     setDuration("");
     setPrice("");
+    setCapacity("");
     setImageUrl("");
     setImageFile(null);
     setImagePreview("");
@@ -89,6 +91,7 @@ const ServiceManagementPage = () => {
     setDescription(service.description);
     setDuration(String(service.durationMinutes));
     setPrice(String(service.price));
+    setCapacity(service.maxConcurrentAppointments === null ? "" : String(service.maxConcurrentAppointments));
     setImageUrl(service.imageUrl);
     setImageFile(null);
     setImagePreview(service.imageUrl);
@@ -114,6 +117,13 @@ const ServiceManagementPage = () => {
         : undefined,
     image: !imageFile && !imageUrl.trim() ? "Service image is required." : undefined,
   };
+  const capacityError = capacity === ""
+    ? undefined
+    : !Number.isInteger(Number(capacity)) || Number(capacity) <= 0
+      ? "Enter a positive whole number."
+      : editing && Number(capacity) > editing.assignedEmployeeCount
+        ? `Capacity cannot exceed ${editing.assignedEmployeeCount} assigned employees.`
+        : undefined;
   const chooseImage = (file: File | null) => {
     if (!file) return;
     if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
@@ -133,7 +143,7 @@ const ServiceManagementPage = () => {
     setTouched(markFieldsTouched(requiredFields));
     const minutes = Number(duration);
     const amount = Number(price);
-    if (requiredFields.some((field) => fieldErrors[field])) {
+    if (requiredFields.some((field) => fieldErrors[field]) || capacityError) {
       setError(null);
       return;
     }
@@ -151,6 +161,7 @@ const ServiceManagementPage = () => {
         price: amount,
         imageUrl: savedImageUrl,
         isActive,
+        maxConcurrentAppointments: capacity === "" ? null : Number(capacity),
       };
       const response = editing
         ? await updateSalonService(editing.id, input)
@@ -257,6 +268,10 @@ const ServiceManagementPage = () => {
                     <dt>Price</dt>
                     <dd>Rs. {Number(service.price).toFixed(2)}</dd>
                   </div>
+                  <div>
+                    <dt>Slot capacity</dt>
+                    <dd>{Math.min(service.maxConcurrentAppointments ?? service.assignedEmployeeCount, service.assignedEmployeeCount)} {service.maxConcurrentAppointments === null ? "(auto)" : ""}</dd>
+                  </div>
                 </dl>
                 <footer>
                   <button onClick={() => openEdit(service)} title="Edit">
@@ -298,7 +313,7 @@ const ServiceManagementPage = () => {
                 <h2 id="service-form-title">
                   {editing ? "Edit service" : "Add service"}
                 </h2>
-                <p>All fields are required.</p>
+                <p>Capacity is optional; other fields are required.</p>
               </div>
               <button onClick={close}>
                 <X />
@@ -370,6 +385,25 @@ const ServiceManagementPage = () => {
                 <small>JPG, PNG or WEBP, up to 5 MB</small>
                 {touched.image && fieldErrors.image &&
                   <small className="service-field-error">{fieldErrors.image}</small>}
+              </label>
+              <label className="service-capacity-field">
+                <span>Appointments per time slot (optional)</span>
+                <input
+                  type="number"
+                  min="1"
+                  max={editing?.assignedEmployeeCount || undefined}
+                  step="1"
+                  value={capacity}
+                  onChange={(e) => setCapacity(e.target.value)}
+                  disabled={!editing || editing.assignedEmployeeCount === 0}
+                  aria-invalid={Boolean(capacityError)}
+                />
+                <small>
+                  {editing
+                    ? `Leave empty for automatic capacity (${editing.assignedEmployeeCount} active assigned employee${editing.assignedEmployeeCount === 1 ? "" : "s"}). Maximum: ${editing.assignedEmployeeCount}.`
+                    : "Leave empty for automatic capacity based on active assigned employees."}
+                </small>
+                {capacityError && <small className="service-field-error">{capacityError}</small>}
               </label>
               <label className="service-checkbox">
                 <input

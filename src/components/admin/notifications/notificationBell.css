@@ -20,13 +20,13 @@
 
 .notification-bell_trigger:hover,
 .notification-bell_trigger[aria-expanded="true"] {
-  color: #963dcc;
-  border-color: #d9bce8;
-  background: #fbf5fe;
+  color: #b88624;
+  border-color: #e2ca8c;
+  background: #fdf9ef;
 }
 
 .notification-bell_trigger:focus-visible {
-  outline: 3px solid #963dcc30;
+  outline: 3px solid #b8862430;
   outline-offset: 2px;
 }
 
@@ -60,9 +60,9 @@
   right: 0;
   width: min(390px, calc(100vw - 28px));
   overflow: hidden;
-  border: 1px solid #e7dfea;
+  border: 1px solid #e5ddcf;
   border-radius: 15px;
-  color: #625b6e;
+  color: #686157;
   background: #fff;
   box-shadow: 0 22px 55px #2c173640;
 }
@@ -73,12 +73,12 @@
   justify-content: space-between;
   gap: 16px;
   padding: 18px 18px 14px;
-  border-bottom: 1px solid #eee8f0;
+  border-bottom: 1px solid #ece5d8;
 }
 
 .notification-popover > header h2 {
   margin: 0 0 3px;
-  color: #211b2d;
+  color: #24231f;
   font-size: 1rem;
 }
 
@@ -115,7 +115,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 10px;
   padding: 14px 16px;
-  border-bottom: 1px solid #f0ebf2;
+  border-bottom: 1px solid #eee8dc;
 }
 
 .notification-list article > div {
@@ -231,7 +231,7 @@
   display: flex;
   justify-content: flex-end;
   padding: 10px 14px;
-  background: #fbf9fc;
+  background: #faf8f3;
 }
 
 .notification-popover > footer button {
@@ -240,7 +240,7 @@
   gap: 6px;
   padding: 6px 9px;
   border: 0;
-  color: #9138c6;
+  color: #a97820;
   background: transparent;
   font: inherit;
   font-size: 0.68rem;

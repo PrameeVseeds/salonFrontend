@@ -7,11 +7,11 @@
 }
 .leave-heading h1 {
   margin: 4px 0;
-  color: #211b2d;
+  color: #24231f;
   font-size: 2rem;
 }
 .leave-heading > div > p:last-child {
-  color: #847b8b;
+  color: #837b70;
   font-size: 0.8rem;
 }
 .leave-heading > button {
@@ -23,7 +23,7 @@
   border: 0;
   border-radius: 9px;
   color: #fff;
-  background: linear-gradient(100deg, #8f3bd0, #cd42ac);
+  background: linear-gradient(100deg, #c4932f, #d2a43e);
   font: inherit;
   font-size: 0.75rem;
   font-weight: 750;
@@ -33,7 +33,7 @@
 }
 .leave-panel {
   overflow: hidden;
-  border: 1px solid #e6e0ea;
+  border: 1px solid #e4ded2;
   border-radius: 15px;
   background: #fff;
 }
@@ -42,14 +42,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 21px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .leave-panel h2 {
   margin: 0;
   font-size: 1rem;
 }
 .leave-panel header p {
-  color: #948b9a;
+  color: #928a80;
   font-size: 0.68rem;
 }
 .leave-panel header label {
@@ -61,12 +61,12 @@
   position: absolute;
   left: 11px;
   width: 15px;
-  color: #918797;
+  color: #8e867b;
 }
 .leave-panel header input {
   height: 38px;
   padding: 0 12px 0 34px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   font: inherit;
   font-size: 0.7rem;
@@ -82,17 +82,17 @@
 .leave-panel th,
 .leave-panel td {
   padding: 14px 18px;
-  border-bottom: 1px solid #f0ebf2;
+  border-bottom: 1px solid #eee8dc;
   text-align: left;
 }
 .leave-panel th {
-  color: #918797;
-  background: #fbf9fc;
+  color: #8e867b;
+  background: #faf8f3;
   font-size: 0.62rem;
   text-transform: uppercase;
 }
 .leave-panel td {
-  color: #655b6c;
+  color: #696157;
   font-size: 0.72rem;
 }
 .leave-panel td > strong,
@@ -104,7 +104,7 @@
 }
 .leave-panel td > small {
   margin-top: 3px;
-  color: #978e9d;
+  color: #958d83;
   font-size: 0.62rem;
 }
 .leave-panel td > span {
@@ -136,10 +136,10 @@
   height: 31px;
   display: grid;
   place-items: center;
-  border: 1px solid #e4d5eb;
+  border: 1px solid #dfd3bd;
   border-radius: 7px;
-  color: #873dae;
-  background: #f7effa;
+  color: #a97820;
+  background: #fcf7e9;
 }
 .leave-actions svg {
   width: 14px;
@@ -151,7 +151,7 @@
 .leave-empty {
   padding: 28px;
   text-align: center;
-  color: #918797;
+  color: #8e867b;
   font-size: 0.72rem;
 }
 .leave-message {
@@ -184,14 +184,14 @@
   display: flex;
   justify-content: space-between;
   padding: 20px 22px;
-  border-bottom: 1px solid #eee9f1;
+  border-bottom: 1px solid #ece6da;
 }
 .leave-modal h2 {
   margin: 0;
   font-size: 1.05rem;
 }
 .leave-modal header p {
-  color: #918895;
+  color: #8e867c;
   font-size: 0.68rem;
 }
 .leave-modal header button {
@@ -212,7 +212,7 @@
 .leave-modal label {
   display: grid;
   gap: 6px;
-  color: #332a3a;
+  color: #37342e;
   font-size: 0.7rem;
   font-weight: 700;
 }
@@ -221,7 +221,7 @@
 .leave-modal textarea {
   width: 100%;
   padding: 0 12px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   box-sizing: border-box;
   font: inherit;
@@ -264,7 +264,7 @@
   font-weight: 500;
 }
 .leave-modal label > span > small {
-  color: #918895;
+  color: #8e867c;
   font-weight: 400;
 }
 .leave-modal footer {
@@ -275,7 +275,7 @@
 .leave-modal footer button {
   height: 41px;
   padding: 0 15px;
-  border: 1px solid #ddd6e2;
+  border: 1px solid #ddd6c9;
   border-radius: 8px;
   background: #fff;
 }
@@ -285,7 +285,7 @@
   gap: 6px;
   border: 0;
   color: #fff;
-  background: #993ecc;
+  background: #b88624;
 }
 .leave-modal footer svg {
   width: 15px;
@@ -319,7 +319,7 @@
   .leave-table-wrap {
     overflow: visible;
     padding: 12px;
-    background: #faf8fb;
+    background: #f8f6f1;
   }
   .leave-panel table,
   .leave-panel tbody {
