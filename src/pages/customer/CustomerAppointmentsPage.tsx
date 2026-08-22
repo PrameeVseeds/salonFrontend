@@ -248,6 +248,10 @@ const CustomerAppointmentsPage = () => {
         ),
     [appointments],
   );
+  const selectedService = useMemo(
+    () => services.find((service) => service.id === Number(form.serviceId)),
+    [form.serviceId, services],
+  );
 
   const book = async (event: FormEvent) => {
     event.preventDefault();
@@ -395,9 +399,10 @@ const CustomerAppointmentsPage = () => {
             <CalendarDays />
             <div>
               <h2>Book an appointment</h2>
-              <p>Choose your service, professional, and preferred time.</p>
+              <p>{selectedService ? `${selectedService.name} · ${selectedService.durationMinutes} min · ${Number(selectedService.price).toFixed(2)}` : "Choose your service, professional, and preferred time."}</p>
             </div>
           </header>
+          {!initialServiceId && (
           <label>
             <span>Service</span>
             <select
@@ -414,6 +419,7 @@ const CustomerAppointmentsPage = () => {
               ))}
             </select>
           </label>
+          )}
           <fieldset className="customer-professional-field">
             <legend>
               Professional <small>(optional)</small>
@@ -474,17 +480,26 @@ const CustomerAppointmentsPage = () => {
               </p>
             )}
           </fieldset>
-          <label>
+          <label className="customer-date-field">
             <span>Date</span>
-            <input
-              type="date"
-              min={today}
-              value={form.appointmentDate}
-              onChange={(e) =>
-                loadSlots(form.serviceId, employeeChoice, e.target.value)
-              }
-              required
-            />
+            <span className="customer-date-picker">
+              <CalendarDays aria-hidden="true" />
+              <span className={form.appointmentDate ? "" : "is-placeholder"}>
+                {form.appointmentDate
+                  ? form.appointmentDate.split("-").reverse().join("-")
+                  : "dd-mm-yyyy"}
+              </span>
+              <input
+                type="date"
+                aria-label="Appointment date"
+                min={today}
+                value={form.appointmentDate}
+                onChange={(e) =>
+                  loadSlots(form.serviceId, employeeChoice, e.target.value)
+                }
+                required
+              />
+            </span>
           </label>
           <fieldset className="customer-time-slots">
             <legend>Available times</legend>

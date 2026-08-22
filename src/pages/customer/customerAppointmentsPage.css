@@ -120,6 +120,66 @@
     box-shadow: 0 0 0 3px rgb(197 150 46 / 12%);
 }
 
+.customer-date-field {
+    width: min(100%, 250px);
+}
+
+.customer-date-picker {
+    position: relative;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    border: 1px solid #ddd6c9;
+    border-radius: 8px;
+    background: #fff;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.customer-date-picker>svg {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 12px;
+    width: 17px;
+    height: 17px;
+    color: var(--customer-accent);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.customer-date-picker>span {
+    color: var(--customer-primary);
+    font-size: 0.68rem;
+}
+
+.customer-date-picker>span.is-placeholder {
+    color: #78716c;
+}
+
+.customer-date-picker>input {
+    position: absolute;
+    inset: 0;
+    min-height: 100%;
+    opacity: 0;
+    border: 0;
+    box-shadow: none;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.customer-date-picker:focus-within {
+    border-color: var(--customer-accent);
+    box-shadow: 0 0 0 3px rgb(197 150 46 / 12%);
+}
+
+@media (max-width: 430px) {
+    .customer-date-field {
+        width: 100%;
+    }
+}
+
 .customer-booking-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
