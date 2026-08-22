@@ -42,6 +42,18 @@ const AppointmentManagementPage = () => {
     active: appointments.filter((item) => item.status === "In Progress").length,
     completed: appointments.filter((item) => item.status === "Completed").length,
   }), [appointments]);
+  const orderedAppointments = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const appointmentTime = (appointment: Appointment) =>
+      new Date(`${appointment.appointmentDate}T${appointment.startTime}`).getTime();
+    return [...appointments].sort((first, second) => {
+      const firstTime = appointmentTime(first);
+      const secondTime = appointmentTime(second);
+      const distance = Math.abs(firstTime - today) - Math.abs(secondTime - today);
+      return distance || firstTime - secondTime;
+    });
+  }, [appointments]);
 
   const replaceAppointment = (updated: Appointment) => {
     setAppointments((current) => current.map((item) => item.id === updated.id ? { ...item, ...updated } : item));
@@ -162,7 +174,7 @@ const AppointmentManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {appointments.map((appointment) => (
+              {orderedAppointments.map((appointment) => (
                 <tr key={appointment.id}>
                   <td data-label="Date & time"><strong>{appointment.appointmentDate}</strong><small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small></td>
                   <td data-label="Customer">

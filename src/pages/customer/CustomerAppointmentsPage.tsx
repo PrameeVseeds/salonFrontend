@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import {
   cancelCustomerAppointment,
@@ -61,6 +62,7 @@ const CustomerAppointmentsPage = () => {
   } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
@@ -376,6 +378,11 @@ const CustomerAppointmentsPage = () => {
                 : "Professional assigned by salon";
             })()}
         </small>
+        {cancellable && (
+          <button type="button" onClick={() => setCancelTarget(item)}>
+            Cancel
+          </button>
+        )}
       </div>
       <aside className="customer-appointment-meta">
         <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
@@ -386,11 +393,6 @@ const CustomerAppointmentsPage = () => {
           <span>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}</span>
         </time>
       </aside>
-      {cancellable && (
-        <button type="button" onClick={() => setCancelTarget(item)}>
-          Cancel
-        </button>
-      )}
     </article>
   );
 
@@ -411,8 +413,9 @@ const CustomerAppointmentsPage = () => {
           <button
             className="customer-profile-trigger"
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => setProfileOpen(true)}
             aria-label="View your profile"
+            aria-expanded={profileOpen}
           >
             {customer?.profileImage ? (
               <img src={customer.profileImage} alt="" />
@@ -658,6 +661,7 @@ const CustomerAppointmentsPage = () => {
         )}
       </div>
       <CustomerBottomNav active={isBookingPage ? "services" : "bookings"} />
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={cancelTarget !== null}
         title="Cancel appointment?"

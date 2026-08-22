@@ -14,6 +14,7 @@ import { getPublicServices } from "../../services/salonService";
 import type { SalonService } from "../../types/service";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import {
   getCustomerProfile,
   logoutCustomer,
@@ -30,6 +31,7 @@ const CustomerServicesPage = () => {
   const [loading, setLoading] = useState(true);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [logoutConfirmationOpen, setLogoutConfirmationOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   useEffect(() => {
     Promise.allSettled([getPublicServices(), getCustomerProfile()]).then(
       ([serviceResult, profileResult]) => {
@@ -77,8 +79,9 @@ const CustomerServicesPage = () => {
           <button
             className="customer-profile-trigger"
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => setProfileOpen(true)}
             aria-label="View your profile"
+            aria-expanded={profileOpen}
           >
             {customer?.profileImage ? (
               <img src={customer.profileImage} alt="" />
@@ -160,6 +163,7 @@ const CustomerServicesPage = () => {
         )}
       </div>
       <CustomerBottomNav active="services" />
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={logoutConfirmationOpen}
         title="Sign out?"

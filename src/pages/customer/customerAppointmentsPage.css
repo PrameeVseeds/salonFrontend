@@ -468,15 +468,20 @@
 }
 
 .customer-booking-filters b {
+    width: 19px;
     min-width: 19px;
     height: 19px;
-    display: grid;
-    place-items: center;
-    padding-inline: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 19px;
+    padding: 0;
     border-radius: 999px;
     color: var(--customer-primary);
     background: #e9e1d1;
     font-size: 0.52rem;
+    line-height: 1;
+    text-align: center;
     box-sizing: border-box;
 }
 
@@ -648,17 +653,20 @@
     background: #fff1f3;
 }
 
-.customer-appointment-card>button {
-    grid-column: 2 / -1;
-    justify-self: end;
-    padding: 5px 8px;
+.customer-appointment-details>button {
+    width: fit-content;
+    min-height: 28px;
+    margin-top: 3px;
+    padding: 5px 10px;
     border: 1px solid #efc9cf;
-    border-radius: 6px;
+    border-radius: 7px;
     color: #a53a4a;
     background: #fff5f6;
     font: inherit;
     font-size: 0.55rem;
     font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 
 .customer-appointment-empty {
