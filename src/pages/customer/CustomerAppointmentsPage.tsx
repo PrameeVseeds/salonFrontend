@@ -317,30 +317,43 @@ const CustomerAppointmentsPage = () => {
   };
   const card = (item: Appointment, cancellable: boolean) => (
     <article className="customer-appointment-card" key={item.id}>
-      <time>
+      <span className="customer-appointment-image">
+        {services.find((service) => service.id === item.serviceId)?.imageUrl ? (
+          <img src={services.find((service) => service.id === item.serviceId)?.imageUrl} alt="" />
+        ) : (
+          <Scissors aria-hidden="true" />
+        )}
+      </span>
+      <div className="customer-appointment-details">
         <strong>
-          {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(
-            undefined,
-            { day: "2-digit" },
-          )}
+          {item.serviceName ??
+            services.find((service) => service.id === item.serviceId)?.name ??
+            "Salon service"}
         </strong>
-        <span>
-          {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(
-            undefined,
-            { month: "short" },
-          )}
-        </span>
-      </time>
-      <div>
-        <strong>{item.serviceName ?? `Service #${item.serviceId}`}</strong>
         <span>
           <Clock3 /> {item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)}
         </span>
-        <small>{item.employeeName ?? "Professional assigned by salon"}</small>
+        <small>
+          {item.employeeName ??
+            (() => {
+              const employee = employees.find(
+                (candidate) => candidate.id === item.employeeId,
+              );
+              return employee
+                ? `${employee.firstName} ${employee.lastName}`
+                : "Professional assigned by salon";
+            })()}
+        </small>
       </div>
-      <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
-        {item.status}
-      </b>
+      <aside className="customer-appointment-meta">
+        <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
+          {item.status}
+        </b>
+        <time>
+          <strong>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}</strong>
+          <span>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}</span>
+        </time>
+      </aside>
       {cancellable && (
         <button type="button" onClick={() => setCancelTarget(item)}>
           Cancel
