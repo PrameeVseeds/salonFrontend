@@ -42,19 +42,6 @@
     background: #fff;
 }
 
-.customer-new-booking {
-    min-height: 43px;
-    margin: 20px 0 27px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: 9px;
-    color: #fff;
-    background: var(--customer-primary);
-    font: inherit;
-    font-size: 0.7rem;
-    font-weight: 750;
-}
-
 .customer-booking-form>header {
     display: flex;
     align-items: start;
@@ -366,6 +353,72 @@
 
 .customer-appointments-list {
     margin-bottom: 27px;
+}
+
+.customer-booking-filters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    margin: 22px 0;
+    padding: 5px;
+    border: 1px solid #e5e0d6;
+    border-radius: 12px;
+    background: #f0ede6;
+}
+
+.customer-booking-filters button {
+    min-width: 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 8px;
+    color: #78716c;
+    background: transparent;
+    font: inherit;
+    font-size: 0.63rem;
+    font-weight: 750;
+    touch-action: manipulation;
+}
+
+.customer-booking-filters button.is-active {
+    color: var(--customer-primary);
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(43 41 36 / 8%);
+}
+
+.customer-booking-filters b {
+    min-width: 19px;
+    height: 19px;
+    display: grid;
+    place-items: center;
+    padding-inline: 3px;
+    border-radius: 999px;
+    color: var(--customer-primary);
+    background: #e9e1d1;
+    font-size: 0.52rem;
+    box-sizing: border-box;
+}
+
+.customer-booking-filters button.is-active b {
+    color: #fff;
+    background: var(--customer-accent);
+}
+
+.customer-bookings-more {
+    width: 100%;
+    min-height: 42px;
+    margin-top: 10px;
+    border: 1px solid #ddd6c9;
+    border-radius: 9px;
+    color: var(--customer-primary);
+    background: #fff;
+    font: inherit;
+    font-size: 0.63rem;
+    font-weight: 750;
 }
 
 .customer-appointments-list>header {

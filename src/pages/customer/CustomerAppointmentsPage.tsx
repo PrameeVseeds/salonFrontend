@@ -63,6 +63,8 @@ const CustomerAppointmentsPage = () => {
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
+  const [bookingFilter, setBookingFilter] = useState<"upcoming" | "cancelled" | "past">("upcoming");
+  const [visibleBookingCount, setVisibleBookingCount] = useState(10);
   const initialServiceId = params.get("service") ?? "";
   const isBookingPage = location.pathname === "/book-appointment";
 
@@ -252,6 +254,16 @@ const CustomerAppointmentsPage = () => {
     () => services.find((service) => service.id === Number(form.serviceId)),
     [form.serviceId, services],
   );
+  const filteredBookings = bookingFilter === "upcoming"
+    ? upcoming
+    : bookingFilter === "cancelled"
+      ? cancelled
+      : past;
+  const filteredBookingTitle = bookingFilter === "upcoming"
+    ? "Upcoming"
+    : bookingFilter === "cancelled"
+      ? "Cancelled"
+      : "Past bookings";
 
   const book = async (event: FormEvent) => {
     event.preventDefault();
@@ -566,30 +578,39 @@ const CustomerAppointmentsPage = () => {
         </form>
         )}
         {!isBookingPage && (
-          <button className="customer-new-booking" type="button" onClick={() => navigate("/services")}>Book a new appointment</button>
-        )}
-        {!isBookingPage && (
           <>
+        <nav className="customer-booking-filters" aria-label="Filter bookings">
+          {([
+            ["upcoming", "Upcoming", upcoming.length],
+            ["cancelled", "Cancelled", cancelled.length],
+            ["past", "Past", past.length],
+          ] as const).map(([value, label, count]) => (
+            <button
+              className={bookingFilter === value ? "is-active" : ""}
+              type="button"
+              key={value}
+              onClick={() => { setBookingFilter(value); setVisibleBookingCount(10); }}
+              aria-pressed={bookingFilter === value}
+            >
+              <span>{label}</span><b>{count}</b>
+            </button>
+          ))}
+        </nav>
         <section className="customer-appointments-list">
           <header>
-            <h2>Upcoming</h2>
-            <span>{upcoming.length}</span>
+            <h2>{filteredBookingTitle}</h2>
+            <span>{filteredBookings.length}</span>
           </header>
-          {upcoming.length ? (
-            upcoming.map((item) => card(item, item.status === "Scheduled"))
+          {filteredBookings.length ? (
+            filteredBookings.slice(0, visibleBookingCount).map((item) => card(item, bookingFilter === "upcoming" && item.status === "Scheduled"))
           ) : (
             <div className="customer-appointment-empty">
-              No upcoming appointments.
+              No {filteredBookingTitle.toLowerCase()}.
             </div>
           )}
-        </section>
-        <section className="customer-appointments-list">
-          <header><h2>Cancelled</h2><span>{cancelled.length}</span></header>
-          {cancelled.length ? cancelled.map((item) => card(item, false)) : <div className="customer-appointment-empty">No cancelled bookings.</div>}
-        </section>
-        <section className="customer-appointments-list">
-          <header><h2>Past bookings</h2><span>{past.length}</span></header>
-          {past.length ? past.map((item) => card(item, false)) : <div className="customer-appointment-empty">No past bookings.</div>}
+          {filteredBookings.length > visibleBookingCount && (
+            <button className="customer-bookings-more" type="button" onClick={() => setVisibleBookingCount((count) => count + 10)}>Show more bookings</button>
+          )}
         </section>
           </>
         )}
