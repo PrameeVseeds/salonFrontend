@@ -20,6 +20,82 @@
     text-transform: uppercase;
 }
 
+.customer-appointments-heading.is-booking {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-items: center;
+    column-gap: 12px;
+}
+
+.customer-appointments-heading.is-booking::after {
+    display: none;
+}
+
+.customer-appointments-heading-copy {
+    min-width: 0;
+    width: 100%;
+}
+
+.customer-appointments-heading.is-booking .customer-appointments-heading-copy {
+    display: contents;
+}
+
+.customer-appointments-heading.is-booking .customer-appointments-heading-copy p {
+    grid-column: 2;
+    grid-row: 1;
+    margin-inline: 0;
+    text-align: left;
+}
+
+.customer-appointments-heading.is-booking .customer-appointments-heading-copy h1 {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: left;
+}
+
+.customer-appointments-heading.is-booking .customer-appointments-heading-copy>span {
+    grid-column: 2;
+    grid-row: 3;
+    text-align: left;
+}
+
+.customer-appointments-heading.is-booking .customer-booking-back {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+}
+
+.customer-appointments-heading.is-booking h1 {
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+    line-height: 1.12;
+}
+
+.customer-booking-back {
+    width: 42px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    padding: 0;
+    border: 1px solid #ddd6c9;
+    border-radius: 9px;
+    color: var(--customer-primary);
+    background: #fff;
+    font: inherit;
+    font-size: 0.65rem;
+    font-weight: 750;
+    touch-action: manipulation;
+}
+
+.customer-booking-back svg {
+    width: 16px;
+    height: 16px;
+    color: var(--customer-accent);
+}
+
 .customer-appointments-heading h1 {
     margin: 4px 0 5px;
     color: var(--customer-primary);
@@ -154,6 +230,7 @@
     box-shadow: none;
     cursor: pointer;
     touch-action: manipulation;
+    pointer-events: none;
 }
 
 .customer-date-picker:focus-within {

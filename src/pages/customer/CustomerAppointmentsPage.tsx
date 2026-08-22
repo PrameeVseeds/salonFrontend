@@ -1,11 +1,12 @@
 import {
+  ArrowLeft,
   CalendarDays,
   Clock3,
   LogOut,
   Scissors,
   UserRound,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
@@ -65,6 +66,7 @@ const CustomerAppointmentsPage = () => {
   const [slotsError, setSlotsError] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<"upcoming" | "cancelled" | "past">("upcoming");
   const [visibleBookingCount, setVisibleBookingCount] = useState(10);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const initialServiceId = params.get("service") ?? "";
   const isBookingPage = location.pathname === "/book-appointment";
 
@@ -254,6 +256,16 @@ const CustomerAppointmentsPage = () => {
     () => services.find((service) => service.id === Number(form.serviceId)),
     [form.serviceId, services],
   );
+  const openDatePicker = () => {
+    const input = dateInputRef.current;
+    if (!input) return;
+    try {
+      input.showPicker();
+    } catch {
+      input.focus();
+      input.click();
+    }
+  };
   const filteredBookings = bookingFilter === "upcoming"
     ? upcoming
     : bookingFilter === "cancelled"
@@ -410,10 +422,22 @@ const CustomerAppointmentsPage = () => {
         </div>
       </header>
       <div className="customer-appointments-content">
-        <section className="customer-appointments-heading">
-          <p>{isBookingPage ? "Plan your visit" : "Your schedule"}</p>
-          <h1>{isBookingPage ? "Book an appointment" : "Bookings"}</h1>
-          <span>{isBookingPage ? "Choose your preferred service and time." : "View and manage your salon visits."}</span>
+        <section className={`customer-appointments-heading${isBookingPage ? " is-booking" : ""}`}>
+          {isBookingPage && (
+            <button
+              className="customer-booking-back"
+              type="button"
+              aria-label="Back to services"
+              onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/services")}
+            >
+              <ArrowLeft aria-hidden="true" />
+            </button>
+          )}
+          <div className="customer-appointments-heading-copy">
+            <p>{isBookingPage ? "Plan your visit" : "Your schedule"}</p>
+            <h1>{isBookingPage ? "Book an appointment" : "Bookings"}</h1>
+            <span>{isBookingPage ? "Choose your preferred service and time." : "View and manage your salon visits."}</span>
+          </div>
         </section>
         {isBookingPage && (
         <form
@@ -507,7 +531,18 @@ const CustomerAppointmentsPage = () => {
           </fieldset>
           <label className="customer-date-field">
             <span>Date</span>
-            <span className="customer-date-picker">
+            <span
+              className="customer-date-picker"
+              role="button"
+              tabIndex={0}
+              onClick={openDatePicker}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openDatePicker();
+                }
+              }}
+            >
               <CalendarDays aria-hidden="true" />
               <span className={form.appointmentDate ? "" : "is-placeholder"}>
                 {form.appointmentDate
@@ -515,6 +550,7 @@ const CustomerAppointmentsPage = () => {
                   : "dd-mm-yyyy"}
               </span>
               <input
+                ref={dateInputRef}
                 type="date"
                 aria-label="Appointment date"
                 min={today}
@@ -615,7 +651,7 @@ const CustomerAppointmentsPage = () => {
           </>
         )}
       </div>
-      <CustomerBottomNav active="bookings" />
+      <CustomerBottomNav active={isBookingPage ? "services" : "bookings"} />
       <ConfirmDialog
         open={cancelTarget !== null}
         title="Cancel appointment?"
