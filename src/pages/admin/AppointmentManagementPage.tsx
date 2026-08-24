@@ -1,6 +1,6 @@
 import { Ban, CalendarDays, CheckCircle2, Clock3, Eye, Play, RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { assignAppointmentEmployee, cancelAppointment, completeAppointment, getAppointments, startAppointment } from "../../services/appointmentService";
+import { assignAppointmentEmployee, cancelAppointment, completeAppointment, getAppointments, getAvailableAppointmentEmployees, startAppointment } from "../../services/appointmentService";
 import { getEmployees } from "../../services/employeeService";
 import { getAssignedEmployeeServices } from "../../services/employeeServiceAssignmentService";
 import type { Appointment, AppointmentStatus } from "../../types/appointment";
@@ -43,6 +43,7 @@ const AppointmentManagementPage = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const [eligibleEmployees, setEligibleEmployees] = useState<Record<number, Employee[]>>({});
+  const [availableEmployeeIds, setAvailableEmployeeIds] = useState<Record<number, number[]>>({});
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -99,6 +100,28 @@ const AppointmentManagementPage = () => {
       })
       .catch(() => setEligibleEmployees({}));
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    const scheduled = appointments.filter((appointment) => appointment.status === "Scheduled");
+    Promise.all(scheduled.map(async (appointment) => ({
+      appointmentId: appointment.id,
+      employeeIds: (await getAvailableAppointmentEmployees(appointment.id)).data.employeeIds,
+    })))
+      .then((results) => {
+        if (active)
+          setAvailableEmployeeIds(Object.fromEntries(results.map((result) => [result.appointmentId, result.employeeIds])));
+      })
+      .catch(() => {
+        if (active) setAvailableEmployeeIds({});
+      });
+    return () => { active = false; };
+  }, [appointments]);
+
+  const availableEmployeesFor = (appointment: Appointment) => {
+    const ids = availableEmployeeIds[appointment.id] ?? [];
+    return (eligibleEmployees[appointment.serviceId] ?? []).filter((employee) => ids.includes(employee.id));
+  };
 
   const canStart = (appointment: Appointment) => {
     const startsAt = new Date(`${appointment.appointmentDate}T${appointment.startTime}`).getTime();
@@ -287,8 +310,8 @@ const AppointmentManagementPage = () => {
                         className={`appointment-employee-select${appointment.employeeId ? "" : " is-unassigned"}`}
                         aria-label={`Assign employee to appointment ${appointment.id}`}
                         title="Assign or change employee"
-                        value={appointment.employeeId ?? ""}
-                        disabled={busyId === appointment.id || !(eligibleEmployees[appointment.serviceId]?.length)}
+                        value={availableEmployeesFor(appointment).some((employee) => employee.id === appointment.employeeId) ? appointment.employeeId ?? "" : ""}
+                        disabled={busyId === appointment.id || !availableEmployeesFor(appointment).length}
                         onChange={(event) => {
                           const employeeId = Number(event.target.value);
                           if (employeeId && employeeId !== appointment.employeeId)
@@ -297,11 +320,11 @@ const AppointmentManagementPage = () => {
                       >
                         <option value="">
                           {
-                            eligibleEmployees[appointment.serviceId]?.length ?
-                              "Assign employee" : "No eligible employees"
+                            availableEmployeesFor(appointment).length ?
+                              "Assign employee" : "No available employees"
                           }
                         </option>
-                        {eligibleEmployees[appointment.serviceId]?.map((employee) => (
+                        {availableEmployeesFor(appointment).map((employee) => (
                           <option
                             key={employee.id}
                             value={employee.id}>
@@ -351,44 +374,56 @@ const AppointmentManagementPage = () => {
 
       {selected &&
         <div className="appointment-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}>
-          <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-details-title"><header><div><p>Appointment #{selected.id}</p><h2 id="appointment-details-title">Appointment details</h2></div><button onClick={() => setSelected(null)} aria-label="Close"><X /></button></header><dl>
-            <div>
-              <dt>Customer</dt>
-              <dd>{selected.customerName ?? `#${selected.customerId}`}
-                <small>{selected.customerPhone}<br />{selected.customerEmail}</small>
-              </dd>
-            </div>
-            <div>
-              <dt>Service</dt>
-              <dd>{selected.serviceName ?? `#${selected.serviceId}`}</dd>
-            </div>
-            <div>
-              <dt>Employee</dt>
-              <dd>{selected.employeeName ?? "Unassigned"}</dd></div>
-            <div>
-              <dt>Schedule</dt>
-              <dd>{selected.appointmentDate}, {selected.startTime.slice(0, 5)} - {selected.endTime.slice(0, 5)}</dd>
-            </div>
-            <div>
-              <dt>Status</dt>
-              <dd>
-                <span className={`appointment-status is-${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</span>
-              </dd>
-            </div>
-            <div>
-              <dt>Amount</dt>
-              <dd>{Number(selected.totalAmount).toFixed(2)}</dd>
-            </div>
-            <div className="is-wide">
-              <dt>Customer notes</dt>
-              <dd>{selected.notes || "No notes provided."}</dd>
-            </div>
-            {selected.cancellationReason &&
+          <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-details-title">
+            <header>
+              <div>
+                <p>Appointment #{selected.id}</p>
+                <h2 id="appointment-details-title">
+                  Appointment details
+                </h2>
+              </div>
+              <button onClick={() => setSelected(null)} aria-label="Close">
+                <X />
+              </button>
+            </header>
+            <dl>
+              <div>
+                <dt>Customer</dt>
+                <dd>{selected.customerName ?? `#${selected.customerId}`}
+                  <small>{selected.customerPhone}<br />{selected.customerEmail}</small>
+                </dd>
+              </div>
+              <div>
+                <dt>Service</dt>
+                <dd>{selected.serviceName ?? `#${selected.serviceId}`}</dd>
+              </div>
+              <div>
+                <dt>Employee</dt>
+                <dd>{selected.employeeName ?? "Unassigned"}</dd></div>
+              <div>
+                <dt>Schedule</dt>
+                <dd>{selected.appointmentDate}, {selected.startTime.slice(0, 5)} - {selected.endTime.slice(0, 5)}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>
+                  <span className={`appointment-status is-${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</span>
+                </dd>
+              </div>
+              <div>
+                <dt>Amount</dt>
+                <dd>{Number(selected.totalAmount).toFixed(2)}</dd>
+              </div>
               <div className="is-wide">
-                <dt>Cancellation reason</dt>
-                <dd>{selected.cancellationReason}</dd>
-              </div>}
-          </dl>
+                <dt>Customer notes</dt>
+                <dd>{selected.notes || "No notes provided."}</dd>
+              </div>
+              {selected.cancellationReason &&
+                <div className="is-wide">
+                  <dt>Cancellation reason</dt>
+                  <dd>{selected.cancellationReason}</dd>
+                </div>}
+            </dl>
           </section>
         </div>}
 
