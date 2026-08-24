@@ -10,7 +10,7 @@ const statuses: Array<AppointmentStatus | ""> = ["", "Scheduled", "In Progress",
 const AppointmentManagementPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [date, setDate] = useState("");
-  const [status, setStatus] = useState<AppointmentStatus | "">("");
+  const [status, setStatus] = useState<AppointmentStatus | "">("Scheduled");
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [selected, setSelected] = useState<Appointment | null>(null);
@@ -20,9 +20,10 @@ const AppointmentManagementPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const { data } = await getAppointments({ date: date || undefined, status: status || undefined, search: appliedSearch || undefined });
@@ -30,11 +31,29 @@ const AppointmentManagementPage = () => {
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Unable to load appointments."));
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [date, status, appliedSearch]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    const initialLoadTimer = window.setTimeout(() => void load(), 0);
+    const refreshTimer = window.setInterval(() => void load(true), 30_000);
+    return () => {
+      window.clearTimeout(initialLoadTimer);
+      window.clearInterval(refreshTimer);
+    };
+  }, [load]);
+
+  useEffect(() => {
+    const clockTimer = window.setInterval(() => setCurrentTime(Date.now()), 30_000);
+    return () => window.clearInterval(clockTimer);
+  }, []);
+
+  const canStart = (appointment: Appointment) => {
+    const startsAt = new Date(`${appointment.appointmentDate}T${appointment.startTime}`).getTime();
+    const endsAt = new Date(`${appointment.appointmentDate}T${appointment.endTime}`).getTime();
+    return currentTime >= startsAt && currentTime <= endsAt;
+  };
 
   const counts = useMemo(() => ({
     total: appointments.length,
@@ -158,7 +177,7 @@ const AppointmentManagementPage = () => {
             </select>
           </label>
           <button type="submit">Apply</button>
-          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus(""); }}>Clear</button>
+          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Scheduled"); }}>Clear</button>
         </form>
         <div className="appointment-table-wrap">
           <table>
@@ -191,7 +210,7 @@ const AppointmentManagementPage = () => {
                   <td data-label="Actions">
                     <div className="appointment-actions">
                       <button className="is-view" title="View details" onClick={() => setSelected(appointment)}><Eye /></button>
-                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button disabled={busyId === appointment.id} onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> : <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
+                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button disabled={busyId === appointment.id || (appointment.status === "Scheduled" && !canStart(appointment))} title={appointment.status === "Scheduled" && !canStart(appointment) ? "This appointment can only be started during its scheduled time." : undefined} onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> : <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
                       {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button className="is-cancel" title="Cancel appointment" onClick={() => setCancelTarget(appointment)}><Ban /></button>}
                     </div>
                   </td>

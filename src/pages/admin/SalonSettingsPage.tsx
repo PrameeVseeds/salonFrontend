@@ -25,7 +25,7 @@ const defaults: UpdateSalonSettingsInput = {
   enableOnlinePayment: false,
   bookingIntervalMinutes: 30,
   appointmentBufferMinutes: 0,
-  appointmentGracePeriodMinutes: 15,
+  appointmentGracePeriodMinutes: 5,
 };
 const getError = (error: unknown) =>
   getApiErrorMessage(error, "Unable to save settings.");
