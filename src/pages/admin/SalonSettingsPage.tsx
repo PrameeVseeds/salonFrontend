@@ -26,12 +26,13 @@ const defaults: UpdateSalonSettingsInput = {
   bookingIntervalMinutes: 30,
   appointmentBufferMinutes: 0,
   appointmentGracePeriodMinutes: 5,
+  appointmentReminderMinutes: 15,
 };
 const getError = (error: unknown) =>
   getApiErrorMessage(error, "Unable to save settings.");
 
-type RequiredSettingField = "salonName" | "phone" | "email" | "address" | "bookingInterval" | "appointmentBuffer" | "appointmentGracePeriod";
-const requiredSettingFields: RequiredSettingField[] = ["salonName", "phone", "email", "address", "bookingInterval", "appointmentBuffer", "appointmentGracePeriod"];
+type RequiredSettingField = "salonName" | "phone" | "email" | "address" | "bookingInterval" | "appointmentBuffer" | "appointmentGracePeriod" | "appointmentReminder";
+const requiredSettingFields: RequiredSettingField[] = ["salonName", "phone", "email", "address", "bookingInterval", "appointmentBuffer", "appointmentGracePeriod", "appointmentReminder"];
 const RequiredLabel = ({ children }: { children: string }) => (
   <span className="settings-required-label">{children}<Asterisk aria-label="required" /></span>
 );
@@ -46,6 +47,7 @@ const SalonSettingsPage = () => {
   const [bookingInterval, setBookingInterval] = useState(String(defaults.bookingIntervalMinutes));
   const [appointmentBuffer, setAppointmentBuffer] = useState(String(defaults.appointmentBufferMinutes));
   const [appointmentGracePeriod, setAppointmentGracePeriod] = useState(String(defaults.appointmentGracePeriodMinutes));
+  const [appointmentReminder, setAppointmentReminder] = useState(String(defaults.appointmentReminderMinutes));
   const [touched, setTouched] = useState<Partial<Record<RequiredSettingField, boolean>>>({});
   const apply = (value: SalonSettings) => {
     setSettings(value);
@@ -62,10 +64,12 @@ const SalonSettingsPage = () => {
       bookingIntervalMinutes: value.bookingIntervalMinutes,
       appointmentBufferMinutes: value.appointmentBufferMinutes,
       appointmentGracePeriodMinutes: value.appointmentGracePeriodMinutes,
+      appointmentReminderMinutes: value.appointmentReminderMinutes,
     });
     setBookingInterval(String(value.bookingIntervalMinutes));
     setAppointmentBuffer(String(value.appointmentBufferMinutes));
     setAppointmentGracePeriod(String(value.appointmentGracePeriodMinutes));
+    setAppointmentReminder(String(value.appointmentReminderMinutes));
   };
   useEffect(() => {
     getSalonSettings()
@@ -113,6 +117,11 @@ const SalonSettingsPage = () => {
       : !Number.isInteger(Number(appointmentGracePeriod)) || Number(appointmentGracePeriod) < 0
         ? "Enter zero or a positive whole number."
         : undefined,
+    appointmentReminder: !appointmentReminder
+      ? "Reminder time is required."
+      : !Number.isInteger(Number(appointmentReminder)) || Number(appointmentReminder) < 0
+        ? "Enter zero or a positive whole number."
+        : undefined,
   };
   const save = async (e: FormEvent) => {
     e.preventDefault();
@@ -131,6 +140,7 @@ const SalonSettingsPage = () => {
         bookingIntervalMinutes: Number(bookingInterval),
         appointmentBufferMinutes: Number(appointmentBuffer),
         appointmentGracePeriodMinutes: Number(appointmentGracePeriod),
+        appointmentReminderMinutes: Number(appointmentReminder),
       });
       apply(data.settings);
       setSuccess("Salon settings updated successfully.");
@@ -275,7 +285,24 @@ const SalonSettingsPage = () => {
             {touched.appointmentBuffer && fieldErrors.appointmentBuffer &&
               <small className="settings-field-error">{fieldErrors.appointmentBuffer}</small>}
           </label>
-          <label className="is-wide">
+          <label>
+            <RequiredLabel>Appointment reminder time (minutes before)</RequiredLabel>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={appointmentReminder}
+              onChange={(e) => setAppointmentReminder(e.target.value)}
+              onBlur={() => touch("appointmentReminder")}
+              aria-invalid={Boolean(touched.appointmentReminder && fieldErrors.appointmentReminder)}
+            />
+            <span className="settings-field-hint">
+              Sends one reminder email to the customer, salon admin, and assigned employee this many minutes before the appointment.
+            </span>
+            {touched.appointmentReminder && fieldErrors.appointmentReminder &&
+              <small className="settings-field-error">{fieldErrors.appointmentReminder}</small>}
+          </label>
+          <label>
             <RequiredLabel>Late arrival grace period (minutes)</RequiredLabel>
             <input
               type="number"

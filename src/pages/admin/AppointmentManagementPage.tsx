@@ -5,12 +5,13 @@ import type { Appointment, AppointmentStatus } from "../../types/appointment";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./appointmentManagementPage.css";
 
-const statuses: Array<AppointmentStatus | ""> = ["", "Scheduled", "In Progress", "Completed", "Cancelled"];
+type StatusFilter = AppointmentStatus | "Active" | "";
+const statuses: StatusFilter[] = ["Active", "", "Scheduled", "In Progress", "Completed", "Cancelled"];
 
 const AppointmentManagementPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [date, setDate] = useState("");
-  const [status, setStatus] = useState<AppointmentStatus | "">("Scheduled");
+  const [status, setStatus] = useState<StatusFilter>("Active");
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [selected, setSelected] = useState<Appointment | null>(null);
@@ -26,8 +27,20 @@ const AppointmentManagementPage = () => {
     if (!silent) setLoading(true);
     setError(null);
     try {
-      const { data } = await getAppointments({ date: date || undefined, status: status || undefined, search: appliedSearch || undefined });
-      setAppointments(data.appointments);
+      const filters = { date: date || undefined, search: appliedSearch || undefined };
+      if (status === "Active") {
+        const [scheduledResponse, inProgressResponse] = await Promise.all([
+          getAppointments({ ...filters, status: "Scheduled" }),
+          getAppointments({ ...filters, status: "In Progress" }),
+        ]);
+        setAppointments([
+          ...scheduledResponse.data.appointments,
+          ...inProgressResponse.data.appointments,
+        ]);
+      } else {
+        const { data } = await getAppointments({ ...filters, status: status || undefined });
+        setAppointments(data.appointments);
+      }
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Unable to load appointments."));
     } finally {
@@ -168,16 +181,16 @@ const AppointmentManagementPage = () => {
           </label>
           <label>
             <span>Status</span>
-            <select value={status} onChange={(event) => setStatus(event.target.value as AppointmentStatus | "")}>
+            <select value={status} onChange={(event) => setStatus(event.target.value as StatusFilter)}>
               {statuses.map((item) => (
                 <option key={item || "all"} value={item}>
-                  {item || "All statuses"}
+                  {item === "Active" ? "Scheduled & In Progress" : item || "All statuses"}
                 </option>
               ))}
             </select>
           </label>
           <button type="submit">Apply</button>
-          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Scheduled"); }}>Clear</button>
+          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Active"); }}>Clear</button>
         </form>
         <div className="appointment-table-wrap">
           <table>
