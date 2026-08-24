@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import {getCustomerProfile,logoutCustomer,} from "../../services/customerAuthService";
 import { getPublicGalleryImages } from "../../services/galleryService";
@@ -20,6 +21,7 @@ const CustomerGalleryPage = () => {
   const [selected, setSelected] = useState<GalleryImage | null>(null);
   const [loading, setLoading] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     Promise.allSettled([getPublicGalleryImages(), getCustomerProfile()]).then(
@@ -76,8 +78,9 @@ const CustomerGalleryPage = () => {
           <button
             className="customer-profile-trigger"
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => setProfileOpen(true)}
             aria-label="View your profile"
+            aria-expanded={profileOpen}
           >
             {customer?.profileImage ? (
               <img src={customer.profileImage} alt="" />
@@ -162,6 +165,7 @@ const CustomerGalleryPage = () => {
           </figure>
         </div>
       )}
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={logoutOpen}
         title="Sign out?"

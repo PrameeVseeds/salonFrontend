@@ -1,14 +1,16 @@
 import {
+  ArrowLeft,
   CalendarDays,
   Clock3,
   LogOut,
   Scissors,
   UserRound,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import {
   cancelCustomerAppointment,
@@ -34,6 +36,7 @@ import "./customerAppointmentsPage.css";
 const today = new Date().toISOString().slice(0, 10);
 const CustomerAppointmentsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
   const { brand, style } = usePublicTheme();
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -59,10 +62,16 @@ const CustomerAppointmentsPage = () => {
   } | null>(null);
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
+  const [slotsMessage, setSlotsMessage] = useState<string | null>(null);
+  const [bookingFilter, setBookingFilter] = useState<"upcoming" | "cancelled" | "past">("upcoming");
+  const [visibleBookingCount, setVisibleBookingCount] = useState(10);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const initialServiceId = params.get("service") ?? "";
+  const isBookingPage = location.pathname === "/book-appointment";
 
   useEffect(() => {
     Promise.allSettled([
@@ -135,32 +144,37 @@ const CustomerAppointmentsPage = () => {
     }));
     setAvailableSlots([]);
     setSlotsError(null);
+    setSlotsMessage(null);
     setSlotEmployees({});
-    if (!serviceId || !appointmentDate || !staff.length) return;
+    if (!serviceId || !appointmentDate) return;
     setSlotsLoading(true);
     const candidates =
       choice === "any"
         ? staff
         : staff.filter((employee) => employee.id === Number(choice));
     Promise.all(
-      candidates.map(async (employee) => ({
-        employeeId: employee.id,
-        slots: await getAvailableAppointmentSlots(
+      (candidates.length ? candidates : [null]).map(async (employee) => ({
+        employeeId: employee?.id ?? null,
+        availability: await getAvailableAppointmentSlots(
           Number(serviceId),
-          employee.id,
+          employee?.id ?? null,
           appointmentDate,
         ),
       })),
     )
       .then((results) => {
         const slotMap: Record<string, number> = {};
+        const uniqueSlots = new Set<string>();
         results.forEach((result) =>
-          result.slots.forEach((slot) => {
-            if (!slotMap[slot]) slotMap[slot] = result.employeeId;
+          result.availability.slots.forEach((slot) => {
+            uniqueSlots.add(slot);
+            if (result.employeeId !== null && !slotMap[slot]) slotMap[slot] = result.employeeId;
           }),
         );
         setSlotEmployees(slotMap);
-        setAvailableSlots(Object.keys(slotMap).sort());
+        setAvailableSlots([...uniqueSlots].sort());
+        if (!uniqueSlots.size)
+          setSlotsMessage(results.find((result) => result.availability.message)?.availability.message ?? null);
       })
       .catch((error) =>
         setSlotsError(
@@ -174,6 +188,7 @@ const CustomerAppointmentsPage = () => {
     setEmployeeChoice("any");
     setAvailableSlots([]);
     setSlotEmployees({});
+    setSlotsMessage(null);
     setForm((current) => ({
       ...current,
       serviceId,
@@ -209,7 +224,8 @@ const CustomerAppointmentsPage = () => {
       appointments
         .filter(
           (item) =>
-            item.status === "Scheduled" || item.status === "In Progress",
+            (item.status === "Scheduled" || item.status === "In Progress") &&
+            item.appointmentDate >= today,
         )
         .sort((a, b) =>
           `${a.appointmentDate}${a.startTime}`.localeCompare(
@@ -218,11 +234,25 @@ const CustomerAppointmentsPage = () => {
         ),
     [appointments],
   );
-  const history = useMemo(
+  const cancelled = useMemo(
+    () =>
+      appointments
+        .filter((item) => item.status === "Cancelled")
+        .sort((a, b) =>
+          `${b.appointmentDate}${b.startTime}`.localeCompare(
+            `${a.appointmentDate}${a.startTime}`,
+          ),
+        ),
+    [appointments],
+  );
+  const past = useMemo(
     () =>
       appointments
         .filter(
-          (item) => item.status === "Completed" || item.status === "Cancelled",
+          (item) =>
+            item.status === "Completed" ||
+            ((item.status === "Scheduled" || item.status === "In Progress") &&
+              item.appointmentDate < today),
         )
         .sort((a, b) =>
           `${b.appointmentDate}${b.startTime}`.localeCompare(
@@ -231,6 +261,30 @@ const CustomerAppointmentsPage = () => {
         ),
     [appointments],
   );
+  const selectedService = useMemo(
+    () => services.find((service) => service.id === Number(form.serviceId)),
+    [form.serviceId, services],
+  );
+  const openDatePicker = () => {
+    const input = dateInputRef.current;
+    if (!input) return;
+    try {
+      input.showPicker();
+    } catch {
+      input.focus();
+      input.click();
+    }
+  };
+  const filteredBookings = bookingFilter === "upcoming"
+    ? upcoming
+    : bookingFilter === "cancelled"
+      ? cancelled
+      : past;
+  const filteredBookingTitle = bookingFilter === "upcoming"
+    ? "Upcoming"
+    : bookingFilter === "cancelled"
+      ? "Cancelled"
+      : "Past bookings";
 
   const book = async (event: FormEvent) => {
     event.preventDefault();
@@ -256,6 +310,7 @@ const CustomerAppointmentsPage = () => {
       setEmployeeChoice("any");
       setAvailableSlots([]);
       setSlotEmployees({});
+      setSlotsMessage(null);
       setMessage({ type: "success", text: "Appointment booked successfully." });
     } catch (error) {
       setMessage({
@@ -296,35 +351,48 @@ const CustomerAppointmentsPage = () => {
   };
   const card = (item: Appointment, cancellable: boolean) => (
     <article className="customer-appointment-card" key={item.id}>
-      <time>
+      <span className="customer-appointment-image">
+        {services.find((service) => service.id === item.serviceId)?.imageUrl ? (
+          <img src={services.find((service) => service.id === item.serviceId)?.imageUrl} alt="" />
+        ) : (
+          <Scissors aria-hidden="true" />
+        )}
+      </span>
+      <div className="customer-appointment-details">
         <strong>
-          {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(
-            undefined,
-            { day: "2-digit" },
-          )}
+          {item.serviceName ??
+            services.find((service) => service.id === item.serviceId)?.name ??
+            "Salon service"}
         </strong>
-        <span>
-          {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(
-            undefined,
-            { month: "short" },
-          )}
-        </span>
-      </time>
-      <div>
-        <strong>{item.serviceName ?? `Service #${item.serviceId}`}</strong>
         <span>
           <Clock3 /> {item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)}
         </span>
-        <small>{item.employeeName ?? "Professional assigned by salon"}</small>
+        <small>
+          {item.employeeName ??
+            (() => {
+              const employee = employees.find(
+                (candidate) => candidate.id === item.employeeId,
+              );
+              return employee
+                ? `${employee.firstName} ${employee.lastName}`
+                : "Professional assigned by salon";
+            })()}
+        </small>
+        {cancellable && (
+          <button type="button" onClick={() => setCancelTarget(item)}>
+            Cancel
+          </button>
+        )}
       </div>
-      <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
-        {item.status}
-      </b>
-      {cancellable && (
-        <button type="button" onClick={() => setCancelTarget(item)}>
-          Cancel
-        </button>
-      )}
+      <aside className="customer-appointment-meta">
+        <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
+          {item.status}
+        </b>
+        <time>
+          <strong>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}</strong>
+          <span>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}</span>
+        </time>
+      </aside>
     </article>
   );
 
@@ -345,8 +413,9 @@ const CustomerAppointmentsPage = () => {
           <button
             className="customer-profile-trigger"
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => setProfileOpen(true)}
             aria-label="View your profile"
+            aria-expanded={profileOpen}
           >
             {customer?.profileImage ? (
               <img src={customer.profileImage} alt="" />
@@ -364,11 +433,24 @@ const CustomerAppointmentsPage = () => {
         </div>
       </header>
       <div className="customer-appointments-content">
-        <section className="customer-appointments-heading">
-          <p>Your schedule</p>
-          <h1>Appointments</h1>
-          <span>Book and manage your salon visits.</span>
+        <section className={`customer-appointments-heading${isBookingPage ? " is-booking" : ""}`}>
+          {isBookingPage && (
+            <button
+              className="customer-booking-back"
+              type="button"
+              aria-label="Back to services"
+              onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/services")}
+            >
+              <ArrowLeft aria-hidden="true" />
+            </button>
+          )}
+          <div className="customer-appointments-heading-copy">
+            <p>{isBookingPage ? "Plan your visit" : "Your schedule"}</p>
+            <h1>{isBookingPage ? "Book an appointment" : "Bookings"}</h1>
+            <span>{isBookingPage ? "Choose your preferred service and time." : "View and manage your salon visits."}</span>
+          </div>
         </section>
+        {isBookingPage && (
         <form
           className="customer-booking-form"
           onSubmit={(event) => void book(event)}
@@ -377,9 +459,10 @@ const CustomerAppointmentsPage = () => {
             <CalendarDays />
             <div>
               <h2>Book an appointment</h2>
-              <p>Choose your service, professional, and preferred time.</p>
+              <p>{selectedService ? `${selectedService.name} · ${selectedService.durationMinutes} min · ${Number(selectedService.price).toFixed(2)}` : "Choose your service, professional, and preferred time."}</p>
             </div>
           </header>
+          {!initialServiceId && (
           <label>
             <span>Service</span>
             <select
@@ -396,6 +479,7 @@ const CustomerAppointmentsPage = () => {
               ))}
             </select>
           </label>
+          )}
           <fieldset className="customer-professional-field">
             <legend>
               Professional <small>(optional)</small>
@@ -452,28 +536,47 @@ const CustomerAppointmentsPage = () => {
               </div>
             ) : (
               <p className="customer-professional-empty">
-                No professionals are assigned to this service.
+                No professional selection is needed. The salon can assign one later.
               </p>
             )}
           </fieldset>
-          <label>
+          <label className="customer-date-field">
             <span>Date</span>
-            <input
-              type="date"
-              min={today}
-              value={form.appointmentDate}
-              onChange={(e) =>
-                loadSlots(form.serviceId, employeeChoice, e.target.value)
-              }
-              required
-            />
+            <span
+              className="customer-date-picker"
+              role="button"
+              tabIndex={0}
+              onClick={openDatePicker}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openDatePicker();
+                }
+              }}
+            >
+              <CalendarDays aria-hidden="true" />
+              <span className={form.appointmentDate ? "" : "is-placeholder"}>
+                {form.appointmentDate
+                  ? form.appointmentDate.split("-").reverse().join("-")
+                  : "dd-mm-yyyy"}
+              </span>
+              <input
+                ref={dateInputRef}
+                type="date"
+                aria-label="Appointment date"
+                min={today}
+                value={form.appointmentDate}
+                onChange={(e) =>
+                  loadSlots(form.serviceId, employeeChoice, e.target.value)
+                }
+                required
+              />
+            </span>
           </label>
           <fieldset className="customer-time-slots">
             <legend>Available times</legend>
             {!form.appointmentDate || !form.serviceId ? (
               <p>Select a service and date to view times.</p>
-            ) : !assignedEmployees.length ? (
-              <p>No assigned professionals are available for this service.</p>
             ) : slotsLoading ? (
               <p>Checking available times...</p>
             ) : slotsError ? (
@@ -489,7 +592,7 @@ const CustomerAppointmentsPage = () => {
                       setForm({
                         ...form,
                         startTime: slot,
-                        employeeId: String(slotEmployees[slot]),
+                        employeeId: slotEmployees[slot] ? String(slotEmployees[slot]) : "",
                       })
                     }
                   >
@@ -498,7 +601,7 @@ const CustomerAppointmentsPage = () => {
                 ))}
               </div>
             ) : (
-              <p>No available times for this date.</p>
+              <p>{slotsMessage ?? "No available times for this date."}</p>
             )}
           </fieldset>
           <label>
@@ -518,30 +621,47 @@ const CustomerAppointmentsPage = () => {
             {busy ? "Booking..." : "Confirm appointment"}
           </button>
         </form>
+        )}
+        {!isBookingPage && (
+          <>
+        <nav className="customer-booking-filters" aria-label="Filter bookings">
+          {([
+            ["upcoming", "Upcoming", upcoming.length],
+            ["cancelled", "Cancelled", cancelled.length],
+            ["past", "Past", past.length],
+          ] as const).map(([value, label, count]) => (
+            <button
+              className={bookingFilter === value ? "is-active" : ""}
+              type="button"
+              key={value}
+              onClick={() => { setBookingFilter(value); setVisibleBookingCount(10); }}
+              aria-pressed={bookingFilter === value}
+            >
+              <span>{label}</span><b>{count}</b>
+            </button>
+          ))}
+        </nav>
         <section className="customer-appointments-list">
           <header>
-            <h2>Upcoming</h2>
-            <span>{upcoming.length}</span>
+            <h2>{filteredBookingTitle}</h2>
+            <span>{filteredBookings.length}</span>
           </header>
-          {upcoming.length ? (
-            upcoming.map((item) => card(item, item.status === "Scheduled"))
+          {filteredBookings.length ? (
+            filteredBookings.slice(0, visibleBookingCount).map((item) => card(item, bookingFilter === "upcoming" && item.status === "Scheduled"))
           ) : (
             <div className="customer-appointment-empty">
-              No upcoming appointments.
+              No {filteredBookingTitle.toLowerCase()}.
             </div>
           )}
+          {filteredBookings.length > visibleBookingCount && (
+            <button className="customer-bookings-more" type="button" onClick={() => setVisibleBookingCount((count) => count + 10)}>Show more bookings</button>
+          )}
         </section>
-        {history.length > 0 && (
-          <section className="customer-appointments-list">
-            <header>
-              <h2>History</h2>
-              <span>{history.length}</span>
-            </header>
-            {history.map((item) => card(item, false))}
-          </section>
+          </>
         )}
       </div>
-      <CustomerBottomNav active="bookings" />
+      <CustomerBottomNav active={isBookingPage ? "services" : "bookings"} />
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={cancelTarget !== null}
         title="Cancel appointment?"

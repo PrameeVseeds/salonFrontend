@@ -20,4 +20,5 @@ export const appRoutes = createBrowserRouter([
   { path: "/services", element: <ProtectedCustomer><CustomerServicesPage /></ProtectedCustomer> },
   { path: "/gallery", element: <ProtectedCustomer><CustomerGalleryPage /></ProtectedCustomer> },
   { path: "/appointments", element: <ProtectedCustomer><CustomerAppointmentsPage /></ProtectedCustomer> },
+  { path: "/book-appointment", element: <ProtectedCustomer><CustomerAppointmentsPage /></ProtectedCustomer> },
 ]);
