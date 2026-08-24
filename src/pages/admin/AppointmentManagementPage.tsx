@@ -284,7 +284,9 @@ const AppointmentManagementPage = () => {
                   <td data-label="Employee">
                     {appointment.status === "Scheduled" ? (
                       <select
+                        className={`appointment-employee-select${appointment.employeeId ? "" : " is-unassigned"}`}
                         aria-label={`Assign employee to appointment ${appointment.id}`}
+                        title="Assign or change employee"
                         value={appointment.employeeId ?? ""}
                         disabled={busyId === appointment.id || !(eligibleEmployees[appointment.serviceId]?.length)}
                         onChange={(event) => {

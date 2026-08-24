@@ -261,6 +261,46 @@
   font-size: 0.66rem;
 }
 
+.appointment-employee-select {
+  width: min(180px, 100%);
+  min-width: 150px;
+  height: 36px;
+  padding: 0 34px 0 11px;
+  border: 1px solid #ded6e3;
+  border-radius: 8px;
+  color: #4f4854;
+  background-color: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.appointment-employee-select:hover {
+  border-color: #c5a65f;
+  background-color: #fffdf8;
+}
+
+.appointment-employee-select:focus {
+  outline: none;
+  border-color: #bd861b;
+  box-shadow: 0 0 0 3px rgb(189 134 27 / 14%);
+}
+
+.appointment-employee-select.is-unassigned {
+  color: #8a6218;
+  border-color: #e3c98f;
+  background-color: #fff9e9;
+}
+
+.appointment-employee-select:disabled {
+  color: #8e877f;
+  background-color: #f4f1ec;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
 .appointment-actions {
   display: flex;
   align-items: center;
