@@ -343,6 +343,23 @@
   line-height: 1.4;
 }
 
+.service-capacity-auto {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  color: #625a50;
+  font-size: 0.67rem;
+  font-weight: 600;
+}
+
+.service-capacity-auto input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #b88624;
+}
+
 .service-image-picker {
   height: 64px;
   display: flex;
