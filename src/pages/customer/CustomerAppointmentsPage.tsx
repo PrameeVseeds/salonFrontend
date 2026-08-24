@@ -18,10 +18,7 @@ import {
   getAvailableAppointmentSlots,
   getCustomerAppointments,
 } from "../../services/appointmentService";
-import {
-  getCustomerProfile,
-  logoutCustomer,
-} from "../../services/customerAuthService";
+import {getCustomerProfile,logoutCustomer,} from "../../services/customerAuthService";
 import { getPublicServices } from "../../services/salonService";
 import { getPublicEmployees } from "../../services/employeeService";
 import { getPublicAssignedEmployeeServices } from "../../services/employeeServiceAssignmentService";
@@ -33,7 +30,9 @@ import { getApiErrorMessage } from "../../utils/apiError";
 import "./customerDashboardPage.css";
 import "./customerAppointmentsPage.css";
 
-const today = new Date().toISOString().slice(0, 10);
+const localDateKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+const today = localDateKey(new Date());
 const CustomerAppointmentsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,11 +66,24 @@ const CustomerAppointmentsPage = () => {
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
   const [slotsMessage, setSlotsMessage] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
   const [bookingFilter, setBookingFilter] = useState<"upcoming" | "cancelled" | "past">("upcoming");
   const [visibleBookingCount, setVisibleBookingCount] = useState(10);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const initialServiceId = params.get("service") ?? "";
   const isBookingPage = location.pathname === "/book-appointment";
+
+  const visibleAvailableSlots = useMemo(
+    () => availableSlots.filter((slot) =>
+      new Date(`${form.appointmentDate}T${slot}`).getTime() > currentTime,
+    ),
+    [availableSlots, form.appointmentDate, currentTime],
+  );
+
+  useEffect(() => {
+    const clockTimer = window.setInterval(() => setCurrentTime(Date.now()), 30_000);
+    return () => window.clearInterval(clockTimer);
+  }, []);
 
   useEffect(() => {
     Promise.allSettled([
@@ -267,7 +279,8 @@ const CustomerAppointmentsPage = () => {
   );
   const openDatePicker = () => {
     const input = dateInputRef.current;
-    if (!input) return;
+    if (!input)
+      return;
     try {
       input.showPicker();
     } catch {
@@ -389,8 +402,12 @@ const CustomerAppointmentsPage = () => {
           {item.status}
         </b>
         <time>
-          <strong>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}</strong>
-          <span>{new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}</span>
+          <strong>
+            {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}
+            </strong>
+          <span>
+            {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}
+            </span>
         </time>
       </aside>
     </article>
@@ -459,7 +476,10 @@ const CustomerAppointmentsPage = () => {
             <CalendarDays />
             <div>
               <h2>Book an appointment</h2>
-              <p>{selectedService ? `${selectedService.name} · ${selectedService.durationMinutes} min · ${Number(selectedService.price).toFixed(2)}` : "Choose your service, professional, and preferred time."}</p>
+              <p>
+                {selectedService ? `${selectedService.name} · ${selectedService.durationMinutes} min · ${Number(selectedService.price).toFixed(2)}`
+                 : "Choose your service, professional, and preferred time."}
+                 </p>
             </div>
           </header>
           {!initialServiceId && (
@@ -581,9 +601,9 @@ const CustomerAppointmentsPage = () => {
               <p>Checking available times...</p>
             ) : slotsError ? (
               <p className="is-error">{slotsError}</p>
-            ) : availableSlots.length ? (
+            ) : visibleAvailableSlots.length ? (
               <div>
-                {availableSlots.map((slot) => (
+                {visibleAvailableSlots.map((slot) => (
                   <button
                     className={form.startTime === slot ? "is-selected" : ""}
                     type="button"
@@ -592,7 +612,7 @@ const CustomerAppointmentsPage = () => {
                       setForm({
                         ...form,
                         startTime: slot,
-                        employeeId: slotEmployees[slot] ? String(slotEmployees[slot]) : "",
+                        employeeId: employeeChoice !== "any" && slotEmployees[slot] ? String(slotEmployees[slot]) : "",
                       })
                     }
                   >
@@ -637,7 +657,8 @@ const CustomerAppointmentsPage = () => {
               onClick={() => { setBookingFilter(value); setVisibleBookingCount(10); }}
               aria-pressed={bookingFilter === value}
             >
-              <span>{label}</span><b>{count}</b>
+              <span>{label}</span>
+              <b>{count}</b>
             </button>
           ))}
         </nav>

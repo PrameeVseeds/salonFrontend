@@ -1,12 +1,32 @@
 import { Ban, CalendarDays, CheckCircle2, Clock3, Eye, Play, RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { cancelAppointment, completeAppointment, getAppointments, startAppointment } from "../../services/appointmentService";
+import { assignAppointmentEmployee, cancelAppointment, completeAppointment, getAppointments, startAppointment } from "../../services/appointmentService";
+import { getEmployees } from "../../services/employeeService";
+import { getAssignedEmployeeServices } from "../../services/employeeServiceAssignmentService";
 import type { Appointment, AppointmentStatus } from "../../types/appointment";
+import type { Employee } from "../../types/employee";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./appointmentManagementPage.css";
 
 type StatusFilter = AppointmentStatus | "Active" | "";
 const statuses: StatusFilter[] = ["Active", "", "Scheduled", "In Progress", "Completed", "Cancelled"];
+
+const formatDateInput = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)]
+    .filter(Boolean)
+    .join("-");
+};
+
+const toApiDate = (value: string): string | undefined => {
+  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value);
+  if (!match) return undefined;
+  const [, day, month, year] = match;
+  const candidate = new Date(`${year}-${month}-${day}T00:00:00Z`);
+  if (candidate.getUTCFullYear() !== Number(year) || candidate.getUTCMonth() + 1 !== Number(month)
+    || candidate.getUTCDate() !== Number(day)) return undefined;
+  return `${year}-${month}-${day}`;
+};
 
 const AppointmentManagementPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -22,12 +42,13 @@ const AppointmentManagementPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [eligibleEmployees, setEligibleEmployees] = useState<Record<number, Employee[]>>({});
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     setError(null);
     try {
-      const filters = { date: date || undefined, search: appliedSearch || undefined };
+      const filters = { date: toApiDate(date), search: appliedSearch || undefined };
       if (status === "Active") {
         const [scheduledResponse, inProgressResponse] = await Promise.all([
           getAppointments({ ...filters, status: "Scheduled" }),
@@ -60,6 +81,23 @@ const AppointmentManagementPage = () => {
   useEffect(() => {
     const clockTimer = window.setInterval(() => setCurrentTime(Date.now()), 30_000);
     return () => window.clearInterval(clockTimer);
+  }, []);
+
+  useEffect(() => {
+    getEmployees()
+      .then(async ({ data }) => {
+        const activeEmployees = data.employees.filter((employee) => employee.isActive);
+        const assignments = await Promise.all(activeEmployees.map(async (employee) => ({
+          employee,
+          services: (await getAssignedEmployeeServices(employee.id)).data.services,
+        })));
+        const byService: Record<number, Employee[]> = {};
+        assignments.forEach(({ employee, services }) => services.forEach((service) => {
+          (byService[service.id] ??= []).push(employee);
+        }));
+        setEligibleEmployees(byService);
+      })
+      .catch(() => setEligibleEmployees({}));
   }, []);
 
   const canStart = (appointment: Appointment) => {
@@ -126,10 +164,29 @@ const AppointmentManagementPage = () => {
     }
   };
 
+  const assignEmployee = async (appointment: Appointment, employeeId: number) => {
+    setBusyId(appointment.id);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await assignAppointmentEmployee(appointment.id, employeeId);
+      replaceAppointment(response.data.appointment);
+      setSuccess(response.message);
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError, "Unable to assign employee."));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <div className="appointment-page">
       <header className="appointment-heading">
-        <div><p className="dashboard-eyebrow">Daily operations</p><h1>Appointments</h1><p>Track arrivals, services, completions, and cancellations.</p></div>
+        <div>
+          <p className="dashboard-eyebrow">Daily operations</p>
+          <h1>Appointments</h1>
+          <p>Track arrivals, services, completions, and cancellations.</p>
+        </div>
         <button className="appointment-refresh" onClick={() => void load()} disabled={loading}><RefreshCw />Refresh</button>
       </header>
       {error && <p className="appointment-message is-error">{error}</p>}
@@ -177,7 +234,15 @@ const AppointmentManagementPage = () => {
           </label>
           <label>
             <span>Date</span>
-            <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
+              placeholder="dd-mm-yyyy"
+              value={date}
+              onChange={(event) => setDate(formatDateInput(event.target.value))}
+              aria-label="Date in day-month-year format"
+            />
           </label>
           <label>
             <span>Status</span>
@@ -216,66 +281,114 @@ const AppointmentManagementPage = () => {
                     <strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
                     <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small>
                   </td>
-                  <td data-label="Employee">{appointment.employeeName ?? (appointment.employeeId ? `Employee #${appointment.employeeId}` : "Unassigned")}</td>
+                  <td data-label="Employee">
+                    {appointment.status === "Scheduled" ? (
+                      <select
+                        aria-label={`Assign employee to appointment ${appointment.id}`}
+                        value={appointment.employeeId ?? ""}
+                        disabled={busyId === appointment.id || !(eligibleEmployees[appointment.serviceId]?.length)}
+                        onChange={(event) => {
+                          const employeeId = Number(event.target.value);
+                          if (employeeId && employeeId !== appointment.employeeId)
+                            void assignEmployee(appointment, employeeId);
+                        }}
+                      >
+                        <option value="">
+                          {
+                            eligibleEmployees[appointment.serviceId]?.length ?
+                              "Assign employee" : "No eligible employees"
+                          }
+                        </option>
+                        {eligibleEmployees[appointment.serviceId]?.map((employee) => (
+                          <option
+                            key={employee.id}
+                            value={employee.id}>
+                            {employee.firstName} {employee.lastName}
+                          </option>
+                        ))}
+                      </select>
+                    ) : appointment.employeeName ?? (appointment.employeeId ? `Employee #${appointment.employeeId}` : "Unassigned")}
+                  </td>
                   <td data-label="Amount">{Number(appointment.totalAmount).toFixed(2)}</td>
                   <td data-label="Status">
                     <span className={`appointment-status is-${appointment.status.toLowerCase().replace(" ", "-")}`}>{appointment.status}</span></td>
                   <td data-label="Actions">
                     <div className="appointment-actions">
-                      <button className="is-view" title="View details" onClick={() => setSelected(appointment)}><Eye /></button>
-                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button disabled={busyId === appointment.id || (appointment.status === "Scheduled" && !canStart(appointment))} title={appointment.status === "Scheduled" && !canStart(appointment) ? "This appointment can only be started during its scheduled time." : undefined} onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> : <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
-                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button className="is-cancel" title="Cancel appointment" onClick={() => setCancelTarget(appointment)}><Ban /></button>}
+                      <button className="is-view" title="View details" onClick={() => setSelected(appointment)}>
+                        <Eye />
+                      </button>
+                      {(appointment.status === "Scheduled" || appointment.status === "In Progress")
+                        &&
+                        <button disabled={busyId === appointment.id || (appointment.status === "Scheduled"
+                          &&
+                          !canStart(appointment))} title={appointment.status === "Scheduled" && !canStart(appointment)
+                            ? "This appointment can only be started during its scheduled time." : undefined}
+                          onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> :
+                            <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
+                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") &&
+                        <button className="is-cancel" title="Cancel appointment" onClick={() => setCancelTarget(appointment)}>
+                          <Ban />
+                        </button>}
                     </div>
                   </td>
                 </tr>
               ))}
-              {!loading && !appointments.length && <tr><td className="appointment-empty" colSpan={7}><Clock3 />No appointments match these filters.</td></tr>}
-              {loading && <tr><td className="appointment-empty" colSpan={7}>Loading appointments...</td></tr>}
+              {!loading && !appointments.length && <tr><td className="appointment-empty" colSpan={7}>
+                <Clock3 />
+                No appointments match these filters.
+              </td>
+              </tr>}
+              {loading &&
+                <tr>
+                  <td className="appointment-empty" colSpan={7}>Loading appointments...</td>
+                </tr>}
             </tbody>
           </table>
         </div>
       </section>
 
-      {selected && <div className="appointment-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-details-title"><header><div><p>Appointment #{selected.id}</p><h2 id="appointment-details-title">Appointment details</h2></div><button onClick={() => setSelected(null)} aria-label="Close"><X /></button></header><dl>
-        <div>
-          <dt>Customer</dt>
-          <dd>{selected.customerName ?? `#${selected.customerId}`}
-            <small>{selected.customerPhone}<br />{selected.customerEmail}</small>
-          </dd>
-        </div>
-        <div>
-          <dt>Service</dt>
-          <dd>{selected.serviceName ?? `#${selected.serviceId}`}</dd>
-        </div>
-        <div>
-          <dt>Employee</dt>
-          <dd>{selected.employeeName ?? "Unassigned"}</dd></div>
-        <div>
-          <dt>Schedule</dt>
-          <dd>{selected.appointmentDate}, {selected.startTime.slice(0, 5)} - {selected.endTime.slice(0, 5)}</dd>
-        </div>
-        <div>
-          <dt>Status</dt>
-          <dd>
-            <span className={`appointment-status is-${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</span>
-          </dd>
-        </div>
-        <div>
-          <dt>Amount</dt>
-          <dd>{Number(selected.totalAmount).toFixed(2)}</dd>
-        </div>
-        <div className="is-wide">
-          <dt>Customer notes</dt>
-          <dd>{selected.notes || "No notes provided."}</dd>
-        </div>
-        {selected.cancellationReason &&
-          <div className="is-wide">
-            <dt>Cancellation reason</dt>
-            <dd>{selected.cancellationReason}</dd>
-          </div>}
-      </dl>
-      </section>
-      </div>}
+      {selected &&
+        <div className="appointment-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}>
+          <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-details-title"><header><div><p>Appointment #{selected.id}</p><h2 id="appointment-details-title">Appointment details</h2></div><button onClick={() => setSelected(null)} aria-label="Close"><X /></button></header><dl>
+            <div>
+              <dt>Customer</dt>
+              <dd>{selected.customerName ?? `#${selected.customerId}`}
+                <small>{selected.customerPhone}<br />{selected.customerEmail}</small>
+              </dd>
+            </div>
+            <div>
+              <dt>Service</dt>
+              <dd>{selected.serviceName ?? `#${selected.serviceId}`}</dd>
+            </div>
+            <div>
+              <dt>Employee</dt>
+              <dd>{selected.employeeName ?? "Unassigned"}</dd></div>
+            <div>
+              <dt>Schedule</dt>
+              <dd>{selected.appointmentDate}, {selected.startTime.slice(0, 5)} - {selected.endTime.slice(0, 5)}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>
+                <span className={`appointment-status is-${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Amount</dt>
+              <dd>{Number(selected.totalAmount).toFixed(2)}</dd>
+            </div>
+            <div className="is-wide">
+              <dt>Customer notes</dt>
+              <dd>{selected.notes || "No notes provided."}</dd>
+            </div>
+            {selected.cancellationReason &&
+              <div className="is-wide">
+                <dt>Cancellation reason</dt>
+                <dd>{selected.cancellationReason}</dd>
+              </div>}
+          </dl>
+          </section>
+        </div>}
 
       {cancelTarget &&
         <div className="appointment-modal-backdrop">
@@ -292,7 +405,9 @@ const AppointmentManagementPage = () => {
             <p>Provide a reason for cancelling {cancelTarget.customerName ?? "this customer's"} appointment.</p>
             <textarea autoFocus maxLength={255} value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} placeholder="Cancellation reason" />
             <footer>
-              <button className="is-secondary" onClick={() => setCancelTarget(null)}>Keep appointment</button>
+              <button className="is-secondary" onClick={() => setCancelTarget(null)}>
+                Keep appointment
+              </button>
               <button className="is-danger" disabled={!cancelReason.trim() || busyId === cancelTarget.id} onClick={() => void submitCancellation()}>
                 <Ban />
                 Cancel appointment

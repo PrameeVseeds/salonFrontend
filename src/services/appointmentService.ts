@@ -51,6 +51,14 @@ export const completeAppointment = async (id: number,): Promise<ApiResponse<Appo
     )
   ).data;
 
+export const assignAppointmentEmployee = async (id: number, employeeId: number): Promise<ApiResponse<AppointmentResponseData>> =>
+  (
+    await adminAxiosClient.patch<ApiResponse<AppointmentResponseData>>(
+      `${ENDPOINT}/${id}/employee`,
+      { employeeId },
+    )
+  ).data;
+
 export const cancelAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
   (
     await adminAxiosClient.patch<ApiResponse<AppointmentResponseData>>(
