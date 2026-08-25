@@ -640,6 +640,42 @@
     background: #fffcf3;
 }
 
+.appointment-bulk-services {
+    min-width: 190px;
+    display: grid;
+    gap: 5px;
+}
+
+.appointment-bulk-services>span {
+    padding: 6px 0;
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 7px;
+    border-bottom: 1px dashed #e5d8ba;
+}
+
+.appointment-bulk-services>span:last-child {
+    border-bottom: 0;
+}
+
+.appointment-bulk-services b {
+    color: var(--admin-accent, #c18b21);
+    font-size: 0.68rem;
+}
+
+.appointment-bulk-services strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.appointment-bulk-services small {
+    color: #776d61;
+    white-space: nowrap;
+}
+
 .appointment-group-badge {
     width: fit-content;
     margin-top: 7px;

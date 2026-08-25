@@ -27,6 +27,7 @@ const CustomerNotificationBell = () => {
       return new Set();
     }
   });
+  const [highlightedIds, setHighlightedIds] = useState<Set<number>>(new Set());
   const root = useRef<HTMLDivElement>(null);
 
   const load = async () => {
@@ -61,11 +62,12 @@ const CustomerNotificationBell = () => {
     setOpen((current) => {
       const next = !current;
       if (next && items.length) {
+        setHighlightedIds(new Set(items.filter((item) => !readIds.has(item.id)).map((item) => item.id)));
         const updated = new Set(readIds);
         items.forEach((item) => updated.add(item.id));
         setReadIds(updated);
         localStorage.setItem(READ_KEY, JSON.stringify([...updated]));
-      }
+      } else if (!next) setHighlightedIds(new Set());
       return next;
     });
   };
@@ -91,7 +93,7 @@ const CustomerNotificationBell = () => {
             {loading ? <p>Loading notifications...</p>
               : error && !items.length ? <p className="is-error">{error}</p>
                 : items.length ? items.slice(0, 10).map((item) => (
-                  <article key={item.id}>
+                  <article key={item.id} className={highlightedIds.has(item.id) ? "is-new" : undefined}>
                     <span><CheckCircle2 /></span>
                     <div>
                       <strong>{item.title}</strong>

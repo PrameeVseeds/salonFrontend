@@ -115,6 +115,25 @@
     text-align: left;
 }
 
+.customer-notification_list article.is-new {
+    position: relative;
+    border-left: 3px solid var(--customer-accent);
+    background: #fff9e9;
+}
+
+.customer-notification_list article.is-new::after {
+    content: "New";
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    color: #76520d;
+    background: #ffe3a0;
+    font-size: 0.48rem;
+    font-weight: 800;
+}
+
 .customer-notification_list article>span {
     width: 32px;
     height: 32px;

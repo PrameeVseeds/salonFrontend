@@ -153,28 +153,35 @@ const AppointmentManagementPage = () => {
     });
   }, [appointments]);
 
-  const appointmentGroupInfo = useMemo(() => {
-    const groups = new Map<string, Appointment[]>();
+  const appointmentGroups = useMemo(() => {
+    const groups: Appointment[][] = [];
     orderedAppointments.forEach((appointment) => {
-      const serviceKey = appointment.services?.length
-        ? appointment.services.map((service) => service.serviceId).join(",")
-        : String(appointment.serviceId);
-      const key = `${appointment.customerId}:${appointment.appointmentDate}:${appointment.startTime}:${serviceKey}`;
-      const group = groups.get(key) ?? [];
-      group.push(appointment);
-      groups.set(key, group);
+      const group = groups.find((candidate) => {
+        const first = candidate[0]!;
+        return first.customerId === appointment.customerId &&
+          first.appointmentDate === appointment.appointmentDate && first.status === appointment.status &&
+          Math.abs(new Date(first.createdAt).getTime() - new Date(appointment.createdAt).getTime()) <= 5 * 60_000;
+      });
+      if (group)
+        group.push(appointment);
+      else
+        groups.push([appointment]);
     });
-    const info = new Map<number, { count: number; position: number }>();
-    groups.forEach((group) => {
-      if (group.length < 2)  
+    return groups;
+  }, [orderedAppointments]);
+  const appointmentGroupInfo = useMemo(() => {
+    const info = new Map<number, { count: number; position: number; appointments: Appointment[] }>();
+    appointmentGroups.forEach((group) => {
+      if (group.length < 2)
         return;
       group.forEach((appointment, index) => info.set(appointment.id, {
         count: group.length,
         position: index + 1,
+        appointments: group,
       }));
     });
     return info;
-  }, [orderedAppointments]);
+  }, [appointmentGroups]);
 
   const replaceAppointment = (updated: Appointment) => {
     setAppointments((current) => current.map((item) => item.id === updated.id ? { ...item, ...updated } : item));
@@ -186,7 +193,8 @@ const AppointmentManagementPage = () => {
     setError(null);
     setSuccess(null);
     try {
-      const response = appointment.status === "Scheduled" ? await startAppointment(appointment.id) : await completeAppointment(appointment.id);
+      const response = appointment.status === "Scheduled" ? await startAppointment(appointment.id) :
+        await completeAppointment(appointment.id);
       replaceAppointment(response.data.appointment);
       setSuccess(response.message);
     } catch (requestError) {
@@ -275,7 +283,10 @@ const AppointmentManagementPage = () => {
       </section>
 
       <section className="appointment-card">
-        <form className="appointment-filters" onSubmit={(event) => { event.preventDefault(); setAppliedSearch(search.trim()); }}>
+        <form className="appointment-filters" onSubmit={(event) => {
+          event.preventDefault();
+          setAppliedSearch(search.trim());
+        }}>
           <label>
             <span>Search customer</span>
             <div>
@@ -306,7 +317,12 @@ const AppointmentManagementPage = () => {
             </select>
           </label>
           <button type="submit">Apply</button>
-          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Active"); }}>
+          <button type="button" className="is-secondary" onClick={() => {
+            setSearch("");
+            setAppliedSearch("");
+            setDate("");
+            setStatus("Active");
+          }}>
             Clear
           </button>
         </form>
@@ -324,26 +340,45 @@ const AppointmentManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {orderedAppointments.map((appointment) => (
+              {appointmentGroups.flat().map((appointment) => (
                 <tr key={appointment.id} className={appointmentGroupInfo.has(appointment.id)
-                  ? `is-group-booking is-group-${appointmentGroupInfo.get(appointment.id)!.position === 1 ? "first" : 
+                  ? `is-group-booking is-group-${appointmentGroupInfo.get(appointment.id)!.position === 1 ? "first" :
                     appointmentGroupInfo.get(appointment.id)!.position === appointmentGroupInfo.get(appointment.id)!.count ? "last" : "middle"}`
                   : undefined}>
                   {(!appointmentGroupInfo.has(appointment.id) || appointmentGroupInfo.get(appointment.id)!.position === 1) && <>
                     <td className="appointment-group-shared" rowSpan={appointmentGroupInfo.get(appointment.id)?.count ?? 1} data-label="Date & time">
-                      <strong>{appointment.appointmentDate}</strong><small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small>
+                      <strong>{appointment.appointmentDate}</strong>
+                      {appointmentGroupInfo.has(appointment.id)
+                        ? <small>
+                          {new Set(appointmentGroupInfo.get(appointment.id)!.appointments.map((item) => item.startTime)).size}
+                          scheduled times
+                        </small>
+                        : <small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small>}
                     </td>
                     <td className="appointment-group-shared" rowSpan={appointmentGroupInfo.get(appointment.id)?.count ?? 1} data-label="Customer">
                       <strong>{appointment.customerName ?? `Customer #${appointment.customerId}`}</strong>
                       <small>{appointment.customerPhone ?? appointment.customerEmail}</small>
                       {appointmentGroupInfo.has(appointment.id) && (
-                      <span className="appointment-group-badge">
-                        Group booking · {appointmentGroupInfo.get(appointment.id)!.count} appointments
-                      </span>
+                        <span className="appointment-group-badge">
+                          Group booking · {appointmentGroupInfo.get(appointment.id)!.count} appointments
+                        </span>
                       )}
                     </td>
                     <td className="appointment-group-shared" rowSpan={appointmentGroupInfo.get(appointment.id)?.count ?? 1} data-label="Service">
-                      {appointment.services?.length ? appointment.services.map((service) => (
+                      {appointmentGroupInfo.has(appointment.id) ? (
+                        <div className="appointment-bulk-services">
+                          {appointmentGroupInfo.get(appointment.id)!.appointments.map((item, index) => (
+                            <span key={item.id}>
+                              <b>#{index + 1}</b>
+                              <strong>
+                                {item.services?.length ? item.services.map((service) => service.serviceName).join(" + ") :
+                                  item.serviceName ?? `Service #${item.serviceId}`}
+                              </strong>
+                              <small>{item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)}</small>
+                            </span>
+                          ))}
+                        </div>
+                      ) : appointment.services?.length ? appointment.services.map((service) => (
                         <span key={service.serviceId} className="appointment-service-segment">
                           <strong>{service.serviceName}</strong>
                           <small>{service.startTime.slice(0, 5)}–{service.endTime.slice(0, 5)}</small>
@@ -360,7 +395,8 @@ const AppointmentManagementPage = () => {
                           <select
                             className={`appointment-employee-select${service.employeeId ? "" : " is-unassigned"}`}
                             aria-label={`Assign employee for ${service.serviceName}`}
-                            value={availableEmployeesFor(appointment, service.serviceId).some((employee) => employee.id === service.employeeId) ? service.employeeId ?? "" : ""}
+                            value={availableEmployeesFor(appointment, service.serviceId).some((employee) => employee.id === service.employeeId) ?
+                              service.employeeId ?? "" : ""}
                             disabled={busyId === appointment.id || !availableEmployeesFor(appointment, service.serviceId).length}
                             onChange={(event) => {
                               const employeeId = Number(event.target.value);
@@ -368,7 +404,10 @@ const AppointmentManagementPage = () => {
                                 void assignEmployee(appointment, employeeId, service.serviceId);
                             }}
                           >
-                            <option value="">{availableEmployeesFor(appointment, service.serviceId).length ? "Assign employee" : "No available employees"}</option>
+                            <option value="">
+                              {availableEmployeesFor(appointment, service.serviceId).length ? "Assign employee" :
+                                "No available employees"}
+                            </option>
                             {availableEmployeesFor(appointment, service.serviceId).map((employee) => (
                               <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>
                             ))}
@@ -380,7 +419,8 @@ const AppointmentManagementPage = () => {
                         className={`appointment-employee-select${appointment.employeeId ? "" : " is-unassigned"}`}
                         aria-label={`Assign employee to appointment ${appointment.id}`}
                         title="Assign or change employee"
-                        value={availableEmployeesFor(appointment).some((employee) => employee.id === appointment.employeeId) ? appointment.employeeId ?? "" : ""}
+                        value={availableEmployeesFor(appointment).some((employee) => employee.id === appointment.employeeId) ?
+                          appointment.employeeId ?? "" : ""}
                         disabled={busyId === appointment.id || !availableEmployeesFor(appointment).length}
                         onChange={(event) => {
                           const employeeId = Number(event.target.value);
@@ -406,7 +446,8 @@ const AppointmentManagementPage = () => {
                   </td>
                   <td data-label="Amount">{Number(appointment.totalAmount).toFixed(2)}</td>
                   <td data-label="Status">
-                    <span className={`appointment-status is-${appointment.status.toLowerCase().replace(" ", "-")}`}>{appointment.status}</span></td>
+                    <span className={`appointment-status is-${appointment.status.toLowerCase().replace(" ", "-")}`}>{appointment.status}</span>
+                  </td>
                   <td data-label="Actions">
                     <div className="appointment-actions">
                       <button className="is-view" title="View details" onClick={() => setSelected(appointment)}>
@@ -499,7 +540,8 @@ const AppointmentManagementPage = () => {
 
       {cancelTarget &&
         <div className="appointment-modal-backdrop">
-          <section className="appointment-modal appointment-cancel-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-appointment-title">
+          <section className="appointment-modal appointment-cancel-modal" role="dialog" aria-modal="true"
+            aria-labelledby="cancel-appointment-title">
             <header>
               <div>
                 <p>Appointment #{cancelTarget.id}</p>
@@ -510,12 +552,14 @@ const AppointmentManagementPage = () => {
               </button>
             </header>
             <p>Provide a reason for cancelling {cancelTarget.customerName ?? "this customer's"} appointment.</p>
-            <textarea autoFocus maxLength={255} value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} placeholder="Cancellation reason" />
+            <textarea autoFocus maxLength={255} value={cancelReason} onChange={(event) =>
+              setCancelReason(event.target.value)} placeholder="Cancellation reason" />
             <footer>
               <button className="is-secondary" onClick={() => setCancelTarget(null)}>
                 Keep appointment
               </button>
-              <button className="is-danger" disabled={!cancelReason.trim() || busyId === cancelTarget.id} onClick={() => void submitCancellation()}>
+              <button className="is-danger" disabled={!cancelReason.trim() || busyId === cancelTarget.id} onClick={() =>
+                void submitCancellation()}>
                 <Ban />
                 Cancel appointment
               </button>

@@ -16,6 +16,7 @@ import "./notificationBell.css";
 
 const typeIcon = { Email: Mail, SMS: Smartphone, WhatsApp: MessageCircle };
 const ACKNOWLEDGED_KEY = "admin-acknowledged-notification-attention";
+const SEEN_KEY = "admin-seen-notification-ids";
 const NotificationBell = () => {
   const [items, setItems] = useState<AdminNotification[]>([]);
   const [open, setOpen] = useState(false);
@@ -30,6 +31,15 @@ const NotificationBell = () => {
       return new Set();
     }
   });
+  const [seenIds, setSeenIds] = useState<Set<number>>(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(SEEN_KEY) ?? "[]");
+      return new Set(Array.isArray(stored) ? stored.filter(Number.isInteger) : []);
+    } catch {
+      return new Set();
+    }
+  });
+  const [highlightedIds, setHighlightedIds] = useState<Set<number>>(new Set());
   const root = useRef<HTMLDivElement>(null);
 
   const load = async () => {
@@ -95,6 +105,13 @@ const NotificationBell = () => {
           return next;
         });
       }
+      if (nextOpen) {
+        setHighlightedIds(new Set(items.filter((item) => !seenIds.has(item.id)).map((item) => item.id)));
+        const nextSeen = new Set(seenIds);
+        items.forEach((item) => nextSeen.add(item.id));
+        setSeenIds(nextSeen);
+        localStorage.setItem(SEEN_KEY, JSON.stringify([...nextSeen]));
+      } else setHighlightedIds(new Set());
       return nextOpen;
     });
   };
@@ -141,7 +158,7 @@ const NotificationBell = () => {
                 const Icon = typeIcon[item.notificationType];
 
                 return (
-                  <article key={item.id}>
+                  <article key={item.id} className={highlightedIds.has(item.id) ? "is-new" : undefined}>
                     <span
                       className={`notification-type is-${item.sentStatus.toLowerCase()}`}
                     >

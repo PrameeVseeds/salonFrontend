@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   CalendarDays,
+  CalendarPlus,
   ChevronDown,
   Clock3,
   LogOut,
@@ -108,6 +109,16 @@ const CustomerAppointmentsPage = () => {
     const clockTimer = window.setInterval(() => setCurrentTime(Date.now()), 30_000);
     return () => window.clearInterval(clockTimer);
   }, []);
+  useEffect(() => {
+    const cancelId = Number(params.get("cancel"));
+    if (!cancelId || isBookingPage || !appointments.length)
+      return;
+    const target = appointments.find((appointment) => appointment.id === cancelId && appointment.status === "Scheduled");
+    if (target) {
+      setCancelTarget(target);
+      navigate("/appointments", { replace: true });
+    }
+  }, [appointments, isBookingPage, navigate, params]);
 
   useEffect(() => {
     Promise.allSettled([
@@ -324,7 +335,8 @@ const CustomerAppointmentsPage = () => {
     [appointments],
   );
   const selectedServices = useMemo(
-    () => form.serviceIds.map(Number).map((id) => services.find((service) => service.id === id)).filter((service): service is SalonService => Boolean(service)),
+    () => form.serviceIds.map(Number).map((id) =>
+      services.find((service) => service.id === id)).filter((service): service is SalonService => Boolean(service)),
     [form.serviceIds, services],
   );
   const openDatePicker = () => {
@@ -349,17 +361,20 @@ const CustomerAppointmentsPage = () => {
       ? "Cancelled"
       : "Past bookings";
   const groupedBookings = (() => {
-    const groups = new Map<string, Appointment[]>();
+    const groups: Appointment[][] = [];
     filteredBookings.forEach((appointment) => {
-      const serviceKey = appointment.services?.length
-        ? appointment.services.map((service) => service.serviceId).join(",")
-        : String(appointment.serviceId);
-      const key = `${appointment.appointmentDate}:${appointment.startTime}:${serviceKey}:${appointment.status}`;
-      const group = groups.get(key) ?? [];
-      group.push(appointment);
-      groups.set(key, group);
+      const group = groups.find((candidate) => {
+        const first = candidate[0]!;
+        return first.appointmentDate === appointment.appointmentDate &&
+          first.status === appointment.status &&
+          Math.abs(new Date(first.createdAt).getTime() - new Date(appointment.createdAt).getTime()) <= 5 * 60_000;
+      });
+      if (group)
+        group.push(appointment);
+      else
+        groups.push([appointment]);
     });
-    return [...groups.values()];
+    return groups;
   })();
 
   const resetBookingForm = () => {
@@ -531,7 +546,10 @@ const CustomerAppointmentsPage = () => {
           return distance(first) - distance(second);
         })[0];
       if (!nearest) {
-        setMessage({ type: "error", text: "No nearby slot can hold the remaining appointments. Please select another time or reduce the appointment count." });
+        setMessage({
+          type: "error", text:
+            "No nearby slot can hold the remaining appointments. Please select another time or reduce the appointment count."
+        });
         return;
       }
       setSlotSuggestion({
@@ -576,56 +594,77 @@ const CustomerAppointmentsPage = () => {
   const card = (items: Appointment[], cancellable: boolean) => {
     const item = items[0]!;
     return (
-    <article className={`customer-appointment-card${items.length > 1 ? " is-bulk" : ""}`} 
-    key={items.map((appointment) => appointment.id).join("-")}>
-      <span className="customer-appointment-image">
-        {services.find((service) => service.id === item.serviceId)?.imageUrl ? (
-          <img src={services.find((service) => service.id === item.serviceId)?.imageUrl} alt="" />
-        ) : (
-          <Scissors aria-hidden="true" />
-        )}
-      </span>
-      <div className="customer-appointment-details">
-        <strong>
-          {item.services?.length ? item.services.map((service) => service.serviceName).join(" + ") : item.serviceName ??
-            services.find((service) => service.id === item.serviceId)?.name ??
-            "Salon service"}
-        </strong>
-        {items.length > 1 && <b className="customer-bulk-booking-badge">Bulk booking · {items.length} appointments</b>}
-        <span>
-          <Clock3 /> {item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)}
+      <article className={`customer-appointment-card${items.length > 1 ? " is-bulk" : ""}`}
+        key={items.map((appointment) => appointment.id).join("-")}>
+        <span className="customer-appointment-image">
+          {services.find((service) => service.id === item.serviceId)?.imageUrl ? (
+            <img src={services.find((service) => service.id === item.serviceId)?.imageUrl} alt="" />
+          ) : (
+            <Scissors aria-hidden="true" />
+          )}
         </span>
-        <div className="customer-bulk-booking-items">
-          {items.map((appointment, index) => (
-            <span key={appointment.id}>
-              <small>
-                {items.length > 1 && <b>#{index + 1}</b>}
-                {appointment.services?.length ? [...new Set(appointment.services.map
-                ((service) => service.employeeName).filter(Boolean))].join(" + ") || "Professional assigned by salon" : appointment.employeeName ??
-                  (() => {
-                    const employee = employees.find((candidate) => candidate.id === appointment.employeeId);
-                    return employee ? `${employee.firstName} ${employee.lastName}` : "Professional assigned by salon";
-                  })()}
-              </small>
-              {cancellable && <button type="button" onClick={() => setCancelTarget(appointment)}>Cancel</button>}
-            </span>
-          ))}
-        </div>
-      </div>
-      <aside className="customer-appointment-meta">
-        <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
-          {item.status}
-        </b>
-        <time>
+        <div className="customer-appointment-details">
           <strong>
-            {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}
+            {items.length > 1 ? "Bulk appointment set" : item.services?.length ? item.services.map((service) =>
+              service.serviceName).join(" + ") : item.serviceName ??
+              services.find((service) => service.id === item.serviceId)?.name ??
+            "Salon service"}
           </strong>
+          {items.length > 1 && <b className="customer-bulk-booking-badge">Bulk booking · {items.length} appointments</b>}
           <span>
-            {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}
+            <Clock3 /> {items.length > 1
+              ? `${new Set(items.map((appointment) => appointment.startTime)).size} scheduled time${new Set(items.map((appointment) => appointment.startTime)).size === 1 ? "" : "s"}`
+              : `${item.startTime.slice(0, 5)}–${item.endTime.slice(0, 5)}`}
           </span>
-        </time>
-      </aside>
-    </article>
+          <span>
+            <CalendarDays /> {new Date(`${item.appointmentDate}T00:00:00`).toLocaleDateString(undefined, {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </span>
+          <div className="customer-bulk-booking-items">
+            {items.map((appointment, index) => (
+              <span key={appointment.id}>
+                <div className="customer-bulk-item-info">
+                  <b>#{index + 1}</b>
+                  <strong>{appointment.services?.length ? appointment.services.map((service) => service.serviceName).join(" + ") :
+                    appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
+                  <time><Clock3 /> {appointment.startTime.slice(0, 5)}–{appointment.endTime.slice(0, 5)}</time>
+                  <small>{appointment.services?.length ? [...new Set(appointment.services.map
+                    ((service) => service.employeeName).filter(Boolean))].join(" + ") || "Professional assigned by salon" :
+                    appointment.employeeName ??
+                    (() => {
+                      const employee = employees.find((candidate) => candidate.id === appointment.employeeId);
+                      return employee ? `${employee.firstName} ${employee.lastName}` : "Professional assigned by salon";
+                    })()}</small>
+                  {appointment.status === "Cancelled" && (
+                    <p className="customer-cancellation-reason">
+                      <b>Cancellation reason</b>
+                      <span>{appointment.cancellationReason?.trim() || "No reason was provided."}</span>
+                    </p>
+                  )}
+                </div>
+                {cancellable && <button type="button" onClick={() => setCancelTarget(appointment)}>Cancel</button>}
+              </span>
+            ))}
+          </div>
+        </div>
+        <aside className="customer-appointment-meta">
+          <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
+            {item.status}
+          </b>
+          <time>
+            <strong>
+              {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}
+            </strong>
+            <span>
+              {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}
+            </span>
+          </time>
+        </aside>
+      </article>
     );
   };
 
@@ -683,6 +722,16 @@ const CustomerAppointmentsPage = () => {
             <h1>{isBookingPage ? "Book an appointment" : "Bookings"}</h1>
             <span>{isBookingPage ? "Choose your preferred service and time." : "View and manage your salon visits."}</span>
           </div>
+          {!isBookingPage && (
+            <button
+              className="customer-new-appointment"
+              type="button"
+              onClick={() => navigate("/book-appointment")}
+            >
+              <CalendarPlus aria-hidden="true" />
+              <span>Book appointment</span>
+            </button>
+          )}
         </section>
         {isBookingPage && (
           <form
@@ -987,7 +1036,7 @@ const CustomerAppointmentsPage = () => {
                 <span>{filteredBookings.length}</span>
               </header>
               {filteredBookings.length ? (
-                groupedBookings.slice(0, visibleBookingCount).map((group) => card(group, 
+                groupedBookings.slice(0, visibleBookingCount).map((group) => card(group,
                   bookingFilter === "upcoming" && group.every((item) => item.status === "Scheduled")))
               ) : (
                 <div className="customer-appointment-empty">
@@ -995,8 +1044,8 @@ const CustomerAppointmentsPage = () => {
                 </div>
               )}
               {groupedBookings.length > visibleBookingCount && (
-                <button className="customer-bookings-more" type="button" onClick={() => 
-                setVisibleBookingCount((count) => count + 10)}>
+                <button className="customer-bookings-more" type="button" onClick={() =>
+                  setVisibleBookingCount((count) => count + 10)}>
                   Show more bookings
                 </button>
               )}
@@ -1005,8 +1054,8 @@ const CustomerAppointmentsPage = () => {
         )}
       </div>
       <CustomerBottomNav active={isBookingPage ? "services" : "bookings"} />
-      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" 
-      customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile"
+        customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={slotSuggestion !== null}
         title="Use the nearest available time?"
@@ -1029,19 +1078,19 @@ const CustomerAppointmentsPage = () => {
                     <span>
                       <b>{requested}</b>
                       <small>Requested</small>
-                      </span>
+                    </span>
                     <span>
                       <b>{detail?.serviceLimit ?? slotSuggestion.selectedCount}</b>
                       <small>Slot limit</small>
-                      </span>
+                    </span>
                     <span>
                       <b>{detail?.bookedCount ?? 0}</b>
                       <small>Booked</small>
-                      </span>
+                    </span>
                     <span>
                       <b>{detail?.availableEmployees ?? slotSuggestion.selectedCount}</b>
                       <small>Staff free</small>
-                      </span>
+                    </span>
                   </div>
                   <strong className="customer-slot-proposal_reason">{reason}</strong>
                   <div className="customer-slot-proposal_plan">
@@ -1063,7 +1112,7 @@ const CustomerAppointmentsPage = () => {
             })()
             : `${slotSuggestion.alreadyBooked} of your appointments ${slotSuggestion.alreadyBooked === 1 ? "has" : "have"} been booked.
              The nearest available time for the remaining ${slotSuggestion.remaining} ${slotSuggestion.remaining === 1 ? "appointment is" :
-               "appointments is"} ${slotSuggestion.slot.slice(0, 5)} on ${form.appointmentDate.split("-").reverse().join("-")}. 
+              "appointments is"} ${slotSuggestion.slot.slice(0, 5)} on ${form.appointmentDate.split("-").reverse().join("-")}. 
                Would you like to continue?`
           : ""}
         confirmLabel="Yes, book this time"
@@ -1074,8 +1123,8 @@ const CustomerAppointmentsPage = () => {
         onConfirm={() => {
           if (!slotSuggestion) return;
           if (slotSuggestion.selectedSlot && slotSuggestion.selectedCount)
-            void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining, 
-          slotSuggestion.slot);
+            void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining,
+              slotSuggestion.slot);
           else
             void attemptBooking(slotSuggestion.remaining, slotSuggestion.slot, slotSuggestion.alreadyBooked);
         }}
