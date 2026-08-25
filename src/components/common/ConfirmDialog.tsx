@@ -1,12 +1,13 @@
 import { AlertTriangle, X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import "./confirmDialog.css";
 
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
-  message: string;
+  message: ReactNode;
   confirmLabel?: string;
+  cancelLabel?: string;
   busyLabel?: string;
   tone?: "danger" | "primary";
   busy?: boolean;
@@ -19,6 +20,7 @@ const ConfirmDialog = ({
   title,
   message,
   confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   busyLabel = "Working...",
   tone = "danger",
   busy = false,
@@ -64,7 +66,7 @@ const ConfirmDialog = ({
         <p id="confirm-dialog-message">{message}</p>
         <footer>
           <button type="button" onClick={onCancel} disabled={busy}>
-            Cancel
+            {cancelLabel}
           </button>
           <button
             className={`is-${tone}`}

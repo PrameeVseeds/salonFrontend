@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   CalendarDays,
+  ChevronDown,
   Clock3,
   LogOut,
   Scissors,
@@ -43,9 +44,30 @@ const CustomerAppointmentsPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [assignedEmployees, setAssignedEmployees] = useState<Employee[]>([]);
   const [employeeChoice, setEmployeeChoice] = useState("any");
+  const [appointmentCount, setAppointmentCount] = useState(1);
+  const [appointmentChoices, setAppointmentChoices] = useState<Array<{ serviceIds: string[]; employeeId: string }>>([
+    { serviceIds: params.get("service") ? [params.get("service")!] : [], employeeId: "" },
+  ]);
+  const [employeeServiceIds, setEmployeeServiceIds] = useState<Record<number, number[]>>({});
+  const [expandedServiceCards, setExpandedServiceCards] = useState<Set<number>>(new Set());
+  const [slotSuggestion, setSlotSuggestion] = useState<{
+    slot: string;
+    remaining: number;
+    alreadyBooked: number;
+    selectedSlot?: string;
+    selectedCount?: number;
+  } | null>(null);
   const [slotEmployees, setSlotEmployees] = useState<Record<string, number>>(
     {},
   );
+  const [slotCapacities, setSlotCapacities] = useState<Record<string, number>>({});
+  const [slotDetails, setSlotDetails] = useState<Record<string, {
+    serviceLimit: number;
+    bookedCount: number;
+    availableEmployees: number;
+    remainingCapacity: number;
+    limitingReason: "service_capacity" | "employee_availability" | "both" | null;
+  }>>({});
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [form, setForm] = useState({
     serviceId: params.get("service") ?? "",
@@ -141,6 +163,21 @@ const CustomerAppointmentsPage = () => {
       active = false;
     };
   }, [employees, initialServiceId]);
+  useEffect(() => {
+    if (!employees.length) return;
+    let active = true;
+    Promise.all(employees.map(async (employee) => {
+      try {
+        const { data } = await getPublicAssignedEmployeeServices(employee.id);
+        return [employee.id, data.services.map((service) => service.id)] as const;
+      } catch {
+        return [employee.id, []] as const;
+      }
+    })).then((entries) => {
+      if (active) setEmployeeServiceIds(Object.fromEntries(entries));
+    });
+    return () => { active = false; };
+  }, [employees]);
   const loadSlots = (
     serviceIds: string[],
     choice: string,
@@ -156,10 +193,13 @@ const CustomerAppointmentsPage = () => {
       appointmentDate,
       startTime: "",
     }));
+    setAppointmentChoices((current) => current.map(() => ({ serviceIds, employeeId: "" })));
     setAvailableSlots([]);
     setSlotsError(null);
     setSlotsMessage(null);
     setSlotEmployees({});
+    setSlotCapacities({});
+    setSlotDetails({});
     if (!serviceIds.length || !appointmentDate) return;
     setSlotsLoading(true);
     const candidates =
@@ -178,14 +218,18 @@ const CustomerAppointmentsPage = () => {
     )
       .then((results) => {
         const slotMap: Record<string, number> = {};
+        const capacityMap: Record<string, number> = {};
         const uniqueSlots = new Set<string>();
         results.forEach((result) =>
           result.availability.slots.forEach((slot) => {
             uniqueSlots.add(slot);
+            capacityMap[slot] = Math.max(capacityMap[slot] ?? 0, result.availability.slotDetails[slot]?.remainingCapacity ?? 1);
             if (result.employeeId !== null && !slotMap[slot]) slotMap[slot] = result.employeeId;
           }),
         );
         setSlotEmployees(slotMap);
+        setSlotCapacities(capacityMap);
+        setSlotDetails(Object.assign({}, ...results.map((result) => result.availability.slotDetails)));
         setAvailableSlots([...uniqueSlots].sort());
         if (!uniqueSlots.size)
           setSlotsMessage(results.find((result) => result.availability.message)?.availability.message ?? null);
@@ -202,6 +246,8 @@ const CustomerAppointmentsPage = () => {
     setEmployeeChoice("any");
     setAvailableSlots([]);
     setSlotEmployees({});
+    setSlotCapacities({});
+    setSlotDetails({});
     setSlotsMessage(null);
     setForm((current) => ({
       ...current,
@@ -301,43 +347,202 @@ const CustomerAppointmentsPage = () => {
     : bookingFilter === "cancelled"
       ? "Cancelled"
       : "Past bookings";
+  const groupedBookings = (() => {
+    const groups = new Map<string, Appointment[]>();
+    filteredBookings.forEach((appointment) => {
+      const serviceKey = appointment.services?.length
+        ? appointment.services.map((service) => service.serviceId).join(",")
+        : String(appointment.serviceId);
+      const key = `${appointment.appointmentDate}:${appointment.startTime}:${serviceKey}:${appointment.status}`;
+      const group = groups.get(key) ?? [];
+      group.push(appointment);
+      groups.set(key, group);
+    });
+    return [...groups.values()];
+  })();
 
-  const book = async (event: FormEvent) => {
-    event.preventDefault();
+  const resetBookingForm = () => {
+    setForm({ serviceId: "", serviceIds: [], employeeId: "", appointmentDate: "", startTime: "", notes: "" });
+    setAssignedEmployees([]);
+    setEmployeeChoice("any");
+    setAppointmentCount(1);
+    setAppointmentChoices([{ serviceIds: [], employeeId: "" }]);
+    setExpandedServiceCards(new Set());
+    setAvailableSlots([]);
+    setSlotEmployees({});
+    setSlotCapacities({});
+    setSlotDetails({});
+    setSlotsMessage(null);
+    setSlotSuggestion(null);
+  };
+
+  const nearestAvailableSlot = async (fromSlot: string): Promise<string | null> => {
+    const availability = await getAvailableAppointmentSlots(
+      form.serviceIds.map(Number), null, form.appointmentDate,
+    );
+    const toMinutes = (slot: string) => {
+      const [hours = 0, minutes = 0] = slot.split(":").map(Number);
+      return hours * 60 + minutes;
+    };
+    const origin = toMinutes(fromSlot);
+    return availability.slots
+      .filter((slot) => slot !== fromSlot && new Date(`${form.appointmentDate}T${slot}`).getTime() > Date.now())
+      .sort((first, second) => Math.abs(toMinutes(first) - origin) - Math.abs(toMinutes(second) - origin))[0] ?? null;
+  };
+
+  const attemptBooking = async (count: number, slot: string, alreadyBooked = 0) => {
     setBusy(true);
     setMessage(null);
+    const booked: Appointment[] = [];
     try {
-      const { data } = await createCustomerAppointment({
-        serviceId: Number(form.serviceId),
-        serviceIds: form.serviceIds.map(Number),
-        employeeId: employeeChoice === "any" ? null : Number(form.employeeId),
-        appointmentDate: form.appointmentDate,
-        startTime: form.startTime,
-        notes: form.notes.trim() || null,
+      for (let index = 0; index < count; index += 1) {
+        const choice = appointmentChoices[index] ?? { serviceIds: form.serviceIds, employeeId: form.employeeId };
+        const { data } = await createCustomerAppointment({
+          serviceId: Number(choice.serviceIds[0]),
+          serviceIds: choice.serviceIds.map(Number),
+          employeeId: choice.employeeId ? Number(choice.employeeId) : null,
+          appointmentDate: form.appointmentDate,
+          startTime: slot,
+          notes: form.notes.trim() || null,
+        });
+        booked.push(data.appointment);
+      }
+      setAppointments((current) => [...current, ...booked]);
+      const totalBooked = alreadyBooked + booked.length;
+      resetBookingForm();
+      setMessage({
+        type: "success",
+        text: totalBooked === 1
+          ? "Appointment booked successfully."
+          : `${totalBooked} appointments booked successfully.`,
       });
-      setAppointments((current) => [...current, data.appointment]);
-      setForm({
-        serviceId: "",
-        serviceIds: [],
-        employeeId: "",
-        appointmentDate: "",
-        startTime: "",
-        notes: "",
-      });
-      setAssignedEmployees([]);
-      setEmployeeChoice("any");
-      setAvailableSlots([]);
-      setSlotEmployees({});
-      setSlotsMessage(null);
-      setMessage({ type: "success", text: "Appointment booked successfully." });
     } catch (error) {
+      if (booked.length) setAppointments((current) => [...current, ...booked]);
+      const totalBooked = alreadyBooked + booked.length;
+      const remaining = count - booked.length;
+      try {
+        const nearest = await nearestAvailableSlot(slot);
+        if (nearest) {
+          setSlotSuggestion({ slot: nearest, remaining, alreadyBooked: totalBooked });
+          setAppointmentCount(remaining);
+          return;
+        }
+      } catch { /* Keep the original availability error below. */ }
+      setAppointmentCount(remaining);
       setMessage({
         type: "error",
-        text: getApiErrorMessage(error, "Unable to book this appointment."),
+        text: `${totalBooked ? `${totalBooked} appointment${totalBooked === 1 ? " is" : "s are"} booked. ` : ""}${getApiErrorMessage(error, "No alternative appointment slot is available.")}`,
       });
     } finally {
       setBusy(false);
     }
+  };
+
+  const bookApprovedSplit = async (selectedCount: number, selectedSlot: string, remaining: number, nearestSlot: string) => {
+    setBusy(true);
+    setMessage(null);
+    const booked: Appointment[] = [];
+    try {
+      for (const plan of [{ count: selectedCount, slot: selectedSlot }, { count: remaining, slot: nearestSlot }]) {
+        for (let index = 0; index < plan.count; index += 1) {
+          const choice = appointmentChoices[booked.length] ?? { serviceIds: form.serviceIds, employeeId: "" };
+          const { data } = await createCustomerAppointment({
+            serviceId: Number(choice.serviceIds[0]),
+            serviceIds: choice.serviceIds.map(Number),
+            employeeId: choice.employeeId ? Number(choice.employeeId) : null,
+            appointmentDate: form.appointmentDate,
+            startTime: plan.slot,
+            notes: form.notes.trim() || null,
+          });
+          booked.push(data.appointment);
+        }
+      }
+      setAppointments((current) => [...current, ...booked]);
+      resetBookingForm();
+      setMessage({ type: "success", text: `${booked.length} appointments booked successfully.` });
+    } catch (error) {
+      if (booked.length) setAppointments((current) => [...current, ...booked]);
+      setSlotSuggestion(null);
+      setMessage({
+        type: "error",
+        text: getApiErrorMessage(error, "Availability changed before the approved booking could be completed."),
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const book = async (event: FormEvent) => {
+    event.preventDefault();
+    const choices = appointmentChoices.slice(0, appointmentCount);
+    if (choices.some((choice) => !choice.serviceIds.length)) {
+      setMessage({ type: "error", text: "Please select at least one service for every appointment." });
+      return;
+    }
+    setBusy(true);
+    try {
+      const checks = await Promise.all(choices.map((choice) => getAvailableAppointmentSlots(
+        choice.serviceIds.map(Number), choice.employeeId ? Number(choice.employeeId) : null, form.appointmentDate,
+      )));
+      const unavailableIndex = checks.findIndex((availability) => !availability.slots.includes(form.startTime));
+      if (unavailableIndex >= 0) {
+        setMessage({ type: "error", text: `Appointment #${unavailableIndex + 1}'s services or professional are not available at ${form.startTime.slice(0, 5)}. Please change that appointment or select another time.` });
+        return;
+      }
+      const selectedProfessionals = choices.map((choice) => choice.employeeId).filter(Boolean);
+      if (new Set(selectedProfessionals).size !== selectedProfessionals.length) {
+        setMessage({ type: "error", text: "The same professional cannot be selected for two appointments at the same time. Choose another professional or use Any available professional." });
+        return;
+      }
+      const groupedCounts = new Map<string, { count: number; checkIndex: number }>();
+      choices.forEach((choice, index) => {
+        const key = choice.serviceIds.join(",");
+        const current = groupedCounts.get(key);
+        groupedCounts.set(key, { count: (current?.count ?? 0) + 1, checkIndex: current?.checkIndex ?? index });
+      });
+      const overCapacity = [...groupedCounts.values()].find((group) =>
+        group.count > (checks[group.checkIndex]!.slotDetails[form.startTime]?.remainingCapacity ?? 1),
+      );
+      if (overCapacity && groupedCounts.size > 1) {
+        const available = checks[overCapacity.checkIndex]!.slotDetails[form.startTime]?.remainingCapacity ?? 0;
+        setMessage({ type: "error", text: `Only ${available} of the appointments using the same services can fit at this time. Select another slot, reduce that service count, or choose different services.` });
+        return;
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: getApiErrorMessage(error, "Unable to verify all appointment selections.") });
+      return;
+    } finally {
+      setBusy(false);
+    }
+    const usesSharedServices = choices.every((choice) => choice.serviceIds.join(",") === form.serviceIds.join(","));
+    const selectedCapacity = Math.max(1, slotCapacities[form.startTime] ?? 1);
+    if (usesSharedServices && appointmentCount > selectedCapacity) {
+      const remaining = appointmentCount - selectedCapacity;
+      const [hours = 0, minutes = 0] = form.startTime.split(":").map(Number);
+      const selectedMinutes = hours * 60 + minutes;
+      const nearest = availableSlots
+        .filter((slot) => slot !== form.startTime && (slotCapacities[slot] ?? 0) >= remaining)
+        .sort((first, second) => {
+          const distance = (slot: string) => {
+            const [slotHours = 0, slotMinutes = 0] = slot.split(":").map(Number);
+            return Math.abs(slotHours * 60 + slotMinutes - selectedMinutes);
+          };
+          return distance(first) - distance(second);
+        })[0];
+      if (!nearest) {
+        setMessage({ type: "error", text: "No nearby slot can hold the remaining appointments. Please select another time or reduce the appointment count." });
+        return;
+      }
+      setSlotSuggestion({
+        slot: nearest,
+        remaining,
+        alreadyBooked: 0,
+        selectedSlot: form.startTime,
+        selectedCount: selectedCapacity,
+      });
+      return;
+    }
+    void attemptBooking(appointmentCount, form.startTime);
   };
   const cancelBooking = async () => {
     if (!cancelTarget)
@@ -367,8 +572,10 @@ const CustomerAppointmentsPage = () => {
     logoutCustomer();
     navigate("/", { replace: true });
   };
-  const card = (item: Appointment, cancellable: boolean) => (
-    <article className="customer-appointment-card" key={item.id}>
+  const card = (items: Appointment[], cancellable: boolean) => {
+    const item = items[0]!;
+    return (
+    <article className={`customer-appointment-card${items.length > 1 ? " is-bulk" : ""}`} key={items.map((appointment) => appointment.id).join("-")}>
       <span className="customer-appointment-image">
         {services.find((service) => service.id === item.serviceId)?.imageUrl ? (
           <img src={services.find((service) => service.id === item.serviceId)?.imageUrl} alt="" />
@@ -382,25 +589,25 @@ const CustomerAppointmentsPage = () => {
             services.find((service) => service.id === item.serviceId)?.name ??
             "Salon service"}
         </strong>
+        {items.length > 1 && <b className="customer-bulk-booking-badge">Bulk booking · {items.length} appointments</b>}
         <span>
           <Clock3 /> {item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)}
         </span>
-        <small>
-          {item.services?.length ? [...new Set(item.services.map((service) => service.employeeName).filter(Boolean))].join(" + ") : item.employeeName ??
-            (() => {
-              const employee = employees.find(
-                (candidate) => candidate.id === item.employeeId,
-              );
-              return employee
-                ? `${employee.firstName} ${employee.lastName}`
-                : "Professional assigned by salon";
-            })()}
-        </small>
-        {cancellable && (
-          <button type="button" onClick={() => setCancelTarget(item)}>
-            Cancel
-          </button>
-        )}
+        <div className="customer-bulk-booking-items">
+          {items.map((appointment, index) => (
+            <span key={appointment.id}>
+              <small>
+                {items.length > 1 && <b>#{index + 1}</b>}
+                {appointment.services?.length ? [...new Set(appointment.services.map((service) => service.employeeName).filter(Boolean))].join(" + ") || "Professional assigned by salon" : appointment.employeeName ??
+                  (() => {
+                    const employee = employees.find((candidate) => candidate.id === appointment.employeeId);
+                    return employee ? `${employee.firstName} ${employee.lastName}` : "Professional assigned by salon";
+                  })()}
+              </small>
+              {cancellable && <button type="button" onClick={() => setCancelTarget(appointment)}>Cancel</button>}
+            </span>
+          ))}
+        </div>
       </div>
       <aside className="customer-appointment-meta">
         <b className={`is-${item.status.toLowerCase().replace(" ", "-")}`}>
@@ -416,7 +623,8 @@ const CustomerAppointmentsPage = () => {
         </time>
       </aside>
     </article>
-  );
+    );
+  };
 
   return (
     <main className="customer-appointments-page" style={style}>
@@ -633,6 +841,104 @@ const CustomerAppointmentsPage = () => {
                 <p>{slotsMessage ?? "No available times for this date."}</p>
               )}
             </fieldset>
+            <fieldset className="customer-appointment-count">
+              <legend>Appointment count</legend>
+              <div role="group" aria-label="Number of appointments">
+                {[1, 2, 3, 4].map((count) => (
+                  <button
+                    key={count}
+                    type="button"
+                    className={appointmentCount === count ? "is-selected" : ""}
+                    onClick={() => {
+                      setAppointmentCount(count);
+                      setAppointmentChoices((current) => Array.from({ length: count }, (_, index) =>
+                        current[index] ?? { serviceIds: form.serviceIds, employeeId: "" },
+                      ));
+                    }}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
+              <small>
+                {appointmentCount > 1
+                  ? "Customize services and professionals for each appointment below."
+                  : "Book up to four appointments at the selected time."}
+              </small>
+            </fieldset>
+            {appointmentCount > 1 && (
+              <section className="customer-bulk-configurator" aria-label="Configure each appointment">
+                <header>
+                  <strong>Customize each appointment</strong>
+                  <small>Choose services and a professional separately.</small>
+                </header>
+                {appointmentChoices.slice(0, appointmentCount).map((choice, index) => {
+                  const eligible = employees.filter((employee) =>
+                    choice.serviceIds.length > 0 && choice.serviceIds.every((serviceId) =>
+                      (employeeServiceIds[employee.id] ?? []).includes(Number(serviceId)),
+                    ),
+                  );
+                  return (
+                    <article key={index}>
+                      <b>Appointment {index + 1}</b>
+                      <button
+                        className={`customer-bulk-services-toggle${expandedServiceCards.has(index) ? " is-open" : ""}`}
+                        type="button"
+                        aria-expanded={expandedServiceCards.has(index)}
+                        onClick={() => setExpandedServiceCards((current) => {
+                          const next = new Set(current);
+                          if (next.has(index)) next.delete(index);
+                          else next.add(index);
+                          return next;
+                        })}
+                      >
+                        <span>
+                          <b>Services</b>
+                          <small>{choice.serviceIds.length ? `${choice.serviceIds.length} selected` : "Choose services"}</small>
+                        </span>
+                        <ChevronDown aria-hidden="true" />
+                      </button>
+                      {expandedServiceCards.has(index) && <fieldset>
+                        <legend>Services</legend>
+                        <div>
+                          {services.map((service) => (
+                            <label key={service.id} className={choice.serviceIds.includes(String(service.id)) ? "is-selected" : ""}>
+                              <input
+                                type="checkbox"
+                                checked={choice.serviceIds.includes(String(service.id))}
+                                onChange={() => setAppointmentChoices((current) => current.map((item, itemIndex) => {
+                                  if (itemIndex !== index) return item;
+                                  const id = String(service.id);
+                                  const serviceIds = item.serviceIds.includes(id)
+                                    ? item.serviceIds.filter((value) => value !== id)
+                                    : [...item.serviceIds, id];
+                                  return { serviceIds, employeeId: "" };
+                                }))}
+                              />
+                              <span>
+                                <b>{service.name}</b>
+                                <small>{service.durationMinutes} min</small>
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>}
+                      <label>
+                        <span>Professional</span>
+                        <select value={choice.employeeId} onChange={(event) => setAppointmentChoices((current) =>
+                          current.map((item, itemIndex) => itemIndex === index ? { ...item, employeeId: event.target.value } : item),
+                        )}>
+                          <option value="">Any available professional</option>
+                          {eligible.map((employee) => (
+                            <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>
+                          ))}
+                        </select>
+                      </label>
+                    </article>
+                  );
+                })}
+              </section>
+            )}
             <label>
               <span>Notes (optional)</span>
               <textarea
@@ -677,13 +983,13 @@ const CustomerAppointmentsPage = () => {
                 <span>{filteredBookings.length}</span>
               </header>
               {filteredBookings.length ? (
-                filteredBookings.slice(0, visibleBookingCount).map((item) => card(item, bookingFilter === "upcoming" && item.status === "Scheduled"))
+                groupedBookings.slice(0, visibleBookingCount).map((group) => card(group, bookingFilter === "upcoming" && group.every((item) => item.status === "Scheduled")))
               ) : (
                 <div className="customer-appointment-empty">
                   No {filteredBookingTitle.toLowerCase()}.
                 </div>
               )}
-              {filteredBookings.length > visibleBookingCount && (
+              {groupedBookings.length > visibleBookingCount && (
                 <button className="customer-bookings-more" type="button" onClick={() => setVisibleBookingCount((count) => count + 10)}>
                   Show more bookings
                 </button>
@@ -694,6 +1000,73 @@ const CustomerAppointmentsPage = () => {
       </div>
       <CustomerBottomNav active={isBookingPage ? "services" : "bookings"} />
       {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
+      <ConfirmDialog
+        open={slotSuggestion !== null}
+        title="Use the nearest available time?"
+        message={slotSuggestion
+          ? slotSuggestion.selectedSlot && slotSuggestion.selectedCount
+            ? (() => {
+              const detail = slotDetails[slotSuggestion.selectedSlot!];
+              const requested = slotSuggestion.selectedCount! + slotSuggestion.remaining;
+              const reason = detail?.limitingReason === "service_capacity"
+                ? "Service capacity reached"
+                : detail?.limitingReason === "employee_availability"
+                  ? "Not enough professionals"
+                  : detail?.limitingReason === "both"
+                    ? "Capacity and staff limit"
+                    : "Slot capacity reached";
+              return (
+                <div className="customer-slot-proposal">
+                  <span className="customer-slot-proposal_notice">Nothing has been booked yet</span>
+                  <div className="customer-slot-proposal_stats">
+                    <span><b>{requested}</b><small>Requested</small></span>
+                    <span><b>{detail?.serviceLimit ?? slotSuggestion.selectedCount}</b><small>Slot limit</small></span>
+                    <span><b>{detail?.bookedCount ?? 0}</b><small>Booked</small></span>
+                    <span><b>{detail?.availableEmployees ?? slotSuggestion.selectedCount}</b><small>Staff free</small></span>
+                  </div>
+                  <strong className="customer-slot-proposal_reason">{reason}</strong>
+                  <div className="customer-slot-proposal_plan">
+                    <span>
+                      <small>Selected time</small>
+                      <b>{slotSuggestion.selectedSlot.slice(0, 5)}</b>
+                      <em>{slotSuggestion.selectedCount} appointment{slotSuggestion.selectedCount === 1 ? "" : "s"}</em>
+                    </span>
+                    <i>+</i>
+                    <span className="is-nearest">
+                      <small>Nearest time</small>
+                      <b>{slotSuggestion.slot.slice(0, 5)}</b>
+                      <em>{slotSuggestion.remaining} appointment{slotSuggestion.remaining === 1 ? "" : "s"}</em>
+                    </span>
+                  </div>
+                  <small className="customer-slot-proposal_date">{form.appointmentDate.split("-").reverse().join("-")}</small>
+                </div>
+              );
+            })()
+            : `${slotSuggestion.alreadyBooked} of your appointments ${slotSuggestion.alreadyBooked === 1 ? "has" : "have"} been booked. The nearest available time for the remaining ${slotSuggestion.remaining} ${slotSuggestion.remaining === 1 ? "appointment is" : "appointments is"} ${slotSuggestion.slot.slice(0, 5)} on ${form.appointmentDate.split("-").reverse().join("-")}. Would you like to continue?`
+          : ""}
+        confirmLabel="Yes, book this time"
+        cancelLabel="No, choose another"
+        busyLabel="Booking..."
+        tone="primary"
+        busy={busy}
+        onConfirm={() => {
+          if (!slotSuggestion) return;
+          if (slotSuggestion.selectedSlot && slotSuggestion.selectedCount)
+            void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining, slotSuggestion.slot);
+          else
+            void attemptBooking(slotSuggestion.remaining, slotSuggestion.slot, slotSuggestion.alreadyBooked);
+        }}
+        onCancel={() => {
+          const remaining = slotSuggestion?.remaining ?? appointmentCount;
+          setSlotSuggestion(null);
+          setAppointmentCount(remaining);
+          setForm((current) => ({ ...current, startTime: "" }));
+          setMessage({
+            type: "error",
+            text: "Please select another available time or reduce the appointment count.",
+          });
+        }}
+      />
       <ConfirmDialog
         open={cancelTarget !== null}
         title="Cancel appointment?"

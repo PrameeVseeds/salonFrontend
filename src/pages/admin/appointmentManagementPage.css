@@ -623,3 +623,43 @@
     grid-template-columns: 78px minmax(0, 1fr);
   }
 }
+.appointment-card tbody tr.is-group-booking {
+    background: #fffcf3;
+}
+
+.appointment-card tbody tr.is-group-first .appointment-group-shared:first-child {
+    border-left: 3px solid var(--admin-accent, #c18b21);
+}
+
+.appointment-card tbody tr.is-group-booking:not(.is-group-last)>td:not([rowspan]) {
+    border-bottom-style: dashed;
+}
+
+.appointment-group-shared {
+    vertical-align: middle;
+    background: #fffcf3;
+}
+
+.appointment-group-badge {
+    width: fit-content;
+    margin-top: 7px;
+    padding: 4px 7px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #ead7a9;
+    border-radius: 999px;
+    color: #76520d;
+    background: #fff4d6;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.appointment-group-badge small {
+    margin: 0;
+    padding-left: 6px;
+    border-left: 1px solid #dcbf79;
+    color: #76520d;
+    font-size: 0.62rem;
+}

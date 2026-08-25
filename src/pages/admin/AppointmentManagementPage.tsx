@@ -153,6 +153,29 @@ const AppointmentManagementPage = () => {
     });
   }, [appointments]);
 
+  const appointmentGroupInfo = useMemo(() => {
+    const groups = new Map<string, Appointment[]>();
+    orderedAppointments.forEach((appointment) => {
+      const serviceKey = appointment.services?.length
+        ? appointment.services.map((service) => service.serviceId).join(",")
+        : String(appointment.serviceId);
+      const key = `${appointment.customerId}:${appointment.appointmentDate}:${appointment.startTime}:${serviceKey}`;
+      const group = groups.get(key) ?? [];
+      group.push(appointment);
+      groups.set(key, group);
+    });
+    const info = new Map<number, { count: number; position: number }>();
+    groups.forEach((group) => {
+      if (group.length < 2)  
+        return;
+      group.forEach((appointment, index) => info.set(appointment.id, {
+        count: group.length,
+        position: index + 1,
+      }));
+    });
+    return info;
+  }, [orderedAppointments]);
+
   const replaceAppointment = (updated: Appointment) => {
     setAppointments((current) => current.map((item) => item.id === updated.id ? { ...item, ...updated } : item));
     setSelected((current) => current?.id === updated.id ? { ...current, ...updated } : current);
@@ -283,7 +306,9 @@ const AppointmentManagementPage = () => {
             </select>
           </label>
           <button type="submit">Apply</button>
-          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Active"); }}>Clear</button>
+          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Active"); }}>
+            Clear
+          </button>
         </form>
         <div className="appointment-table-wrap">
           <table>
@@ -300,20 +325,33 @@ const AppointmentManagementPage = () => {
             </thead>
             <tbody>
               {orderedAppointments.map((appointment) => (
-                <tr key={appointment.id}>
-                  <td data-label="Date & time"><strong>{appointment.appointmentDate}</strong><small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small></td>
-                  <td data-label="Customer">
-                    <strong>{appointment.customerName ?? `Customer #${appointment.customerId}`}</strong><small>{appointment.customerPhone ?? appointment.customerEmail}</small>
-                  </td>
-                  <td data-label="Service">
-                    {appointment.services?.length ? appointment.services.map((service) => (
-                      <span key={service.serviceId} className="appointment-service-segment">
-                        <strong>{service.serviceName}</strong>
-                        <small>{service.startTime.slice(0, 5)}–{service.endTime.slice(0, 5)}</small>
+                <tr key={appointment.id} className={appointmentGroupInfo.has(appointment.id)
+                  ? `is-group-booking is-group-${appointmentGroupInfo.get(appointment.id)!.position === 1 ? "first" : 
+                    appointmentGroupInfo.get(appointment.id)!.position === appointmentGroupInfo.get(appointment.id)!.count ? "last" : "middle"}`
+                  : undefined}>
+                  {(!appointmentGroupInfo.has(appointment.id) || appointmentGroupInfo.get(appointment.id)!.position === 1) && <>
+                    <td className="appointment-group-shared" rowSpan={appointmentGroupInfo.get(appointment.id)?.count ?? 1} data-label="Date & time">
+                      <strong>{appointment.appointmentDate}</strong><small>{appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}</small>
+                    </td>
+                    <td className="appointment-group-shared" rowSpan={appointmentGroupInfo.get(appointment.id)?.count ?? 1} data-label="Customer">
+                      <strong>{appointment.customerName ?? `Customer #${appointment.customerId}`}</strong>
+                      <small>{appointment.customerPhone ?? appointment.customerEmail}</small>
+                      {appointmentGroupInfo.has(appointment.id) && (
+                      <span className="appointment-group-badge">
+                        Group booking · {appointmentGroupInfo.get(appointment.id)!.count} appointments
                       </span>
-                    )) : <><strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
-                      <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small></>}
-                  </td>
+                      )}
+                    </td>
+                    <td className="appointment-group-shared" rowSpan={appointmentGroupInfo.get(appointment.id)?.count ?? 1} data-label="Service">
+                      {appointment.services?.length ? appointment.services.map((service) => (
+                        <span key={service.serviceId} className="appointment-service-segment">
+                          <strong>{service.serviceName}</strong>
+                          <small>{service.startTime.slice(0, 5)}–{service.endTime.slice(0, 5)}</small>
+                        </span>
+                      )) : <><strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
+                        <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small></>}
+                    </td>
+                  </>}
                   <td data-label="Employee">
                     {appointment.services && appointment.services.length > 1 ? appointment.services.map((service) => (
                       <span key={service.serviceId} className="appointment-service-segment">
