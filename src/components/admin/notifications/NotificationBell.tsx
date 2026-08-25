@@ -15,12 +15,21 @@ import type { AdminNotification } from "../../../types/notification";
 import "./notificationBell.css";
 
 const typeIcon = { Email: Mail, SMS: Smartphone, WhatsApp: MessageCircle };
+const ACKNOWLEDGED_KEY = "admin-acknowledged-notification-attention";
 const NotificationBell = () => {
   const [items, setItems] = useState<AdminNotification[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [retrying, setRetrying] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [acknowledged, setAcknowledged] = useState<Set<number>>(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(ACKNOWLEDGED_KEY) ?? "[]");
+      return new Set(Array.isArray(stored) ? stored.filter(Number.isInteger) : []);
+    } catch {
+      return new Set();
+    }
+  });
   const root = useRef<HTMLDivElement>(null);
 
   const load = async () => {
@@ -57,6 +66,12 @@ const NotificationBell = () => {
           value.id === item.id ? data.notification : value,
         ),
       );
+      setAcknowledged((current) => {
+        const next = new Set(current);
+        next.delete(item.id);
+        localStorage.setItem(ACKNOWLEDGED_KEY, JSON.stringify([...next]));
+        return next;
+      });
     } 
     catch {
       setError("Notification retry failed.");
@@ -66,7 +81,23 @@ const NotificationBell = () => {
     }
   };
 
-  const attention = items.filter((item) => item.sentStatus !== "Sent").length;
+  const attentionItems = items.filter((item) => item.sentStatus !== "Sent");
+  const attention = attentionItems.filter((item) => !acknowledged.has(item.id)).length;
+
+  const toggle = () => {
+    setOpen((value) => {
+      const nextOpen = !value;
+      if (nextOpen && attentionItems.length) {
+        setAcknowledged((current) => {
+          const next = new Set(current);
+          attentionItems.forEach((item) => next.add(item.id));
+          localStorage.setItem(ACKNOWLEDGED_KEY, JSON.stringify([...next]));
+          return next;
+        });
+      }
+      return nextOpen;
+    });
+  };
 
   const recent = items.slice(0, 8);
   return (
@@ -76,7 +107,7 @@ const NotificationBell = () => {
         type="button"
         aria-label={`Notifications${attention ? `, ${attention} requiring attention` : ""}`}
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggle}
       >
         <Bell />
         {attention > 0 && <span>{attention > 99 ? "99+" : attention}</span>}
@@ -87,8 +118,8 @@ const NotificationBell = () => {
             <div>
               <h2>Notifications</h2>
               <p>
-                {attention
-                  ? `${attention} require attention`
+                {attentionItems.length
+                  ? `${attentionItems.length} ${attentionItems.length === 1 ? "delivery requires" : "deliveries require"} attention`
                   : "All deliveries are up to date"}
               </p>
             </div>
@@ -132,7 +163,7 @@ const NotificationBell = () => {
                       {item.sentStatus}
                     </span>
 
-                    {item.sentStatus === "Failed" && (
+                    {item.sentStatus !== "Sent" && (
                       <button
                         className="notification-retry"
                         type="button"
