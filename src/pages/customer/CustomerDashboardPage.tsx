@@ -228,7 +228,8 @@ const CustomerDashboardPage = () => {
                   </time>
                   <div>
                     <strong>
-                      {appointment.serviceName ?? "Salon appointment"}
+                      {appointment.services?.length ? appointment.services.map((service) => service.serviceName).join(" + ") :
+                      appointment.serviceName ?? "Salon appointment"}
                     </strong>
                     <span>
                       <Clock3 />

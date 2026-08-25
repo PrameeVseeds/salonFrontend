@@ -1,16 +1,37 @@
 import { Ban, CalendarDays, CheckCircle2, Clock3, Eye, Play, RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { cancelAppointment, completeAppointment, getAppointments, startAppointment } from "../../services/appointmentService";
+import { assignAppointmentEmployee, cancelAppointment, completeAppointment, getAppointments, getAvailableAppointmentEmployees, startAppointment } from "../../services/appointmentService";
+import { getEmployees } from "../../services/employeeService";
+import { getAssignedEmployeeServices } from "../../services/employeeServiceAssignmentService";
 import type { Appointment, AppointmentStatus } from "../../types/appointment";
+import type { Employee } from "../../types/employee";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./appointmentManagementPage.css";
 
-const statuses: Array<AppointmentStatus | ""> = ["", "Scheduled", "In Progress", "Completed", "Cancelled"];
+type StatusFilter = AppointmentStatus | "Active" | "";
+const statuses: StatusFilter[] = ["Active", "", "Scheduled", "In Progress", "Completed", "Cancelled"];
+
+const formatDateInput = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)]
+    .filter(Boolean)
+    .join("-");
+};
+
+const toApiDate = (value: string): string | undefined => {
+  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value);
+  if (!match) return undefined;
+  const [, day, month, year] = match;
+  const candidate = new Date(`${year}-${month}-${day}T00:00:00Z`);
+  if (candidate.getUTCFullYear() !== Number(year) || candidate.getUTCMonth() + 1 !== Number(month)
+    || candidate.getUTCDate() !== Number(day)) return undefined;
+  return `${year}-${month}-${day}`;
+};
 
 const AppointmentManagementPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [date, setDate] = useState("");
-  const [status, setStatus] = useState<AppointmentStatus | "">("");
+  const [status, setStatus] = useState<StatusFilter>("Active");
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [selected, setSelected] = useState<Appointment | null>(null);
@@ -20,21 +41,98 @@ const AppointmentManagementPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [eligibleEmployees, setEligibleEmployees] = useState<Record<number, Employee[]>>({});
+  const [availableEmployeeIds, setAvailableEmployeeIds] = useState<Record<string, number[]>>({});
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
-      const { data } = await getAppointments({ date: date || undefined, status: status || undefined, search: appliedSearch || undefined });
-      setAppointments(data.appointments);
+      const filters = { date: toApiDate(date), search: appliedSearch || undefined };
+      if (status === "Active") {
+        const [scheduledResponse, inProgressResponse] = await Promise.all([
+          getAppointments({ ...filters, status: "Scheduled" }),
+          getAppointments({ ...filters, status: "In Progress" }),
+        ]);
+        setAppointments([
+          ...scheduledResponse.data.appointments,
+          ...inProgressResponse.data.appointments,
+        ]);
+      } else {
+        const { data } = await getAppointments({ ...filters, status: status || undefined });
+        setAppointments(data.appointments);
+      }
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Unable to load appointments."));
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [date, status, appliedSearch]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    const initialLoadTimer = window.setTimeout(() => void load(), 0);
+    const refreshTimer = window.setInterval(() => void load(true), 30_000);
+    return () => {
+      window.clearTimeout(initialLoadTimer);
+      window.clearInterval(refreshTimer);
+    };
+  }, [load]);
+
+  useEffect(() => {
+    const clockTimer = window.setInterval(() => setCurrentTime(Date.now()), 30_000);
+    return () => window.clearInterval(clockTimer);
+  }, []);
+
+  useEffect(() => {
+    getEmployees()
+      .then(async ({ data }) => {
+        const activeEmployees = data.employees.filter((employee) => employee.isActive);
+        const assignments = await Promise.all(activeEmployees.map(async (employee) => ({
+          employee,
+          services: (await getAssignedEmployeeServices(employee.id)).data.services,
+        })));
+        const byService: Record<number, Employee[]> = {};
+        assignments.forEach(({ employee, services }) => services.forEach((service) => {
+          (byService[service.id] ??= []).push(employee);
+        }));
+        setEligibleEmployees(byService);
+      })
+      .catch(() => setEligibleEmployees({}));
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const scheduled = appointments.filter((appointment) => appointment.status === "Scheduled");
+    Promise.all(scheduled.flatMap((appointment) => {
+      const serviceIds = appointment.services && appointment.services.length > 1
+        ? appointment.services.map((service) => service.serviceId) : [undefined];
+      return serviceIds.map(async (serviceId) => ({
+        key: `${appointment.id}:${serviceId ?? "all"}`,
+        employeeIds: (await getAvailableAppointmentEmployees(appointment.id, serviceId)).data.employeeIds,
+      }));
+    }))
+      .then((results) => {
+        if (active)
+          setAvailableEmployeeIds(Object.fromEntries(results.map((result) => [result.key, result.employeeIds])));
+      })
+      .catch(() => {
+        if (active) setAvailableEmployeeIds({});
+      });
+    return () => { active = false; };
+  }, [appointments]);
+
+  const availableEmployeesFor = (appointment: Appointment, serviceId = appointment.serviceId) => {
+    const key = `${appointment.id}:${appointment.services && appointment.services.length > 1 ? serviceId : "all"}`;
+    const ids = availableEmployeeIds[key] ?? [];
+    return (eligibleEmployees[serviceId] ?? []).filter((employee) => ids.includes(employee.id));
+  };
+
+  const canStart = (appointment: Appointment) => {
+    const startsAt = new Date(`${appointment.appointmentDate}T${appointment.startTime}`).getTime();
+    const endsAt = new Date(`${appointment.appointmentDate}T${appointment.endTime}`).getTime();
+    return currentTime >= startsAt && currentTime <= endsAt;
+  };
 
   const counts = useMemo(() => ({
     total: appointments.length,
@@ -94,10 +192,29 @@ const AppointmentManagementPage = () => {
     }
   };
 
+  const assignEmployee = async (appointment: Appointment, employeeId: number, serviceId?: number) => {
+    setBusyId(appointment.id);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await assignAppointmentEmployee(appointment.id, employeeId, serviceId);
+      replaceAppointment(response.data.appointment);
+      setSuccess(response.message);
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError, "Unable to assign employee."));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <div className="appointment-page">
       <header className="appointment-heading">
-        <div><p className="dashboard-eyebrow">Daily operations</p><h1>Appointments</h1><p>Track arrivals, services, completions, and cancellations.</p></div>
+        <div>
+          <p className="dashboard-eyebrow">Daily operations</p>
+          <h1>Appointments</h1>
+          <p>Track arrivals, services, completions, and cancellations.</p>
+        </div>
         <button className="appointment-refresh" onClick={() => void load()} disabled={loading}><RefreshCw />Refresh</button>
       </header>
       {error && <p className="appointment-message is-error">{error}</p>}
@@ -145,20 +262,28 @@ const AppointmentManagementPage = () => {
           </label>
           <label>
             <span>Date</span>
-            <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
+              placeholder="dd-mm-yyyy"
+              value={date}
+              onChange={(event) => setDate(formatDateInput(event.target.value))}
+              aria-label="Date in day-month-year format"
+            />
           </label>
           <label>
             <span>Status</span>
-            <select value={status} onChange={(event) => setStatus(event.target.value as AppointmentStatus | "")}>
+            <select value={status} onChange={(event) => setStatus(event.target.value as StatusFilter)}>
               {statuses.map((item) => (
                 <option key={item || "all"} value={item}>
-                  {item || "All statuses"}
+                  {item === "Active" ? "Scheduled & In Progress" : item || "All statuses"}
                 </option>
               ))}
             </select>
           </label>
           <button type="submit">Apply</button>
-          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus(""); }}>Clear</button>
+          <button type="button" className="is-secondary" onClick={() => { setSearch(""); setAppliedSearch(""); setDate(""); setStatus("Active"); }}>Clear</button>
         </form>
         <div className="appointment-table-wrap">
           <table>
@@ -181,69 +306,158 @@ const AppointmentManagementPage = () => {
                     <strong>{appointment.customerName ?? `Customer #${appointment.customerId}`}</strong><small>{appointment.customerPhone ?? appointment.customerEmail}</small>
                   </td>
                   <td data-label="Service">
-                    <strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
-                    <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small>
+                    {appointment.services?.length ? appointment.services.map((service) => (
+                      <span key={service.serviceId} className="appointment-service-segment">
+                        <strong>{service.serviceName}</strong>
+                        <small>{service.startTime.slice(0, 5)}–{service.endTime.slice(0, 5)}</small>
+                      </span>
+                    )) : <><strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
+                      <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small></>}
                   </td>
-                  <td data-label="Employee">{appointment.employeeName ?? (appointment.employeeId ? `Employee #${appointment.employeeId}` : "Unassigned")}</td>
+                  <td data-label="Employee">
+                    {appointment.services && appointment.services.length > 1 ? appointment.services.map((service) => (
+                      <span key={service.serviceId} className="appointment-service-segment">
+                        <small>{service.serviceName}</small>
+                        {appointment.status === "Scheduled" ? (
+                          <select
+                            className={`appointment-employee-select${service.employeeId ? "" : " is-unassigned"}`}
+                            aria-label={`Assign employee for ${service.serviceName}`}
+                            value={availableEmployeesFor(appointment, service.serviceId).some((employee) => employee.id === service.employeeId) ? service.employeeId ?? "" : ""}
+                            disabled={busyId === appointment.id || !availableEmployeesFor(appointment, service.serviceId).length}
+                            onChange={(event) => {
+                              const employeeId = Number(event.target.value);
+                              if (employeeId && employeeId !== service.employeeId)
+                                void assignEmployee(appointment, employeeId, service.serviceId);
+                            }}
+                          >
+                            <option value="">{availableEmployeesFor(appointment, service.serviceId).length ? "Assign employee" : "No available employees"}</option>
+                            {availableEmployeesFor(appointment, service.serviceId).map((employee) => (
+                              <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>
+                            ))}
+                          </select>
+                        ) : <strong>{service.employeeName ?? "Unassigned"}</strong>}
+                      </span>
+                    )) : appointment.status === "Scheduled" ? (
+                      <select
+                        className={`appointment-employee-select${appointment.employeeId ? "" : " is-unassigned"}`}
+                        aria-label={`Assign employee to appointment ${appointment.id}`}
+                        title="Assign or change employee"
+                        value={availableEmployeesFor(appointment).some((employee) => employee.id === appointment.employeeId) ? appointment.employeeId ?? "" : ""}
+                        disabled={busyId === appointment.id || !availableEmployeesFor(appointment).length}
+                        onChange={(event) => {
+                          const employeeId = Number(event.target.value);
+                          if (employeeId && employeeId !== appointment.employeeId)
+                            void assignEmployee(appointment, employeeId);
+                        }}
+                      >
+                        <option value="">
+                          {
+                            availableEmployeesFor(appointment).length ?
+                              "Assign employee" : "No available employees"
+                          }
+                        </option>
+                        {availableEmployeesFor(appointment).map((employee) => (
+                          <option
+                            key={employee.id}
+                            value={employee.id}>
+                            {employee.firstName} {employee.lastName}
+                          </option>
+                        ))}
+                      </select>
+                    ) : appointment.employeeName ?? (appointment.employeeId ? `Employee #${appointment.employeeId}` : "Unassigned")}
+                  </td>
                   <td data-label="Amount">{Number(appointment.totalAmount).toFixed(2)}</td>
                   <td data-label="Status">
                     <span className={`appointment-status is-${appointment.status.toLowerCase().replace(" ", "-")}`}>{appointment.status}</span></td>
                   <td data-label="Actions">
                     <div className="appointment-actions">
-                      <button className="is-view" title="View details" onClick={() => setSelected(appointment)}><Eye /></button>
-                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button disabled={busyId === appointment.id} onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> : <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
-                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") && <button className="is-cancel" title="Cancel appointment" onClick={() => setCancelTarget(appointment)}><Ban /></button>}
+                      <button className="is-view" title="View details" onClick={() => setSelected(appointment)}>
+                        <Eye />
+                      </button>
+                      {(appointment.status === "Scheduled" || appointment.status === "In Progress")
+                        &&
+                        <button disabled={busyId === appointment.id || (appointment.status === "Scheduled"
+                          &&
+                          !canStart(appointment))} title={appointment.status === "Scheduled" && !canStart(appointment)
+                            ? "This appointment can only be started during its scheduled time." : undefined}
+                          onClick={() => void changeStatus(appointment)}>{appointment.status === "Scheduled" ? <Play /> :
+                            <CheckCircle2 />}{appointment.status === "Scheduled" ? "Start" : "Complete"}</button>}
+                      {(appointment.status === "Scheduled" || appointment.status === "In Progress") &&
+                        <button className="is-cancel" title="Cancel appointment" onClick={() => setCancelTarget(appointment)}>
+                          <Ban />
+                        </button>}
                     </div>
                   </td>
                 </tr>
               ))}
-              {!loading && !appointments.length && <tr><td className="appointment-empty" colSpan={7}><Clock3 />No appointments match these filters.</td></tr>}
-              {loading && <tr><td className="appointment-empty" colSpan={7}>Loading appointments...</td></tr>}
+              {!loading && !appointments.length && <tr><td className="appointment-empty" colSpan={7}>
+                <Clock3 />
+                No appointments match these filters.
+              </td>
+              </tr>}
+              {loading &&
+                <tr>
+                  <td className="appointment-empty" colSpan={7}>Loading appointments...</td>
+                </tr>}
             </tbody>
           </table>
         </div>
       </section>
 
-      {selected && <div className="appointment-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-details-title"><header><div><p>Appointment #{selected.id}</p><h2 id="appointment-details-title">Appointment details</h2></div><button onClick={() => setSelected(null)} aria-label="Close"><X /></button></header><dl>
-        <div>
-          <dt>Customer</dt>
-          <dd>{selected.customerName ?? `#${selected.customerId}`}
-            <small>{selected.customerPhone}<br />{selected.customerEmail}</small>
-          </dd>
-        </div>
-        <div>
-          <dt>Service</dt>
-          <dd>{selected.serviceName ?? `#${selected.serviceId}`}</dd>
-        </div>
-        <div>
-          <dt>Employee</dt>
-          <dd>{selected.employeeName ?? "Unassigned"}</dd></div>
-        <div>
-          <dt>Schedule</dt>
-          <dd>{selected.appointmentDate}, {selected.startTime.slice(0, 5)} - {selected.endTime.slice(0, 5)}</dd>
-        </div>
-        <div>
-          <dt>Status</dt>
-          <dd>
-            <span className={`appointment-status is-${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</span>
-          </dd>
-        </div>
-        <div>
-          <dt>Amount</dt>
-          <dd>{Number(selected.totalAmount).toFixed(2)}</dd>
-        </div>
-        <div className="is-wide">
-          <dt>Customer notes</dt>
-          <dd>{selected.notes || "No notes provided."}</dd>
-        </div>
-        {selected.cancellationReason &&
-          <div className="is-wide">
-            <dt>Cancellation reason</dt>
-            <dd>{selected.cancellationReason}</dd>
-          </div>}
-      </dl>
-      </section>
-      </div>}
+      {selected &&
+        <div className="appointment-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}>
+          <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-details-title">
+            <header>
+              <div>
+                <p>Appointment #{selected.id}</p>
+                <h2 id="appointment-details-title">
+                  Appointment details
+                </h2>
+              </div>
+              <button onClick={() => setSelected(null)} aria-label="Close">
+                <X />
+              </button>
+            </header>
+            <dl>
+              <div>
+                <dt>Customer</dt>
+                <dd>{selected.customerName ?? `#${selected.customerId}`}
+                  <small>{selected.customerPhone}<br />{selected.customerEmail}</small>
+                </dd>
+              </div>
+              <div>
+                <dt>Service</dt>
+                <dd>{selected.serviceName ?? `#${selected.serviceId}`}</dd>
+              </div>
+              <div>
+                <dt>Employee</dt>
+                <dd>{selected.employeeName ?? "Unassigned"}</dd></div>
+              <div>
+                <dt>Schedule</dt>
+                <dd>{selected.appointmentDate}, {selected.startTime.slice(0, 5)} - {selected.endTime.slice(0, 5)}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>
+                  <span className={`appointment-status is-${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</span>
+                </dd>
+              </div>
+              <div>
+                <dt>Amount</dt>
+                <dd>{Number(selected.totalAmount).toFixed(2)}</dd>
+              </div>
+              <div className="is-wide">
+                <dt>Customer notes</dt>
+                <dd>{selected.notes || "No notes provided."}</dd>
+              </div>
+              {selected.cancellationReason &&
+                <div className="is-wide">
+                  <dt>Cancellation reason</dt>
+                  <dd>{selected.cancellationReason}</dd>
+                </div>}
+            </dl>
+          </section>
+        </div>}
 
       {cancelTarget &&
         <div className="appointment-modal-backdrop">
@@ -260,7 +474,9 @@ const AppointmentManagementPage = () => {
             <p>Provide a reason for cancelling {cancelTarget.customerName ?? "this customer's"} appointment.</p>
             <textarea autoFocus maxLength={255} value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} placeholder="Cancellation reason" />
             <footer>
-              <button className="is-secondary" onClick={() => setCancelTarget(null)}>Keep appointment</button>
+              <button className="is-secondary" onClick={() => setCancelTarget(null)}>
+                Keep appointment
+              </button>
               <button className="is-danger" disabled={!cancelReason.trim() || busyId === cancelTarget.id} onClick={() => void submitCancellation()}>
                 <Ban />
                 Cancel appointment

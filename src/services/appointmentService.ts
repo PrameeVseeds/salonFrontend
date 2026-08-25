@@ -19,9 +19,13 @@ export const createCustomerAppointment = async (input: CreateCustomerAppointment
 export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/my/${id}/cancel`, { reason })).data;
 
-export const getAvailableAppointmentSlots = async (serviceId: number, employeeId: number | null, date: string): Promise<{ slots: string[]; message: string | null }> => {
-  const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[]; availabilityMessage?: string | null }>>(`${ENDPOINT}/available-slots`, {
-    params: { serviceId, ...(employeeId === null ? {} : { employeeId }), date },
+export const getAvailableAppointmentSlots = async (serviceIds: number | number[], employeeId: number | null, date: string): Promise<
+{ slots: string[]; message: string | null }
+> => {
+  const selectedServiceIds = Array.isArray(serviceIds) ? serviceIds : [serviceIds];
+  const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[]; 
+    availabilityMessage?: string | null }>>(`${ENDPOINT}/available-slots`, {
+    params: { serviceIds: selectedServiceIds.join(","), ...(employeeId === null ? {} : { employeeId }), date },
   });
   return {
     slots: response.data.data.availableSlots ?? response.data.data.slots ?? [],
@@ -48,6 +52,22 @@ export const completeAppointment = async (id: number,): Promise<ApiResponse<Appo
   (
     await adminAxiosClient.patch<ApiResponse<AppointmentResponseData>>(
       `${ENDPOINT}/${id}/complete`,
+    )
+  ).data;
+
+export const assignAppointmentEmployee = async (id: number, employeeId: number, serviceId?: number): Promise<ApiResponse<AppointmentResponseData>> =>
+  (
+    await adminAxiosClient.patch<ApiResponse<AppointmentResponseData>>(
+      `${ENDPOINT}/${id}/employee`,
+      { employeeId, ...(serviceId ? { serviceId } : {}) },
+    )
+  ).data;
+
+export const getAvailableAppointmentEmployees = async (id: number, serviceId?: number): Promise<ApiResponse<{ employeeIds: number[] }>> =>
+  (
+    await adminAxiosClient.get<ApiResponse<{ employeeIds: number[] }>>(
+      `${ENDPOINT}/${id}/available-employees`,
+      { params: serviceId ? { serviceId } : undefined },
     )
   ).data;
 

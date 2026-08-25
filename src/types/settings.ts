@@ -13,6 +13,7 @@ export interface SalonSettings {
     bookingIntervalMinutes: number;
     appointmentBufferMinutes: number;
     appointmentGracePeriodMinutes: number;
+    appointmentReminderMinutes: number;
     createdAt: string;
     updatedAt: string;
 }
