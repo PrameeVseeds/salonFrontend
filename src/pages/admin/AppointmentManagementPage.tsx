@@ -43,7 +43,7 @@ const AppointmentManagementPage = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const [eligibleEmployees, setEligibleEmployees] = useState<Record<number, Employee[]>>({});
-  const [availableEmployeeIds, setAvailableEmployeeIds] = useState<Record<number, number[]>>({});
+  const [availableEmployeeIds, setAvailableEmployeeIds] = useState<Record<string, number[]>>({});
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -104,13 +104,17 @@ const AppointmentManagementPage = () => {
   useEffect(() => {
     let active = true;
     const scheduled = appointments.filter((appointment) => appointment.status === "Scheduled");
-    Promise.all(scheduled.map(async (appointment) => ({
-      appointmentId: appointment.id,
-      employeeIds: (await getAvailableAppointmentEmployees(appointment.id)).data.employeeIds,
-    })))
+    Promise.all(scheduled.flatMap((appointment) => {
+      const serviceIds = appointment.services && appointment.services.length > 1
+        ? appointment.services.map((service) => service.serviceId) : [undefined];
+      return serviceIds.map(async (serviceId) => ({
+        key: `${appointment.id}:${serviceId ?? "all"}`,
+        employeeIds: (await getAvailableAppointmentEmployees(appointment.id, serviceId)).data.employeeIds,
+      }));
+    }))
       .then((results) => {
         if (active)
-          setAvailableEmployeeIds(Object.fromEntries(results.map((result) => [result.appointmentId, result.employeeIds])));
+          setAvailableEmployeeIds(Object.fromEntries(results.map((result) => [result.key, result.employeeIds])));
       })
       .catch(() => {
         if (active) setAvailableEmployeeIds({});
@@ -118,9 +122,10 @@ const AppointmentManagementPage = () => {
     return () => { active = false; };
   }, [appointments]);
 
-  const availableEmployeesFor = (appointment: Appointment) => {
-    const ids = availableEmployeeIds[appointment.id] ?? [];
-    return (eligibleEmployees[appointment.serviceId] ?? []).filter((employee) => ids.includes(employee.id));
+  const availableEmployeesFor = (appointment: Appointment, serviceId = appointment.serviceId) => {
+    const key = `${appointment.id}:${appointment.services && appointment.services.length > 1 ? serviceId : "all"}`;
+    const ids = availableEmployeeIds[key] ?? [];
+    return (eligibleEmployees[serviceId] ?? []).filter((employee) => ids.includes(employee.id));
   };
 
   const canStart = (appointment: Appointment) => {
@@ -187,12 +192,12 @@ const AppointmentManagementPage = () => {
     }
   };
 
-  const assignEmployee = async (appointment: Appointment, employeeId: number) => {
+  const assignEmployee = async (appointment: Appointment, employeeId: number, serviceId?: number) => {
     setBusyId(appointment.id);
     setError(null);
     setSuccess(null);
     try {
-      const response = await assignAppointmentEmployee(appointment.id, employeeId);
+      const response = await assignAppointmentEmployee(appointment.id, employeeId, serviceId);
       replaceAppointment(response.data.appointment);
       setSuccess(response.message);
     } catch (requestError) {
@@ -301,11 +306,38 @@ const AppointmentManagementPage = () => {
                     <strong>{appointment.customerName ?? `Customer #${appointment.customerId}`}</strong><small>{appointment.customerPhone ?? appointment.customerEmail}</small>
                   </td>
                   <td data-label="Service">
-                    <strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
-                    <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small>
+                    {appointment.services?.length ? appointment.services.map((service) => (
+                      <span key={service.serviceId} className="appointment-service-segment">
+                        <strong>{service.serviceName}</strong>
+                        <small>{service.startTime.slice(0, 5)}–{service.endTime.slice(0, 5)}</small>
+                      </span>
+                    )) : <><strong>{appointment.serviceName ?? `Service #${appointment.serviceId}`}</strong>
+                      <small>{appointment.serviceDurationMinutes ? `${appointment.serviceDurationMinutes} minutes` : ""}</small></>}
                   </td>
                   <td data-label="Employee">
-                    {appointment.status === "Scheduled" ? (
+                    {appointment.services && appointment.services.length > 1 ? appointment.services.map((service) => (
+                      <span key={service.serviceId} className="appointment-service-segment">
+                        <small>{service.serviceName}</small>
+                        {appointment.status === "Scheduled" ? (
+                          <select
+                            className={`appointment-employee-select${service.employeeId ? "" : " is-unassigned"}`}
+                            aria-label={`Assign employee for ${service.serviceName}`}
+                            value={availableEmployeesFor(appointment, service.serviceId).some((employee) => employee.id === service.employeeId) ? service.employeeId ?? "" : ""}
+                            disabled={busyId === appointment.id || !availableEmployeesFor(appointment, service.serviceId).length}
+                            onChange={(event) => {
+                              const employeeId = Number(event.target.value);
+                              if (employeeId && employeeId !== service.employeeId)
+                                void assignEmployee(appointment, employeeId, service.serviceId);
+                            }}
+                          >
+                            <option value="">{availableEmployeesFor(appointment, service.serviceId).length ? "Assign employee" : "No available employees"}</option>
+                            {availableEmployeesFor(appointment, service.serviceId).map((employee) => (
+                              <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>
+                            ))}
+                          </select>
+                        ) : <strong>{service.employeeName ?? "Unassigned"}</strong>}
+                      </span>
+                    )) : appointment.status === "Scheduled" ? (
                       <select
                         className={`appointment-employee-select${appointment.employeeId ? "" : " is-unassigned"}`}
                         aria-label={`Assign employee to appointment ${appointment.id}`}

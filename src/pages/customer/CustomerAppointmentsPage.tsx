@@ -18,7 +18,7 @@ import {
   getAvailableAppointmentSlots,
   getCustomerAppointments,
 } from "../../services/appointmentService";
-import {getCustomerProfile,logoutCustomer,} from "../../services/customerAuthService";
+import { getCustomerProfile, logoutCustomer, } from "../../services/customerAuthService";
 import { getPublicServices } from "../../services/salonService";
 import { getPublicEmployees } from "../../services/employeeService";
 import { getPublicAssignedEmployeeServices } from "../../services/employeeServiceAssignmentService";
@@ -49,6 +49,7 @@ const CustomerAppointmentsPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [form, setForm] = useState({
     serviceId: params.get("service") ?? "",
+    serviceIds: params.get("service") ? [params.get("service")!] : [] as string[],
     employeeId: "",
     appointmentDate: "",
     startTime: "",
@@ -141,7 +142,7 @@ const CustomerAppointmentsPage = () => {
     };
   }, [employees, initialServiceId]);
   const loadSlots = (
-    serviceId: string,
+    serviceIds: string[],
     choice: string,
     appointmentDate: string,
     staff = assignedEmployees,
@@ -149,7 +150,8 @@ const CustomerAppointmentsPage = () => {
     setEmployeeChoice(choice);
     setForm((current) => ({
       ...current,
-      serviceId,
+      serviceId: serviceIds[0] ?? "",
+      serviceIds,
       employeeId: choice === "any" ? "" : choice,
       appointmentDate,
       startTime: "",
@@ -158,17 +160,17 @@ const CustomerAppointmentsPage = () => {
     setSlotsError(null);
     setSlotsMessage(null);
     setSlotEmployees({});
-    if (!serviceId || !appointmentDate) return;
+    if (!serviceIds.length || !appointmentDate) return;
     setSlotsLoading(true);
     const candidates =
       choice === "any"
-        ? staff
+        ? [null]
         : staff.filter((employee) => employee.id === Number(choice));
     Promise.all(
       (candidates.length ? candidates : [null]).map(async (employee) => ({
         employeeId: employee?.id ?? null,
         availability: await getAvailableAppointmentSlots(
-          Number(serviceId),
+          serviceIds.map(Number),
           employee?.id ?? null,
           appointmentDate,
         ),
@@ -195,7 +197,7 @@ const CustomerAppointmentsPage = () => {
       )
       .finally(() => setSlotsLoading(false));
   };
-  const selectService = async (serviceId: string) => {
+  const selectServices = async (serviceIds: string[]) => {
     setAssignedEmployees([]);
     setEmployeeChoice("any");
     setAvailableSlots([]);
@@ -203,11 +205,12 @@ const CustomerAppointmentsPage = () => {
     setSlotsMessage(null);
     setForm((current) => ({
       ...current,
-      serviceId,
+      serviceId: serviceIds[0] ?? "",
+      serviceIds,
       employeeId: "",
       startTime: "",
     }));
-    if (!serviceId) 
+    if (!serviceIds.length)
       return;
     const matches = (
       await Promise.all(
@@ -216,9 +219,9 @@ const CustomerAppointmentsPage = () => {
             const { data } = await getPublicAssignedEmployeeServices(
               employee.id,
             );
-            return data.services.some(
+            return serviceIds.every((serviceId) => data.services.some(
               (service) => service.id === Number(serviceId),
-            )
+            ))
               ? employee
               : null;
           } catch {
@@ -229,7 +232,7 @@ const CustomerAppointmentsPage = () => {
     ).filter((employee): employee is Employee => employee !== null);
     setAssignedEmployees(matches);
     if (form.appointmentDate)
-      loadSlots(serviceId, "any", form.appointmentDate, matches);
+      loadSlots(serviceIds, "any", form.appointmentDate, matches);
   };
   const upcoming = useMemo(
     () =>
@@ -273,9 +276,9 @@ const CustomerAppointmentsPage = () => {
         ),
     [appointments],
   );
-  const selectedService = useMemo(
-    () => services.find((service) => service.id === Number(form.serviceId)),
-    [form.serviceId, services],
+  const selectedServices = useMemo(
+    () => form.serviceIds.map(Number).map((id) => services.find((service) => service.id === id)).filter((service): service is SalonService => Boolean(service)),
+    [form.serviceIds, services],
   );
   const openDatePicker = () => {
     const input = dateInputRef.current;
@@ -306,6 +309,7 @@ const CustomerAppointmentsPage = () => {
     try {
       const { data } = await createCustomerAppointment({
         serviceId: Number(form.serviceId),
+        serviceIds: form.serviceIds.map(Number),
         employeeId: employeeChoice === "any" ? null : Number(form.employeeId),
         appointmentDate: form.appointmentDate,
         startTime: form.startTime,
@@ -314,6 +318,7 @@ const CustomerAppointmentsPage = () => {
       setAppointments((current) => [...current, data.appointment]);
       setForm({
         serviceId: "",
+        serviceIds: [],
         employeeId: "",
         appointmentDate: "",
         startTime: "",
@@ -335,7 +340,7 @@ const CustomerAppointmentsPage = () => {
     }
   };
   const cancelBooking = async () => {
-    if (!cancelTarget) 
+    if (!cancelTarget)
       return;
     setBusy(true);
     try {
@@ -373,7 +378,7 @@ const CustomerAppointmentsPage = () => {
       </span>
       <div className="customer-appointment-details">
         <strong>
-          {item.serviceName ??
+          {item.services?.length ? item.services.map((service) => service.serviceName).join(" + ") : item.serviceName ??
             services.find((service) => service.id === item.serviceId)?.name ??
             "Salon service"}
         </strong>
@@ -381,7 +386,7 @@ const CustomerAppointmentsPage = () => {
           <Clock3 /> {item.startTime.slice(0, 5)}–{item.endTime.slice(0, 5)}
         </span>
         <small>
-          {item.employeeName ??
+          {item.services?.length ? [...new Set(item.services.map((service) => service.employeeName).filter(Boolean))].join(" + ") : item.employeeName ??
             (() => {
               const employee = employees.find(
                 (candidate) => candidate.id === item.employeeId,
@@ -404,10 +409,10 @@ const CustomerAppointmentsPage = () => {
         <time>
           <strong>
             {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { day: "2-digit" })}
-            </strong>
+          </strong>
           <span>
             {new Date(`${item.appointmentDate}T00:00`).toLocaleDateString(undefined, { month: "short" })}
-            </span>
+          </span>
         </time>
       </aside>
     </article>
@@ -468,216 +473,222 @@ const CustomerAppointmentsPage = () => {
           </div>
         </section>
         {isBookingPage && (
-        <form
-          className="customer-booking-form"
-          onSubmit={(event) => void book(event)}
-        >
-          <header>
-            <CalendarDays />
-            <div>
-              <h2>Book an appointment</h2>
-              <p>
-                {selectedService ? `${selectedService.name} · ${selectedService.durationMinutes} min · ${Number(selectedService.price).toFixed(2)}`
-                 : "Choose your service, professional, and preferred time."}
-                 </p>
-            </div>
-          </header>
-          {!initialServiceId && (
-          <label>
-            <span>Service</span>
-            <select
-              value={form.serviceId}
-              onChange={(e) => void selectService(e.target.value)}
-              required
-            >
-              <option value="">Select a service</option>
-              {services.map((service) => (
-                <option value={service.id} key={service.id}>
-                  {service.name} · {service.durationMinutes} min ·{" "}
-                  {Number(service.price).toFixed(2)}
-                </option>
-              ))}
-            </select>
-          </label>
-          )}
-          <fieldset className="customer-professional-field">
-            <legend>
-              Professional <small>(optional)</small>
-            </legend>
-            {!form.serviceId ? (
-              <p className="customer-professional-empty">
-                Select a service to see its professionals.
-              </p>
-            ) : assignedEmployees.length ? (
-              <div className="customer-professional-options">
-                <button
-                  className={employeeChoice === "any" ? "is-selected" : ""}
-                  type="button"
-                  onClick={() =>
-                    loadSlots(form.serviceId, "any", form.appointmentDate)
-                  }
-                >
-                  <span>
-                    <UserRound />
-                  </span>
-                  <strong>Any professional</strong>
-                  <small>Earliest available</small>
-                </button>
-                {assignedEmployees.map((employee) => (
+          <form
+            className="customer-booking-form"
+            onSubmit={(event) => void book(event)}
+          >
+            <header>
+              <CalendarDays />
+              <div>
+                <h2>Book an appointment</h2>
+                <p>
+                  {selectedServices.length ? `${selectedServices.length} service${selectedServices.length === 1 ? "" : "s"} · 
+                ${selectedServices.reduce((total, service) => total + service.durationMinutes, 0)} min · 
+                ${selectedServices.reduce((total, service) => total + Number(service.price), 0).toFixed(2)}`
+                    : "Choose your service, professional, and preferred time."}
+                </p>
+              </div>
+            </header>
+            <fieldset className="customer-service-options">
+              <legend>Services</legend>
+              <div>
+                {services.map((service) => (
+                  <label key={service.id} className={form.serviceIds.includes(String(service.id)) ? "is-selected" : ""}>
+                    <input type="checkbox" checked={form.serviceIds.includes(String(service.id))}
+                      onChange={() => {
+                        const id = String(service.id);
+                        const next = form.serviceIds.includes(id) ? form.serviceIds.filter((item) => item !== id) : [...form.serviceIds, id];
+                        void selectServices(next);
+                      }} />
+                    <strong>{service.name}</strong>
+                    <small>{service.durationMinutes} min · {Number(service.price).toFixed(2)}</small>
+                    <span className="customer-service-option-image" aria-hidden="true">
+                      {service.imageUrl ? <img src={service.imageUrl} alt="" /> : <Scissors />}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset className="customer-professional-field">
+              <legend>
+                Professional <small>(optional)</small>
+              </legend>
+              {!form.serviceId ? (
+                <p className="customer-professional-empty">
+                  Select a service to see its professionals.
+                </p>
+              ) : assignedEmployees.length ? (
+                <div className="customer-professional-options">
                   <button
-                    className={
-                      employeeChoice === String(employee.id)
-                        ? "is-selected"
-                        : ""
-                    }
+                    className={employeeChoice === "any" ? "is-selected" : ""}
                     type="button"
-                    key={employee.id}
                     onClick={() =>
-                      loadSlots(
-                        form.serviceId,
-                        String(employee.id),
-                        form.appointmentDate,
-                      )
+                      loadSlots(form.serviceIds, "any", form.appointmentDate)
                     }
                   >
                     <span>
-                      {employee.profileImage ? (
-                        <img src={employee.profileImage} alt="" />
-                      ) : (
-                        <UserRound />
-                      )}
+                      <UserRound />
                     </span>
-                    <strong>
-                      {employee.firstName} {employee.lastName}
-                    </strong>
-                    <small>Select professional</small>
+                    <strong>Any professional</strong>
+                    <small>Earliest available</small>
                   </button>
-                ))}
-              </div>
-            ) : (
-              <p className="customer-professional-empty">
-                No professional selection is needed. The salon can assign one later.
+                  {assignedEmployees.map((employee) => (
+                    <button
+                      className={
+                        employeeChoice === String(employee.id)
+                          ? "is-selected"
+                          : ""
+                      }
+                      type="button"
+                      key={employee.id}
+                      onClick={() =>
+                        loadSlots(
+                          form.serviceIds,
+                          String(employee.id),
+                          form.appointmentDate,
+                        )
+                      }
+                    >
+                      <span>
+                        {employee.profileImage ? (
+                          <img src={employee.profileImage} alt="" />
+                        ) : (
+                          <UserRound />
+                        )}
+                      </span>
+                      <strong>
+                        {employee.firstName} {employee.lastName}
+                      </strong>
+                      <small>Select professional</small>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="customer-professional-empty">
+                  No professional selection is needed. The salon can assign one later.
+                </p>
+              )}
+            </fieldset>
+            <label className="customer-date-field">
+              <span>Date</span>
+              <span
+                className="customer-date-picker"
+                role="button"
+                tabIndex={0}
+                onClick={openDatePicker}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openDatePicker();
+                  }
+                }}
+              >
+                <CalendarDays aria-hidden="true" />
+                <span className={form.appointmentDate ? "" : "is-placeholder"}>
+                  {form.appointmentDate
+                    ? form.appointmentDate.split("-").reverse().join("-")
+                    : "dd-mm-yyyy"}
+                </span>
+                <input
+                  ref={dateInputRef}
+                  type="date"
+                  aria-label="Appointment date"
+                  min={today}
+                  value={form.appointmentDate}
+                  onChange={(e) =>
+                    loadSlots(form.serviceIds, employeeChoice, e.target.value)
+                  }
+                  required
+                />
+              </span>
+            </label>
+            <fieldset className="customer-time-slots">
+              <legend>Available times</legend>
+              {!form.appointmentDate || !form.serviceId ? (
+                <p>Select a service and date to view times.</p>
+              ) : slotsLoading ? (
+                <p>Checking available times...</p>
+              ) : slotsError ? (
+                <p className="is-error">{slotsError}</p>
+              ) : visibleAvailableSlots.length ? (
+                <div>
+                  {visibleAvailableSlots.map((slot) => (
+                    <button
+                      className={form.startTime === slot ? "is-selected" : ""}
+                      type="button"
+                      key={slot}
+                      onClick={() =>
+                        setForm({
+                          ...form,
+                          startTime: slot,
+                          employeeId: employeeChoice !== "any" && slotEmployees[slot] ? String(slotEmployees[slot]) : "",
+                        })
+                      }
+                    >
+                      {slot.slice(0, 5)}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p>{slotsMessage ?? "No available times for this date."}</p>
+              )}
+            </fieldset>
+            <label>
+              <span>Notes (optional)</span>
+              <textarea
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="Any preferences for your visit"
+              />
+            </label>
+            {message && (
+              <p className={`customer-booking-message is-${message.type}`}>
+                {message.text}
               </p>
             )}
-          </fieldset>
-          <label className="customer-date-field">
-            <span>Date</span>
-            <span
-              className="customer-date-picker"
-              role="button"
-              tabIndex={0}
-              onClick={openDatePicker}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  openDatePicker();
-                }
-              }}
-            >
-              <CalendarDays aria-hidden="true" />
-              <span className={form.appointmentDate ? "" : "is-placeholder"}>
-                {form.appointmentDate
-                  ? form.appointmentDate.split("-").reverse().join("-")
-                  : "dd-mm-yyyy"}
-              </span>
-              <input
-                ref={dateInputRef}
-                type="date"
-                aria-label="Appointment date"
-                min={today}
-                value={form.appointmentDate}
-                onChange={(e) =>
-                  loadSlots(form.serviceId, employeeChoice, e.target.value)
-                }
-                required
-              />
-            </span>
-          </label>
-          <fieldset className="customer-time-slots">
-            <legend>Available times</legend>
-            {!form.appointmentDate || !form.serviceId ? (
-              <p>Select a service and date to view times.</p>
-            ) : slotsLoading ? (
-              <p>Checking available times...</p>
-            ) : slotsError ? (
-              <p className="is-error">{slotsError}</p>
-            ) : visibleAvailableSlots.length ? (
-              <div>
-                {visibleAvailableSlots.map((slot) => (
-                  <button
-                    className={form.startTime === slot ? "is-selected" : ""}
-                    type="button"
-                    key={slot}
-                    onClick={() =>
-                      setForm({
-                        ...form,
-                        startTime: slot,
-                        employeeId: employeeChoice !== "any" && slotEmployees[slot] ? String(slotEmployees[slot]) : "",
-                      })
-                    }
-                  >
-                    {slot.slice(0, 5)}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p>{slotsMessage ?? "No available times for this date."}</p>
-            )}
-          </fieldset>
-          <label>
-            <span>Notes (optional)</span>
-            <textarea
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              placeholder="Any preferences for your visit"
-            />
-          </label>
-          {message && (
-            <p className={`customer-booking-message is-${message.type}`}>
-              {message.text}
-            </p>
-          )}
-          <button disabled={busy || !form.startTime}>
-            {busy ? "Booking..." : "Confirm appointment"}
-          </button>
-        </form>
+            <button disabled={busy || !form.startTime}>
+              {busy ? "Booking..." : "Confirm appointment"}
+            </button>
+          </form>
         )}
         {!isBookingPage && (
           <>
-        <nav className="customer-booking-filters" aria-label="Filter bookings">
-          {([
-            ["upcoming", "Upcoming", upcoming.length],
-            ["cancelled", "Cancelled", cancelled.length],
-            ["past", "Past", past.length],
-          ] as const).map(([value, label, count]) => (
-            <button
-              className={bookingFilter === value ? "is-active" : ""}
-              type="button"
-              key={value}
-              onClick={() => { setBookingFilter(value); setVisibleBookingCount(10); }}
-              aria-pressed={bookingFilter === value}
-            >
-              <span>{label}</span>
-              <b>{count}</b>
-            </button>
-          ))}
-        </nav>
-        <section className="customer-appointments-list">
-          <header>
-            <h2>{filteredBookingTitle}</h2>
-            <span>{filteredBookings.length}</span>
-          </header>
-          {filteredBookings.length ? (
-            filteredBookings.slice(0, visibleBookingCount).map((item) => card(item, bookingFilter === "upcoming" && item.status === "Scheduled"))
-          ) : (
-            <div className="customer-appointment-empty">
-              No {filteredBookingTitle.toLowerCase()}.
-            </div>
-          )}
-          {filteredBookings.length > visibleBookingCount && (
-            <button className="customer-bookings-more" type="button" onClick={() => setVisibleBookingCount((count) => count + 10)}>Show more bookings</button>
-          )}
-        </section>
+            <nav className="customer-booking-filters" aria-label="Filter bookings">
+              {([
+                ["upcoming", "Upcoming", upcoming.length],
+                ["cancelled", "Cancelled", cancelled.length],
+                ["past", "Past", past.length],
+              ] as const).map(([value, label, count]) => (
+                <button
+                  className={bookingFilter === value ? "is-active" : ""}
+                  type="button"
+                  key={value}
+                  onClick={() => { setBookingFilter(value); setVisibleBookingCount(10); }}
+                  aria-pressed={bookingFilter === value}
+                >
+                  <span>{label}</span>
+                  <b>{count}</b>
+                </button>
+              ))}
+            </nav>
+            <section className="customer-appointments-list">
+              <header>
+                <h2>{filteredBookingTitle}</h2>
+                <span>{filteredBookings.length}</span>
+              </header>
+              {filteredBookings.length ? (
+                filteredBookings.slice(0, visibleBookingCount).map((item) => card(item, bookingFilter === "upcoming" && item.status === "Scheduled"))
+              ) : (
+                <div className="customer-appointment-empty">
+                  No {filteredBookingTitle.toLowerCase()}.
+                </div>
+              )}
+              {filteredBookings.length > visibleBookingCount && (
+                <button className="customer-bookings-more" type="button" onClick={() => setVisibleBookingCount((count) => count + 10)}>
+                  Show more bookings
+                </button>
+              )}
+            </section>
           </>
         )}
       </div>

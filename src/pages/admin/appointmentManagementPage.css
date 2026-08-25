@@ -255,6 +255,22 @@
   display: block;
 }
 
+.appointment-service-segment {
+  display: grid;
+  gap: 2px;
+}
+
+.appointment-service-segment + .appointment-service-segment {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid #eee8dd;
+}
+
+.appointment-service-segment small {
+  color: #91897e;
+  font-size: 0.64rem;
+}
+
 .appointment-card td > small {
   margin-top: 3px;
   color: #91897e;
