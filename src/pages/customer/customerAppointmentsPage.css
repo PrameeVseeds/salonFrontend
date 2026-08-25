@@ -1103,6 +1103,59 @@
     letter-spacing: 0.01em;
 }
 
+.customer-appointment-card-toggle {
+    width: 100%;
+    min-height: 48px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 0;
+    border-radius: 9px;
+    color: var(--customer-primary);
+    background: #fff1c9;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.customer-appointment-card-toggle>span {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.customer-appointment-card-toggle b {
+    font-size: 0.62rem;
+}
+
+.customer-appointment-card-toggle small {
+    overflow: hidden;
+    color: #7c6b4a;
+    font-size: 0.52rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-appointment-card-toggle svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    color: #a66f08;
+    transition: transform 160ms ease;
+}
+
+.customer-appointment-card-toggle.is-open svg {
+    transform: rotate(180deg);
+}
+
+.customer-appointment-card-body {
+    display: grid;
+    gap: 10px;
+}
+
 .customer-bulk-configurator fieldset {
     min-width: 0;
     margin: 0;

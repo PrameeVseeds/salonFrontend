@@ -52,6 +52,7 @@ const CustomerAppointmentsPage = () => {
   ]);
   const [employeeServiceIds, setEmployeeServiceIds] = useState<Record<number, number[]>>({});
   const [expandedServiceCards, setExpandedServiceCards] = useState<Set<number>>(new Set());
+  const [expandedAppointmentCards, setExpandedAppointmentCards] = useState<Set<number>>(new Set([0]));
   const [slotSuggestion, setSlotSuggestion] = useState<{
     slot: string;
     remaining: number;
@@ -384,6 +385,7 @@ const CustomerAppointmentsPage = () => {
     setAppointmentCount(1);
     setAppointmentChoices([{ serviceIds: [], employeeId: "" }]);
     setExpandedServiceCards(new Set());
+    setExpandedAppointmentCards(new Set([0]));
     setAvailableSlots([]);
     setSlotEmployees({});
     setSlotCapacities({});
@@ -447,7 +449,8 @@ const CustomerAppointmentsPage = () => {
       setAppointmentCount(remaining);
       setMessage({
         type: "error",
-        text: `${totalBooked ? `${totalBooked} appointment${totalBooked === 1 ? " is" : "s are"} booked. ` : ""}${getApiErrorMessage(error, "No alternative appointment slot is available.")}`,
+        text: `${totalBooked ? `${totalBooked} appointment${totalBooked === 1 ? " is" : "s are"} booked. ` : ""}
+        ${getApiErrorMessage(error, "No alternative appointment slot is available.")}`,
       });
     } finally {
       setBusy(false);
@@ -502,7 +505,9 @@ const CustomerAppointmentsPage = () => {
       )));
       const unavailableIndex = checks.findIndex((availability) => !availability.slots.includes(form.startTime));
       if (unavailableIndex >= 0) {
-        setMessage({ type: "error", text: `Appointment #${unavailableIndex + 1}'s services or professional are not available at ${form.startTime.slice(0, 5)}. Please change that appointment or select another time.` });
+        setMessage({
+          type: "error", text: `Appointment #${unavailableIndex + 1}'s services or professional are not available at ${form.startTime.slice(0, 5)}. 
+        Please change that appointment or select another time.` });
         return;
       }
       const selectedProfessionals = choices.map((choice) => choice.employeeId).filter(Boolean);
@@ -521,7 +526,9 @@ const CustomerAppointmentsPage = () => {
       );
       if (overCapacity && groupedCounts.size > 1) {
         const available = checks[overCapacity.checkIndex]!.slotDetails[form.startTime]?.remainingCapacity ?? 0;
-        setMessage({ type: "error", text: `Only ${available} of the appointments using the same services can fit at this time. Select another slot, reduce that service count, or choose different services.` });
+        setMessage({
+          type: "error", text: `Only ${available} of the appointments using the same services can fit at this time. 
+          Select another slot, reduce that service count, or choose different services.` });
         return;
       }
     } catch (error) {
@@ -613,7 +620,8 @@ const CustomerAppointmentsPage = () => {
           {items.length > 1 && <b className="customer-bulk-booking-badge">Bulk booking · {items.length} appointments</b>}
           <span>
             <Clock3 /> {items.length > 1
-              ? `${new Set(items.map((appointment) => appointment.startTime)).size} scheduled time${new Set(items.map((appointment) => appointment.startTime)).size === 1 ? "" : "s"}`
+              ? `${new Set(items.map((appointment) => appointment.startTime)).size} scheduled time${new Set(items.map((appointment) =>
+                appointment.startTime)).size === 1 ? "" : "s"}`
               : `${item.startTime.slice(0, 5)}–${item.endTime.slice(0, 5)}`}
           </span>
           <span>
@@ -907,6 +915,7 @@ const CustomerAppointmentsPage = () => {
                       setAppointmentChoices((current) => Array.from({ length: count }, (_, index) =>
                         current[index] ?? { serviceIds: form.serviceIds, employeeId: "" },
                       ));
+                      setExpandedAppointmentCards(new Set([0]));
                     }}
                   >
                     {count}
@@ -933,60 +942,87 @@ const CustomerAppointmentsPage = () => {
                   );
                   return (
                     <article key={index}>
-                      <b>Appointment {index + 1}</b>
                       <button
-                        className={`customer-bulk-services-toggle${expandedServiceCards.has(index) ? " is-open" : ""}`}
                         type="button"
-                        aria-expanded={expandedServiceCards.has(index)}
-                        onClick={() => setExpandedServiceCards((current) => {
+                        className={`customer-appointment-card-toggle${expandedAppointmentCards.has(index) ? " is-open" : ""}`}
+                        aria-expanded={expandedAppointmentCards.has(index)}
+                        onClick={() => setExpandedAppointmentCards((current) => {
                           const next = new Set(current);
-                          if (next.has(index)) next.delete(index);
-                          else next.add(index);
+                          if (next.has(index))
+                            next.delete(index);
+                          else
+                            next.add(index);
                           return next;
                         })}
                       >
                         <span>
-                          <b>Services</b>
-                          <small>{choice.serviceIds.length ? `${choice.serviceIds.length} selected` : "Choose services"}</small>
+                          <b>Appointment {index + 1}</b>
+                          <small>
+                            {choice.serviceIds.length} service{choice.serviceIds.length === 1 ? "" : "s"} · {choice.employeeId
+                              ? (() => {
+                                const employee = employees.find((item) => item.id === Number(choice.employeeId));
+                                return employee ? `${employee.firstName} ${employee.lastName}` : "Selected professional";
+                              })()
+                              : "Any professional"}
+                          </small>
                         </span>
                         <ChevronDown aria-hidden="true" />
                       </button>
-                      {expandedServiceCards.has(index) && <fieldset>
-                        <legend>Services</legend>
-                        <div>
-                          {services.map((service) => (
-                            <label key={service.id} className={choice.serviceIds.includes(String(service.id)) ? "is-selected" : ""}>
-                              <input
-                                type="checkbox"
-                                checked={choice.serviceIds.includes(String(service.id))}
-                                onChange={() => setAppointmentChoices((current) => current.map((item, itemIndex) => {
-                                  if (itemIndex !== index) return item;
-                                  const id = String(service.id);
-                                  const serviceIds = item.serviceIds.includes(id)
-                                    ? item.serviceIds.filter((value) => value !== id)
-                                    : [...item.serviceIds, id];
-                                  return { serviceIds, employeeId: "" };
-                                }))}
-                              />
-                              <span>
-                                <b>{service.name}</b>
-                                <small>{service.durationMinutes} min</small>
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      </fieldset>}
-                      <label>
-                        <span>Professional</span>
-                        <select value={choice.employeeId} onChange={(event) => setAppointmentChoices((current) =>
-                          current.map((item, itemIndex) => itemIndex === index ? { ...item, employeeId: event.target.value } : item),
-                        )}>
-                          <option value="">Any available professional</option>
-                          {eligible.map((employee) => (
-                            <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>
-                          ))}
-                        </select>
-                      </label>
+                      {expandedAppointmentCards.has(index) && <div className="customer-appointment-card-body">
+                        <button
+                          className={`customer-bulk-services-toggle${expandedServiceCards.has(index) ? " is-open" : ""}`}
+                          type="button"
+                          aria-expanded={expandedServiceCards.has(index)}
+                          onClick={() => setExpandedServiceCards((current) => {
+                            const next = new Set(current);
+                            if (next.has(index)) next.delete(index);
+                            else next.add(index);
+                            return next;
+                          })}
+                        >
+                          <span>
+                            <b>Services</b>
+                            <small>{choice.serviceIds.length ? `${choice.serviceIds.length} selected` : "Choose services"}</small>
+                          </span>
+                          <ChevronDown aria-hidden="true" />
+                        </button>
+                        {expandedServiceCards.has(index) && <fieldset>
+                          <legend>Services</legend>
+                          <div>
+                            {services.map((service) => (
+                              <label key={service.id} className={choice.serviceIds.includes(String(service.id)) ? "is-selected" : ""}>
+                                <input
+                                  type="checkbox"
+                                  checked={choice.serviceIds.includes(String(service.id))}
+                                  onChange={() => setAppointmentChoices((current) => current.map((item, itemIndex) => {
+                                    if (itemIndex !== index) return item;
+                                    const id = String(service.id);
+                                    const serviceIds = item.serviceIds.includes(id)
+                                      ? item.serviceIds.filter((value) => value !== id)
+                                      : [...item.serviceIds, id];
+                                    return { serviceIds, employeeId: "" };
+                                  }))}
+                                />
+                                <span>
+                                  <b>{service.name}</b>
+                                  <small>{service.durationMinutes} min</small>
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+                        </fieldset>}
+                        <label>
+                          <span>Professional</span>
+                          <select value={choice.employeeId} onChange={(event) => setAppointmentChoices((current) =>
+                            current.map((item, itemIndex) => itemIndex === index ? { ...item, employeeId: event.target.value } : item),
+                          )}>
+                            <option value="">Any available professional</option>
+                            {eligible.map((employee) => (
+                              <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>}
                     </article>
                   );
                 })}
@@ -1121,7 +1157,8 @@ const CustomerAppointmentsPage = () => {
         tone="primary"
         busy={busy}
         onConfirm={() => {
-          if (!slotSuggestion) return;
+          if (!slotSuggestion)
+            return;
           if (slotSuggestion.selectedSlot && slotSuggestion.selectedCount)
             void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining,
               slotSuggestion.slot);
