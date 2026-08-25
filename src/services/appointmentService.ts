@@ -19,7 +19,7 @@ export const createCustomerAppointment = async (input: CreateCustomerAppointment
 export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/my/${id}/cancel`, { reason })).data;
 
-export const getAvailableAppointmentSlots = async (serviceIds: number | number[], employeeId: number | null, date: string): Promise<
+export const getAvailableAppointmentSlots = async (serviceIds: number | number[], employeeId: number | null, date: string, subServiceIds: Array<number | null> = []): Promise<
   {
      slots: string[]; 
      message: string | null; 
@@ -45,7 +45,7 @@ export const getAvailableAppointmentSlots = async (serviceIds: number | number[]
     }>;
     availabilityMessage?: string | null
   }>>(`${ENDPOINT}/available-slots`, {
-    params: { serviceIds: selectedServiceIds.join(","), ...(employeeId === null ? {} : { employeeId }), date },
+    params: { serviceIds: selectedServiceIds.join(","), ...(subServiceIds.length ? { subServiceIds: subServiceIds.map((id) => id ?? "").join(",") } : {}), ...(employeeId === null ? {} : { employeeId }), date },
   });
   return {
     slots: response.data.data.availableSlots ?? response.data.data.slots ?? [],

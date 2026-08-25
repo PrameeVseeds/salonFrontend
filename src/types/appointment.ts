@@ -23,6 +23,7 @@ export interface Appointment {
   serviceDurationMinutes?: number;
   services?: Array<{
     serviceId: number;
+    subServiceId?: number | null;
     serviceName: string;
     employeeId: number | null;
     employeeName: string | null;
@@ -52,6 +53,7 @@ export interface AppointmentFilters {
 export interface CreateCustomerAppointmentInput {
   serviceId: number;
   serviceIds: number[];
+  subServiceIds?: Array<number | null>;
   employeeId: number | null;
   appointmentDate: string;
   startTime: string;

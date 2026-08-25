@@ -13,13 +13,16 @@ import {
 import { useEffect, useState, type FormEvent } from "react";
 import {
   createSalonService,
+  createSubService,
+  deleteSubService,
   deleteSalonService,
   getServices,
   updateSalonService,
   updateSalonServiceStatus,
+  updateSubService,
   uploadSalonServiceImage,
 } from "../../services/salonService";
-import type { SalonService } from "../../types/service";
+import type { SalonService, SubService } from "../../types/service";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { markFieldsTouched } from "../../utils/form";
 import "./serviceManagementPage.css";
@@ -52,6 +55,17 @@ const ServiceManagementPage = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Partial<Record<RequiredField, boolean>>>({});
+  const [subServiceParent, setSubServiceParent] = useState<SalonService | null>(null);
+  const [editingSubService, setEditingSubService] = useState<SubService | null>(null);
+  const [subName, setSubName] = useState("");
+  const [subDuration, setSubDuration] = useState("");
+  const [subPrice, setSubPrice] = useState("");
+  const [subImageUrl, setSubImageUrl] = useState("");
+  const [subImageFile, setSubImageFile] = useState<File | null>(null);
+  const [subImagePreview, setSubImagePreview] = useState("");
+  const [subIsActive, setSubIsActive] = useState(true);
+  const [subTouched, setSubTouched] = useState(false);
+  const [subError, setSubError] = useState<string | null>(null);
 
   useEffect(() => {
     getServices()
@@ -213,6 +227,44 @@ const ServiceManagementPage = () => {
     }
   };
 
+  const reloadServices = async () => setServices((await getServices()).data.services);
+  const openSubServiceForm = (service: SalonService, item: SubService | null = null) => {
+    setSubServiceParent(service); setEditingSubService(item);
+    setSubName(item?.name ?? ""); setSubDuration(item ? String(item.durationMinutes) : "");
+    setSubPrice(item ? String(item.price) : ""); setSubImageUrl(item?.imageUrl ?? "");
+    setSubImageFile(null); setSubImagePreview(item?.imageUrl ?? "");
+    setSubIsActive(item?.isActive ?? true); setSubTouched(false); setSubError(null);
+  };
+  const closeSubServiceForm = () => {
+    if (!busy) { setSubServiceParent(null); setEditingSubService(null); setSubError(null); }
+  };
+  const chooseSubServiceImage = (file: File | null) => {
+    if (!file) return;
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/) || file.size > 5 * 1024 * 1024) {
+      setSubError("Choose a JPG, PNG, or WEBP image up to 5 MB."); return;
+    }
+    setSubImageFile(file); setSubImagePreview(URL.createObjectURL(file)); setSubError(null);
+  };
+  const submitSubService = async (event: FormEvent) => {
+    event.preventDefault(); setSubTouched(true);
+    if (!subServiceParent || !subName.trim() || !Number.isInteger(Number(subDuration)) || Number(subDuration) <= 0 ||
+      !Number.isFinite(Number(subPrice)) || Number(subPrice) < 0 || (!subImageFile && !subImageUrl)) return;
+    try {
+      setBusy(true); setSubError(null);
+      let savedImageUrl = subImageUrl;
+      if (subImageFile) savedImageUrl = (await uploadSalonServiceImage(subImageFile)).data.imageUrl;
+      const input = { name: subName.trim(), durationMinutes: Number(subDuration), price: Number(subPrice), imageUrl: savedImageUrl, isActive: subIsActive };
+      if (editingSubService) await updateSubService(subServiceParent.id, editingSubService.id, input);
+      else await createSubService(subServiceParent.id, input);
+      await reloadServices(); setBusy(false); closeSubServiceForm();
+    } catch (e) { setSubError(getApiErrorMessage(e)); } finally { setBusy(false); }
+  };
+  const removeSubService = async (service: SalonService, id: number) => {
+    if (!window.confirm("Delete this sub-service?")) return;
+    try { await deleteSubService(service.id, id); await reloadServices(); }
+    catch (e) { setError(getApiErrorMessage(e)); }
+  };
+
   return (
     <div className="service-page">
       <header className="service-page_heading">
@@ -278,6 +330,15 @@ const ServiceManagementPage = () => {
                     <dd>{Math.min(service.maxConcurrentAppointments ?? service.assignedEmployeeCount, service.assignedEmployeeCount)} {service.maxConcurrentAppointments === null ? "(auto)" : ""}</dd>
                   </div>
                 </dl>
+                <section className="sub-service-table">
+                  <header><strong>Sub-services</strong><button type="button" disabled={busy} onClick={() => openSubServiceForm(service)}><Plus /> Add</button></header>
+                  {service.subServices?.length ? service.subServices.map((item) => <div key={item.id}>
+                    <img src={item.imageUrl} alt="" />
+                    <span><b>{item.name}</b><small>{item.durationMinutes} min · Rs. {Number(item.price).toFixed(2)}</small></span>
+                    <button type="button" title="Edit sub-service" onClick={() => openSubServiceForm(service, item)}><Pencil /></button>
+                    <button type="button" title="Delete sub-service" onClick={() => void removeSubService(service, item.id)}><Trash2 /></button>
+                  </div>) : <p>No sub-services. Customers can book the parent service.</p>}
+                </section>
                 <footer>
                   <button onClick={() => openEdit(service)} title="Edit">
                     <Pencil />
@@ -439,6 +500,58 @@ const ServiceManagementPage = () => {
                   <Sparkles />
                   {busy ? "Saving..." : "Save service"}
                 </button>
+              </footer>
+            </form>
+          </section>
+        </div>
+      )}
+      {subServiceParent && (
+        <div className="service-modal sub-service-modal" onMouseDown={(event) => event.target === event.currentTarget && closeSubServiceForm()}>
+          <section role="dialog" aria-modal="true" aria-labelledby="sub-service-form-title">
+            <header>
+              <div>
+                <p className="dashboard-eyebrow">{subServiceParent.name}</p>
+                <h2 id="sub-service-form-title">{editingSubService ? "Edit sub-service" : "Add sub-service"}</h2>
+                <p>Customers will see this option under the parent service.</p>
+              </div>
+              <button type="button" onClick={closeSubServiceForm} aria-label="Close"><X /></button>
+            </header>
+            <form onSubmit={(event) => void submitSubService(event)}>
+              <label>
+                <RequiredLabel>Name</RequiredLabel>
+                <input autoFocus value={subName} onChange={(event) => setSubName(event.target.value)} aria-invalid={subTouched && !subName.trim()} />
+                {subTouched && !subName.trim() && <small className="service-field-error">Name is required.</small>}
+              </label>
+              <label>
+                <RequiredLabel>Duration (minutes)</RequiredLabel>
+                <input type="number" min="1" step="1" value={subDuration} onChange={(event) => setSubDuration(event.target.value)}
+                  aria-invalid={subTouched && (!Number.isInteger(Number(subDuration)) || Number(subDuration) <= 0)} />
+                {subTouched && (!Number.isInteger(Number(subDuration)) || Number(subDuration) <= 0) && <small className="service-field-error">Enter a positive whole number.</small>}
+              </label>
+              <label>
+                <RequiredLabel>Price (Rs.)</RequiredLabel>
+                <input type="number" min="0" step="0.01" value={subPrice} onChange={(event) => setSubPrice(event.target.value)}
+                  aria-invalid={subTouched && (!Number.isFinite(Number(subPrice)) || Number(subPrice) < 0 || subPrice === "")} />
+                {subTouched && (!Number.isFinite(Number(subPrice)) || Number(subPrice) < 0 || subPrice === "") && <small className="service-field-error">Enter a valid price.</small>}
+              </label>
+              <label className="service-image-field">
+                <RequiredLabel>Sub-service image</RequiredLabel>
+                <span className="service-image-picker">
+                  {subImagePreview ? <img src={subImagePreview} alt="Sub-service preview" /> : <ImagePlus aria-hidden="true" />}
+                  <span>{subImageFile?.name ?? (editingSubService ? "Replace image" : "Choose image")}</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => chooseSubServiceImage(event.target.files?.[0] ?? null)} />
+                </span>
+                <small>JPG, PNG or WEBP, up to 5 MB</small>
+                {subTouched && !subImageFile && !subImageUrl && <small className="service-field-error">An image is required.</small>}
+              </label>
+              <label className="service-checkbox is-wide">
+                <input type="checkbox" checked={subIsActive} onChange={(event) => setSubIsActive(event.target.checked)} />
+                Active sub-service
+              </label>
+              {subError && <p className="service-error">{subError}</p>}
+              <footer>
+                <button type="button" onClick={closeSubServiceForm}>Cancel</button>
+                <button className="is-primary" disabled={busy}><Sparkles />{busy ? "Saving..." : editingSubService ? "Save changes" : "Add sub-service"}</button>
               </footer>
             </form>
           </section>

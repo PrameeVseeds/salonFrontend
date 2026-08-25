@@ -434,6 +434,21 @@
   }
 }
 
+.sub-service-table { margin-top: 14px; padding-top: 12px; border-top: 1px solid #eee5d6; }
+.sub-service-table>header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.sub-service-table>header button { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #dec47f; border-radius: 7px; background: #fffaf0; color: #9a6911; padding: 6px 9px; font-weight: 700; }
+.sub-service-table button svg { width: 14px; height: 14px; }
+.sub-service-table>div { display: grid; grid-template-columns: 36px minmax(0, 1fr) 30px 30px; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid #f1ece3; }
+.sub-service-table>div>img { width: 36px; height: 36px; border-radius: 7px; object-fit: cover; }
+.sub-service-table>div>span { display: grid; min-width: 0; }
+.sub-service-table>div b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sub-service-table>div small, .sub-service-table>p { color: #817665; font-size: .7rem; }
+.sub-service-table>div>button { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 7px; background: #f6f0fa; color: #725379; }
+.sub-service-modal>section { width: min(620px, calc(100vw - 28px)); }
+.sub-service-modal form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sub-service-modal .dashboard-eyebrow { margin: 0 0 3px; color: #b17a15; font-size: .67rem; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
+.customer-service-options em { display: block; color: #9a701c; font-size: .65rem; font-style: normal; }
+
 @media (max-width: 600px) {
   .service-page_heading {
     display: grid;
