@@ -9,11 +9,13 @@ import DashboardShell from "./DashboardShell";
 interface ProtectedDashboardProps {
     allowedRole: AdminRole | AdminRole[];
     children: (user: Admin) => ReactNode;
+    withShell?: boolean;
 }
 
 const ProtectedDashboard = ({
     allowedRole,
     children,
+    withShell = true,
 }: ProtectedDashboardProps) => {
     const [user, setUser] = useState<Admin | null>(null);
     const [status, setStatus] = useState<
@@ -76,7 +78,9 @@ const ProtectedDashboard = ({
             </main>
         );
 
-    return <DashboardShell user={user}>{children(user)}</DashboardShell>;
+    return withShell
+        ? <DashboardShell user={user}>{children(user)}</DashboardShell>
+        : <>{children(user)}</>;
 };
 
 export default ProtectedDashboard;
