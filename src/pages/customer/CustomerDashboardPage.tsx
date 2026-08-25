@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerNotificationBell from "../../components/customer/CustomerNotificationBell";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import { getCustomerAppointments } from "../../services/appointmentService";
 import {
@@ -111,6 +112,7 @@ const CustomerDashboardPage = () => {
           <strong>{brand.salonName}</strong>
         </div>
         <div className="customer-dashboard_header-actions">
+          <CustomerNotificationBell />
           <button
             className="customer-profile-trigger"
             type="button"

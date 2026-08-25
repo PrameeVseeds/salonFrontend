@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerNotificationBell from "../../components/customer/CustomerNotificationBell";
 import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import {
@@ -575,7 +576,8 @@ const CustomerAppointmentsPage = () => {
   const card = (items: Appointment[], cancellable: boolean) => {
     const item = items[0]!;
     return (
-    <article className={`customer-appointment-card${items.length > 1 ? " is-bulk" : ""}`} key={items.map((appointment) => appointment.id).join("-")}>
+    <article className={`customer-appointment-card${items.length > 1 ? " is-bulk" : ""}`} 
+    key={items.map((appointment) => appointment.id).join("-")}>
       <span className="customer-appointment-image">
         {services.find((service) => service.id === item.serviceId)?.imageUrl ? (
           <img src={services.find((service) => service.id === item.serviceId)?.imageUrl} alt="" />
@@ -598,7 +600,8 @@ const CustomerAppointmentsPage = () => {
             <span key={appointment.id}>
               <small>
                 {items.length > 1 && <b>#{index + 1}</b>}
-                {appointment.services?.length ? [...new Set(appointment.services.map((service) => service.employeeName).filter(Boolean))].join(" + ") || "Professional assigned by salon" : appointment.employeeName ??
+                {appointment.services?.length ? [...new Set(appointment.services.map
+                ((service) => service.employeeName).filter(Boolean))].join(" + ") || "Professional assigned by salon" : appointment.employeeName ??
                   (() => {
                     const employee = employees.find((candidate) => candidate.id === appointment.employeeId);
                     return employee ? `${employee.firstName} ${employee.lastName}` : "Professional assigned by salon";
@@ -640,6 +643,7 @@ const CustomerAppointmentsPage = () => {
           <strong>{brand.salonName}</strong>
         </div>
         <div className="customer-dashboard_header-actions">
+          <CustomerNotificationBell />
           <button
             className="customer-profile-trigger"
             type="button"
@@ -983,14 +987,16 @@ const CustomerAppointmentsPage = () => {
                 <span>{filteredBookings.length}</span>
               </header>
               {filteredBookings.length ? (
-                groupedBookings.slice(0, visibleBookingCount).map((group) => card(group, bookingFilter === "upcoming" && group.every((item) => item.status === "Scheduled")))
+                groupedBookings.slice(0, visibleBookingCount).map((group) => card(group, 
+                  bookingFilter === "upcoming" && group.every((item) => item.status === "Scheduled")))
               ) : (
                 <div className="customer-appointment-empty">
                   No {filteredBookingTitle.toLowerCase()}.
                 </div>
               )}
               {groupedBookings.length > visibleBookingCount && (
-                <button className="customer-bookings-more" type="button" onClick={() => setVisibleBookingCount((count) => count + 10)}>
+                <button className="customer-bookings-more" type="button" onClick={() => 
+                setVisibleBookingCount((count) => count + 10)}>
                   Show more bookings
                 </button>
               )}
@@ -999,7 +1005,8 @@ const CustomerAppointmentsPage = () => {
         )}
       </div>
       <CustomerBottomNav active={isBookingPage ? "services" : "bookings"} />
-      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" 
+      customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={slotSuggestion !== null}
         title="Use the nearest available time?"
@@ -1019,10 +1026,22 @@ const CustomerAppointmentsPage = () => {
                 <div className="customer-slot-proposal">
                   <span className="customer-slot-proposal_notice">Nothing has been booked yet</span>
                   <div className="customer-slot-proposal_stats">
-                    <span><b>{requested}</b><small>Requested</small></span>
-                    <span><b>{detail?.serviceLimit ?? slotSuggestion.selectedCount}</b><small>Slot limit</small></span>
-                    <span><b>{detail?.bookedCount ?? 0}</b><small>Booked</small></span>
-                    <span><b>{detail?.availableEmployees ?? slotSuggestion.selectedCount}</b><small>Staff free</small></span>
+                    <span>
+                      <b>{requested}</b>
+                      <small>Requested</small>
+                      </span>
+                    <span>
+                      <b>{detail?.serviceLimit ?? slotSuggestion.selectedCount}</b>
+                      <small>Slot limit</small>
+                      </span>
+                    <span>
+                      <b>{detail?.bookedCount ?? 0}</b>
+                      <small>Booked</small>
+                      </span>
+                    <span>
+                      <b>{detail?.availableEmployees ?? slotSuggestion.selectedCount}</b>
+                      <small>Staff free</small>
+                      </span>
                   </div>
                   <strong className="customer-slot-proposal_reason">{reason}</strong>
                   <div className="customer-slot-proposal_plan">
@@ -1042,7 +1061,10 @@ const CustomerAppointmentsPage = () => {
                 </div>
               );
             })()
-            : `${slotSuggestion.alreadyBooked} of your appointments ${slotSuggestion.alreadyBooked === 1 ? "has" : "have"} been booked. The nearest available time for the remaining ${slotSuggestion.remaining} ${slotSuggestion.remaining === 1 ? "appointment is" : "appointments is"} ${slotSuggestion.slot.slice(0, 5)} on ${form.appointmentDate.split("-").reverse().join("-")}. Would you like to continue?`
+            : `${slotSuggestion.alreadyBooked} of your appointments ${slotSuggestion.alreadyBooked === 1 ? "has" : "have"} been booked.
+             The nearest available time for the remaining ${slotSuggestion.remaining} ${slotSuggestion.remaining === 1 ? "appointment is" :
+               "appointments is"} ${slotSuggestion.slot.slice(0, 5)} on ${form.appointmentDate.split("-").reverse().join("-")}. 
+               Would you like to continue?`
           : ""}
         confirmLabel="Yes, book this time"
         cancelLabel="No, choose another"
@@ -1052,7 +1074,8 @@ const CustomerAppointmentsPage = () => {
         onConfirm={() => {
           if (!slotSuggestion) return;
           if (slotSuggestion.selectedSlot && slotSuggestion.selectedCount)
-            void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining, slotSuggestion.slot);
+            void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining, 
+          slotSuggestion.slot);
           else
             void attemptBooking(slotSuggestion.remaining, slotSuggestion.slot, slotSuggestion.alreadyBooked);
         }}

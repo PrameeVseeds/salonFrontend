@@ -13,6 +13,7 @@ import { usePublicTheme } from "../../hooks/usePublicTheme";
 import { getPublicServices } from "../../services/salonService";
 import type { SalonService } from "../../types/service";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerNotificationBell from "../../components/customer/CustomerNotificationBell";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import {
@@ -76,6 +77,7 @@ const CustomerServicesPage = () => {
           <strong>{brand.salonName}</strong>
         </div>
         <div className="customer-dashboard_header-actions">
+          <CustomerNotificationBell />
           <button
             className="customer-profile-trigger"
             type="button"
@@ -163,7 +165,8 @@ const CustomerServicesPage = () => {
         )}
       </div>
       <CustomerBottomNav active="services" />
-      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" 
+      customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={logoutConfirmationOpen}
         title="Sign out?"
