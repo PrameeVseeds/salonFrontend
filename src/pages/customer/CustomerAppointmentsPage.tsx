@@ -125,6 +125,35 @@ const CustomerAppointmentsPage = () => {
   }, [appointments, isBookingPage, navigate, params]);
 
   useEffect(() => {
+    const appointmentId = Number(params.get("appointment"));
+    if (!appointmentId || isBookingPage || !appointments.length) 
+      return;
+
+    const target = appointments.find((appointment) => appointment.id === appointmentId);
+    if (!target) 
+      return;
+
+    const targetTime = new Date(`${target.appointmentDate}T${target.startTime}`).getTime();
+    setBookingFilter(
+      target.status === "Cancelled"
+        ? "cancelled"
+        : target.status === "Scheduled" && targetTime >= Date.now()
+          ? "upcoming"
+          : "past",
+    );
+    setVisibleBookingCount(appointments.length);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const card = document.querySelector<HTMLElement>(
+        `[data-appointment-ids~="${appointmentId}"]`,
+      );
+      card?.scrollIntoView({ behavior: "smooth", block: "center" });
+      card?.focus({ preventScroll: true });
+    }));
+  }, 
+  [appointments, isBookingPage, params]);
+
+  useEffect(() => {
     Promise.allSettled([
       getCustomerProfile(),
       getPublicServices(),
@@ -218,7 +247,9 @@ const CustomerAppointmentsPage = () => {
     setSlotEmployees({});
     setSlotCapacities({});
     setSlotDetails({});
-    if (!serviceIds.length || !appointmentDate) return;
+    if (!serviceIds.length || !appointmentDate) 
+      return;
+    
     setSlotsLoading(true);
     const candidates =
       choice === "any"
@@ -641,6 +672,8 @@ const CustomerAppointmentsPage = () => {
     const itemSummary = getAppointmentSummary(item);
     return (
       <article className={`customer-appointment-card${items.length > 1 ? " is-bulk" : ""}`}
+        data-appointment-ids={items.map((appointment) => appointment.id).join(" ")}
+        tabIndex={-1}
         key={items.map((appointment) => appointment.id).join("-")}>
         <span className="customer-appointment-image">
           {services.find((service) => service.id === item.serviceId)?.imageUrl ? (

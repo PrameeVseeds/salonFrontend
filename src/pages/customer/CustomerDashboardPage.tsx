@@ -239,7 +239,14 @@ const CustomerDashboardPage = () => {
                       {appointment.employeeName ?? "Any professional"}
                     </span>
                   </div>
-                  <ChevronRight />
+                  <button
+                    type="button"
+                    className="customer-booking-details-link"
+                    aria-label={`View details for ${appointment.serviceName ?? "appointment"}`}
+                    onClick={() => navigate(`/appointments?appointment=${appointment.id}`)}
+                  >
+                    <ChevronRight />
+                  </button>
                 </article>
               ))}
             </div>
