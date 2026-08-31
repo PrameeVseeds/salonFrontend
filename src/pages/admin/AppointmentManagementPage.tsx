@@ -1,4 +1,4 @@
-import { Ban, CalendarDays, CheckCircle2, Clock3, Eye, Play, RefreshCw, Search, X } from "lucide-react";
+import { Ban, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock3, Eye, Play, RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { assignAppointmentEmployee, cancelAppointment, completeAppointment, getAppointments, getAvailableAppointmentEmployees, startAppointment } from "../../services/appointmentService";
 import { getEmployees } from "../../services/employeeService";
@@ -10,6 +10,7 @@ import "./appointmentManagementPage.css";
 
 type StatusFilter = AppointmentStatus | "Active" | "";
 const statuses: StatusFilter[] = ["Active", "", "Scheduled", "In Progress", "Completed", "Cancelled"];
+const APPOINTMENT_GROUPS_PER_PAGE = 10;
 
 const formatDateInput = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 8);
@@ -44,6 +45,7 @@ const AppointmentManagementPage = () => {
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const [eligibleEmployees, setEligibleEmployees] = useState<Record<number, Employee[]>>({});
   const [availableEmployeeIds, setAvailableEmployeeIds] = useState<Record<string, number[]>>({});
+  const [currentPage, setCurrentPage] = useState(1);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -182,6 +184,16 @@ const AppointmentManagementPage = () => {
     });
     return info;
   }, [appointmentGroups]);
+  const totalPages = Math.max(1, Math.ceil(appointmentGroups.length / APPOINTMENT_GROUPS_PER_PAGE));
+  const paginatedAppointmentGroups = useMemo(() => {
+    const start = (currentPage - 1) * APPOINTMENT_GROUPS_PER_PAGE;
+    return appointmentGroups.slice(start, start + APPOINTMENT_GROUPS_PER_PAGE);
+  }, [appointmentGroups, currentPage]);
+
+  useEffect(() => setCurrentPage(1), [date, status, appliedSearch]);
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   const replaceAppointment = (updated: Appointment) => {
     setAppointments((current) => current.map((item) => item.id === updated.id ? { ...item, ...updated } : item));
@@ -340,7 +352,7 @@ const AppointmentManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {appointmentGroups.flat().map((appointment) => (
+              {paginatedAppointmentGroups.flat().map((appointment) => (
                 <tr key={appointment.id} className={appointmentGroupInfo.has(appointment.id)
                   ? `is-group-booking is-group-${appointmentGroupInfo.get(appointment.id)!.position === 1 ? "first" :
                     appointmentGroupInfo.get(appointment.id)!.position === appointmentGroupInfo.get(appointment.id)!.count ? "last" : "middle"}`
@@ -481,6 +493,22 @@ const AppointmentManagementPage = () => {
             </tbody>
           </table>
         </div>
+        {!loading && appointmentGroups.length > 0 && (
+          <nav className="admin-pagination" aria-label="Appointment pages">
+            <span>
+              Showing {(currentPage - 1) * APPOINTMENT_GROUPS_PER_PAGE + 1}–{Math.min(currentPage * APPOINTMENT_GROUPS_PER_PAGE, appointmentGroups.length)} of {appointmentGroups.length} booking groups
+            </span>
+            <div>
+              <button type="button" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>
+                <ChevronLeft /> Previous
+              </button>
+              <strong>Page {currentPage} of {totalPages}</strong>
+              <button type="button" onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} disabled={currentPage === totalPages}>
+                Next <ChevronRight />
+              </button>
+            </div>
+          </nav>
+        )}
       </section>
 
       {selected &&

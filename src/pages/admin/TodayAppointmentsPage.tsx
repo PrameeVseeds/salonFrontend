@@ -1,4 +1,4 @@
-import { CalendarDays, Clock3, Play } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAppointments, startAppointment } from "../../services/appointmentService";
 import type { Appointment } from "../../types/appointment";
@@ -9,12 +9,14 @@ const localDateKey = () => {
   const date = new Date();
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 };
+const TODAY_APPOINTMENTS_PER_PAGE = 8;
 
 const TodayAppointmentsPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [currentPage, setCurrentPage] = useState(1);
   const today = localDateKey();
 
   const load = useCallback(async () => {
@@ -35,6 +37,15 @@ const TodayAppointmentsPage = () => {
 
   const ordered = useMemo(() => [...appointments].sort((first, second) =>
     first.startTime.localeCompare(second.startTime)), [appointments]);
+  const totalPages = Math.max(1, Math.ceil(ordered.length / TODAY_APPOINTMENTS_PER_PAGE));
+  const visibleAppointments = useMemo(() => {
+    const start = (currentPage - 1) * TODAY_APPOINTMENTS_PER_PAGE;
+    return ordered.slice(start, start + TODAY_APPOINTMENTS_PER_PAGE);
+  }, [currentPage, ordered]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   const canStart = (appointment: Appointment) => {
     const start = new Date(`${appointment.appointmentDate}T${appointment.startTime}`).getTime();
@@ -72,7 +83,7 @@ const TodayAppointmentsPage = () => {
 
       {error && <p className="today-appointments-error">{error}</p>}
       <section className="today-appointments-list">
-        {ordered.length ? ordered.map((appointment) => (
+        {ordered.length ? visibleAppointments.map((appointment) => (
           <article key={appointment.id}>
             <time>
               <Clock3 /> 
@@ -101,6 +112,22 @@ const TodayAppointmentsPage = () => {
           No scheduled appointments for today.
           </div>}
       </section>
+      {ordered.length > 0 && (
+        <nav className="today-pagination" aria-label="Today's appointment pages">
+          <span>
+            Showing {(currentPage - 1) * TODAY_APPOINTMENTS_PER_PAGE + 1}–{Math.min(currentPage * TODAY_APPOINTMENTS_PER_PAGE, ordered.length)} of {ordered.length}
+          </span>
+          <div>
+            <button type="button" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>
+              <ChevronLeft /> Previous
+            </button>
+            <strong>Page {currentPage} of {totalPages}</strong>
+            <button type="button" onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} disabled={currentPage === totalPages}>
+              Next <ChevronRight />
+            </button>
+          </div>
+        </nav>
+      )}
     </main>
   );
 };

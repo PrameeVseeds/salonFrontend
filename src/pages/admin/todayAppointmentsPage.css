@@ -32,7 +32,10 @@
     box-shadow: 0 8px 18px rgb(189 134 26 / 22%);
 }
 
-.today-appointments-icon svg { width: 25px; height: 25px; }
+.today-appointments-icon svg {
+    width: 25px;
+    height: 25px;
+}
 
 .today-appointments-heading {
     min-width: 0;
@@ -77,10 +80,24 @@
     background: #fff6dc;
 }
 
-.today-appointments-summary strong { font-size: 1.35rem; line-height: 1; }
-.today-appointments-summary span { font-size: .72rem; font-weight: 750; line-height: 1.2; }
+.today-appointments-summary strong {
+    font-size: 1.35rem;
+    line-height: 1;
+}
 
-.today-appointments-list { max-width: 1500px; margin: 0 auto; display: grid; gap: 10px; }
+.today-appointments-summary span {
+    font-size: .72rem;
+    font-weight: 750;
+    line-height: 1.2;
+}
+
+.today-appointments-list {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    gap: 10px;
+}
+
 .today-appointments-list article {
     min-height: 86px;
     padding: 14px 16px;
@@ -94,32 +111,211 @@
     box-shadow: 0 4px 16px rgb(50 39 22 / 5%);
 }
 
-.today-appointments-list time { display: grid; grid-template-columns: 22px auto; align-items: center; color: #bd861a; }
-.today-appointments-list time svg { width: 17px; }
-.today-appointments-list time strong { color: #25221d; font-size: 1.25rem; }
-.today-appointments-list time small { grid-column: 2; color: #8a8175; }
-.today-appointments-list article>div { min-width: 0; display: grid; gap: 4px; }
-.today-appointments-list article>div small { color: #8a8175; font-size: .72rem; }
-.today-appointments-list article>div strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.today-appointments-list button { min-height: 44px; border: 0; border-radius: 9px; color: #fff; background: #bd861a; font: inherit; font-weight: 800; }
-.today-appointments-list button svg { width: 15px; vertical-align: middle; }
-.today-appointments-list button:disabled { cursor: not-allowed; opacity: .38; }
-.today-appointments-error { max-width: 1500px; margin: 0 auto 15px; padding: 11px; border-radius: 9px; color: #a2293c; background: #fff0f2; }
-.today-appointments-empty { padding: 70px 20px; border: 1px dashed #d8cdbb; border-radius: 14px; color: #7d7468; background: #fff; text-align: center; }
+.today-appointments-list time {
+    display: grid;
+    grid-template-columns: 22px auto;
+    align-items: center;
+    color: #bd861a;
+}
+
+.today-appointments-list time svg {
+    width: 17px;
+}
+
+.today-appointments-list time strong {
+    color: #25221d;
+    font-size: 1.25rem;
+}
+
+.today-appointments-list time small {
+    grid-column: 2;
+    color: #8a8175;
+}
+
+.today-appointments-list article>div {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.today-appointments-list article>div small {
+    color: #8a8175;
+    font-size: .72rem;
+}
+
+.today-appointments-list article>div strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.today-appointments-list button {
+    min-height: 44px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: #bd861a;
+    font: inherit;
+    font-weight: 800;
+}
+
+.today-appointments-list button svg {
+    width: 15px;
+    vertical-align: middle;
+}
+
+.today-appointments-list button:disabled {
+    cursor: not-allowed;
+    opacity: .38;
+}
+
+.today-appointments-error {
+    max-width: 1500px;
+    margin: 0 auto 15px;
+    padding: 11px;
+    border-radius: 9px;
+    color: #a2293c;
+    background: #fff0f2;
+}
+
+.today-appointments-empty {
+    padding: 70px 20px;
+    border: 1px dashed #d8cdbb;
+    border-radius: 14px;
+    color: #7d7468;
+    background: #fff;
+    text-align: center;
+}
+
+.today-pagination {
+    max-width: 1500px;
+    margin: 14px auto 0;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 1px solid #e3dbce;
+    border-radius: 12px;
+    color: #766d61;
+    background: #fff;
+    box-sizing: border-box;
+    font-size: .75rem;
+}
+
+.today-pagination>div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.today-pagination strong {
+    min-width: 92px;
+    color: #302c26;
+    text-align: center;
+}
+
+.today-pagination button {
+    min-height: 36px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1px solid #ddd3c4;
+    border-radius: 8px;
+    color: #39342d;
+    background: #fff;
+    font: inherit;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.today-pagination button:hover:not(:disabled) {
+    border-color: #bd861a;
+    color: #8a6112;
+}
+
+.today-pagination button:disabled {
+    cursor: not-allowed;
+    opacity: .45;
+}
+
+.today-pagination button svg {
+    width: 15px;
+    height: 15px;
+}
 
 @media (max-width: 850px) {
-    .today-appointments-list article { grid-template-columns: 100px 1fr 1fr; }
-    .today-appointments-list article>div:nth-of-type(3) { grid-column: 2; }
-    .today-appointments-list button { grid-column: 3; grid-row: 2; }
+    .today-appointments-list article {
+        grid-template-columns: 100px 1fr 1fr;
+    }
+
+    .today-appointments-list article>div:nth-of-type(3) {
+        grid-column: 2;
+    }
+
+    .today-appointments-list button {
+        grid-column: 3;
+        grid-row: 2;
+    }
 }
 
 @media (max-width: 560px) {
-    .today-appointments-screen { padding: 16px; }
-    .today-appointments-screen>header { min-height: 0; padding: 17px; grid-template-columns: 48px 1fr; gap: 12px; border-radius: 14px; }
-    .today-appointments-icon { width: 48px; height: 48px; border-radius: 13px; }
-    .today-appointments-summary { grid-column: 1 / -1; width: 100%; min-width: 0; box-sizing: border-box; }
-    .today-appointments-list article { grid-template-columns: 1fr 1fr; gap: 13px; }
-    .today-appointments-list time { grid-column: 1 / -1; }
-    .today-appointments-list article>div:nth-of-type(3) { grid-column: auto; }
-    .today-appointments-list button { grid-column: 1 / -1; grid-row: auto; }
+    .today-appointments-screen {
+        padding: 16px;
+    }
+
+    .today-appointments-screen>header {
+        min-height: 0;
+        padding: 17px;
+        grid-template-columns: 48px 1fr;
+        gap: 12px;
+        border-radius: 14px;
+    }
+
+    .today-appointments-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 13px;
+    }
+
+    .today-appointments-summary {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .today-appointments-list article {
+        grid-template-columns: 1fr 1fr;
+        gap: 13px;
+    }
+
+    .today-appointments-list time {
+        grid-column: 1 / -1;
+    }
+
+    .today-appointments-list article>div:nth-of-type(3) {
+        grid-column: auto;
+    }
+
+    .today-appointments-list button {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .today-pagination {
+        align-items: stretch;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .today-pagination>div {
+        justify-content: space-between;
+    }
+
+    .today-pagination button {
+        padding-inline: 9px;
+    }
 }
