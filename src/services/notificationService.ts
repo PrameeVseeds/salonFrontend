@@ -1,4 +1,5 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
+import { customerAxiosClient } from "../api/customerAxiosClient";
 import type { ApiResponse } from "../types/api";
 import type {
   NotificationResponseData,
@@ -11,6 +12,13 @@ export const getAdminNotifications = async (): Promise<ApiResponse<Notifications
   const response = await adminAxiosClient.get<
     ApiResponse<NotificationsResponseData>
   >(NOTIFICATIONS_ENDPOINT);
+  return response.data;
+};
+
+export const getCustomerNotifications = async (): Promise<ApiResponse<NotificationsResponseData>> => {
+  const response = await customerAxiosClient.get<ApiResponse<NotificationsResponseData>>(
+    `${NOTIFICATIONS_ENDPOINT}/my`,
+  );
   return response.data;
 };
 

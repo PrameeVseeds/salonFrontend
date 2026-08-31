@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerNotificationBell from "../../components/customer/CustomerNotificationBell";
 import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import {getCustomerProfile,logoutCustomer,} from "../../services/customerAuthService";
@@ -75,6 +76,7 @@ const CustomerGalleryPage = () => {
           <strong>{brand.salonName}</strong>
         </div>
         <div className="customer-dashboard_header-actions">
+          <CustomerNotificationBell />
           <button
             className="customer-profile-trigger"
             type="button"
@@ -165,7 +167,8 @@ const CustomerGalleryPage = () => {
           </figure>
         </div>
       )}
-      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" 
+      customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={logoutOpen}
         title="Sign out?"

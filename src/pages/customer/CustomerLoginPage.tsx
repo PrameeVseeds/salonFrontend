@@ -8,6 +8,10 @@ import { getApiErrorMessage } from "../../utils/apiError";
 const CustomerLoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const requestedReturnTo = new URLSearchParams(location.search).get("returnTo");
+  const returnTo = requestedReturnTo?.startsWith("/") && !requestedReturnTo.startsWith("//")
+    ? requestedReturnTo
+    : "/dashboard";
   const registrationState = typeof location.state === "object" && location.state !== null ? location.state as 
   { email?: unknown; pendingProfileImage?: unknown } : null;
   const [email, setEmail] = useState(typeof registrationState?.email === "string" ? registrationState.email : "");
@@ -25,7 +29,7 @@ const CustomerLoginPage = () => {
       if (registrationState?.pendingProfileImage instanceof File) {
         await updateCustomerProfileImage(registrationState.pendingProfileImage).catch(() => undefined);
       }
-      navigate("/dashboard", { replace: true });
+      navigate(returnTo, { replace: true });
 
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "Unable to sign in."));

@@ -1,0 +1,125 @@
+.today-appointments-screen {
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 54px);
+    color: #25221d;
+    background: #f5f2eb;
+}
+
+.today-appointments-screen>header {
+    max-width: 1500px;
+    min-height: 112px;
+    margin: 0 auto 22px;
+    padding: 22px 26px;
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    border: 1px solid #e3dbce;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 7px 24px rgb(50 39 22 / 6%);
+    box-sizing: border-box;
+}
+
+.today-appointments-icon {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(145deg, #d49a27, #aa7410);
+    box-shadow: 0 8px 18px rgb(189 134 26 / 22%);
+}
+
+.today-appointments-icon svg { width: 25px; height: 25px; }
+
+.today-appointments-heading {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.today-appointments-heading small {
+    display: block;
+    color: #bd861a;
+    font-size: .7rem;
+    font-weight: 850;
+    letter-spacing: .14em;
+    line-height: 1.2;
+}
+
+.today-appointments-heading h1 {
+    margin: 0;
+    color: #211f1b;
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    line-height: 1.12;
+    letter-spacing: -.035em;
+}
+
+.today-appointments-heading p {
+    margin: 1px 0 0;
+    color: #766d61;
+    font-size: .85rem;
+    line-height: 1.35;
+}
+
+.today-appointments-summary {
+    min-width: 138px;
+    padding: 12px 15px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid #f0d998;
+    border-radius: 13px;
+    color: #76520d;
+    background: #fff6dc;
+}
+
+.today-appointments-summary strong { font-size: 1.35rem; line-height: 1; }
+.today-appointments-summary span { font-size: .72rem; font-weight: 750; line-height: 1.2; }
+
+.today-appointments-list { max-width: 1500px; margin: 0 auto; display: grid; gap: 10px; }
+.today-appointments-list article {
+    min-height: 86px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 130px 1.2fr 1.3fr 150px 120px;
+    align-items: center;
+    gap: 18px;
+    border: 1px solid #e3dbce;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgb(50 39 22 / 5%);
+}
+
+.today-appointments-list time { display: grid; grid-template-columns: 22px auto; align-items: center; color: #bd861a; }
+.today-appointments-list time svg { width: 17px; }
+.today-appointments-list time strong { color: #25221d; font-size: 1.25rem; }
+.today-appointments-list time small { grid-column: 2; color: #8a8175; }
+.today-appointments-list article>div { min-width: 0; display: grid; gap: 4px; }
+.today-appointments-list article>div small { color: #8a8175; font-size: .72rem; }
+.today-appointments-list article>div strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.today-appointments-list button { min-height: 44px; border: 0; border-radius: 9px; color: #fff; background: #bd861a; font: inherit; font-weight: 800; }
+.today-appointments-list button svg { width: 15px; vertical-align: middle; }
+.today-appointments-list button:disabled { cursor: not-allowed; opacity: .38; }
+.today-appointments-error { max-width: 1500px; margin: 0 auto 15px; padding: 11px; border-radius: 9px; color: #a2293c; background: #fff0f2; }
+.today-appointments-empty { padding: 70px 20px; border: 1px dashed #d8cdbb; border-radius: 14px; color: #7d7468; background: #fff; text-align: center; }
+
+@media (max-width: 850px) {
+    .today-appointments-list article { grid-template-columns: 100px 1fr 1fr; }
+    .today-appointments-list article>div:nth-of-type(3) { grid-column: 2; }
+    .today-appointments-list button { grid-column: 3; grid-row: 2; }
+}
+
+@media (max-width: 560px) {
+    .today-appointments-screen { padding: 16px; }
+    .today-appointments-screen>header { min-height: 0; padding: 17px; grid-template-columns: 48px 1fr; gap: 12px; border-radius: 14px; }
+    .today-appointments-icon { width: 48px; height: 48px; border-radius: 13px; }
+    .today-appointments-summary { grid-column: 1 / -1; width: 100%; min-width: 0; box-sizing: border-box; }
+    .today-appointments-list article { grid-template-columns: 1fr 1fr; gap: 13px; }
+    .today-appointments-list time { grid-column: 1 / -1; }
+    .today-appointments-list article>div:nth-of-type(3) { grid-column: auto; }
+    .today-appointments-list button { grid-column: 1 / -1; grid-row: auto; }
+}

@@ -17,6 +17,7 @@ import AdminForgotPasswordPage from "../pages/admin/AdminForgotPasswordPage";
 import AdminResetPasswordPage from "../pages/admin/AdminResetPasswordPage";
 import AppointmentManagementPage from "../pages/admin/AppointmentManagementPage";
 import CustomerManagementPage from "../pages/admin/CustomerManagementPage";
+import TodayAppointmentsPage from "../pages/admin/TodayAppointmentsPage";
 
 const sharedDashboardRoles: AdminRole[] = ["admin", "super_admin"];
 
@@ -45,6 +46,14 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <ProtectedDashboard allowedRole={sharedDashboardRoles}>
         {() => <AppointmentManagementPage />}
+      </ProtectedDashboard>
+    ),
+  },
+  {
+    path: "/admin/today-appointments",
+    element: (
+      <ProtectedDashboard allowedRole={sharedDashboardRoles} withShell={false}>
+        {() => <TodayAppointmentsPage />}
       </ProtectedDashboard>
     ),
   },

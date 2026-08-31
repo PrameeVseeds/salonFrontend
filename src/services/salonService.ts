@@ -1,7 +1,7 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
 import { axiosClient } from "../api/axiosClient";
 import type { ApiMessageResponse, ApiResponse } from "../types/api";
-import type {SaveServiceInput,ServiceResponseData,ServicesResponseData,} from "../types/service";
+import type {SaveServiceInput, SaveSubServiceInput, ServiceResponseData, ServicesResponseData, SubService,} from "../types/service";
 
 const SERVICE_ENDPOINT = "/services";
 
@@ -66,3 +66,12 @@ export const deleteSalonService = async (
       `${SERVICE_ENDPOINT}/${id}`,
     )
   ).data;
+
+export const createSubService = async (serviceId: number, input: SaveSubServiceInput): Promise<ApiResponse<{ subService: SubService }>> =>
+  (await adminAxiosClient.post<ApiResponse<{ subService: SubService }>>(`${SERVICE_ENDPOINT}/${serviceId}/sub-services`, input)).data;
+
+export const updateSubService = async (serviceId: number, id: number, input: SaveSubServiceInput): Promise<ApiResponse<{ subService: SubService }>> =>
+  (await adminAxiosClient.put<ApiResponse<{ subService: SubService }>>(`${SERVICE_ENDPOINT}/${serviceId}/sub-services/${id}`, input)).data;
+
+export const deleteSubService = async (serviceId: number, id: number): Promise<ApiMessageResponse> =>
+  (await adminAxiosClient.delete<ApiMessageResponse>(`${SERVICE_ENDPOINT}/${serviceId}/sub-services/${id}`)).data;

@@ -10,6 +10,27 @@ export interface SalonService {
     assignedEmployeeCount: number;
     createdAt: string;
     updatedAt: string;
+    subServices: SubService[];
+}
+
+export interface SubService {
+    id: number;
+    serviceId: number;
+    name: string;
+    durationMinutes: number;
+    price: number;
+    imageUrl: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface SaveSubServiceInput {
+    name: string;
+    durationMinutes: number;
+    price: number;
+    imageUrl: string;
+    isActive: boolean;
 }
 
 export interface SaveServiceInput {

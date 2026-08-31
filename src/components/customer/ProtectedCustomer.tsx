@@ -1,9 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { getCustomerProfile, logoutCustomer } from "../../services/customerAuthService";
 import { hasCustomerToken } from "../../utils/customerToken";
 
 const ProtectedCustomer = ({ children }: { children: ReactNode }) => {
+  const location = useLocation();
   const [state, setState] = useState<"loading" | "ready" | "guest">(hasCustomerToken() ? "loading" : "guest");
   useEffect(() => {
     if (!hasCustomerToken())
@@ -12,7 +13,7 @@ const ProtectedCustomer = ({ children }: { children: ReactNode }) => {
     getCustomerProfile().then(() => setState("ready")).catch(() => { logoutCustomer(); setState("guest"); });
   }, []);
   if (state === "guest")
-    return <Navigate to="/" replace />;
+    return <Navigate to={`/?returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`} replace />;
 
   if (state === "loading")
     return <main className="customer-dashboard-loading">

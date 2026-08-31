@@ -13,6 +13,7 @@ import { usePublicTheme } from "../../hooks/usePublicTheme";
 import { getPublicServices } from "../../services/salonService";
 import type { SalonService } from "../../types/service";
 import CustomerBottomNav from "../../components/customer/CustomerBottomNav";
+import CustomerNotificationBell from "../../components/customer/CustomerNotificationBell";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import CustomerProfileModal from "../../components/customer/CustomerProfileModal";
 import {
@@ -22,6 +23,11 @@ import {
 import type { Customer } from "../../types/customer";
 import "./customerDashboardPage.css";
 import "./customerServicesPage.css";
+
+type CatalogItem = {
+  id: number; parentId: number; parentName: string | null; name: string;
+  description: string; durationMinutes: number; price: number; imageUrl: string;
+};
 
 const CustomerServicesPage = () => {
   const navigate = useNavigate();
@@ -53,10 +59,10 @@ const CustomerServicesPage = () => {
     logoutCustomer();
     navigate("/", { replace: true });
   };
-  const visible = useMemo(
+  const visible = useMemo<CatalogItem[]>(
     () =>
-      services.filter((service) =>
-        `${service.name} ${service.description}`
+      services.map((service) => ({ ...service, parentId: service.id, parentName: null } as CatalogItem)).filter((service) =>
+        `${service.name} ${service.description} ${service.parentName ?? ""}`
           .toLowerCase()
           .includes(query.trim().toLowerCase()),
       ),
@@ -76,6 +82,7 @@ const CustomerServicesPage = () => {
           <strong>{brand.salonName}</strong>
         </div>
         <div className="customer-dashboard_header-actions">
+          <CustomerNotificationBell />
           <button
             className="customer-profile-trigger"
             type="button"
@@ -139,6 +146,7 @@ const CustomerServicesPage = () => {
                 </div>
                 <div>
                   <h2>{service.name}</h2>
+                  {service.parentName && <small>{service.parentName}</small>}
                   <p>{service.description}</p>
                   <footer>
                     <span>
@@ -147,7 +155,7 @@ const CustomerServicesPage = () => {
                     <strong>{Number(service.price).toFixed(2)}</strong>
                   </footer>
                   <button className="customer-service-book" 
-                  type="button" onClick={() => navigate(`/book-appointment?service=${service.id}`)}>
+                  type="button" onClick={() => navigate(`/book-appointment?service=${service.parentId}`)}>
                     Book appointment
                     </button>
                 </div>
@@ -163,7 +171,8 @@ const CustomerServicesPage = () => {
         )}
       </div>
       <CustomerBottomNav active="services" />
-      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
+      {customer && <CustomerProfileModal open={profileOpen} initialTab="profile" 
+      customer={customer} onUpdated={setCustomer} onClose={() => setProfileOpen(false)} />}
       <ConfirmDialog
         open={logoutConfirmationOpen}
         title="Sign out?"

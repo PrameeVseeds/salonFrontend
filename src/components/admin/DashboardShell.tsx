@@ -91,6 +91,14 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
             Appointments
           </NavLink>
           <NavLink
+            to="/admin/today-appointments"
+            title="Locked daily appointments screen"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <CalendarClock aria-hidden="true" />
+            Today screen
+          </NavLink>
+          <NavLink
             to="/admin/business-calendar"
             title="Business calendar"
             onClick={() => setIsMenuOpen(false)}

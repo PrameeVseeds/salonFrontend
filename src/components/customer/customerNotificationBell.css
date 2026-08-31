@@ -1,0 +1,200 @@
+.customer-notification {
+    position: relative;
+}
+
+.customer-dashboard_header-actions .customer-notification_trigger {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    position: relative;
+    border: 1px solid #ded8ce;
+    border-radius: 10px;
+    color: var(--customer-primary);
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.customer-notification_trigger>svg {
+    width: 18px;
+    height: 18px;
+}
+
+.customer-notification_trigger>span {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+    border-radius: 999px;
+    color: #fff;
+    background: #d43850;
+    font-size: .5rem;
+    font-weight: 800;
+    box-sizing: border-box;
+}
+
+.customer-notification_popover {
+    position: absolute;
+    z-index: 100;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(390px, calc(100vw - 28px));
+    overflow: hidden;
+    border: 1px solid #e4ddd1;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 20px 48px rgb(43 41 36 / 20%);
+}
+
+.customer-notification_popover>header {
+    padding: 14px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee9e0;
+}
+
+.customer-notification_popover h2 {
+    margin: 0;
+    color: var(--customer-primary);
+    font-size: .82rem;
+}
+
+.customer-notification_popover header p {
+    margin: 2px 0 0;
+    color: #81786d;
+    font-size: .57rem;
+}
+
+.customer-notification_popover header button {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    color: #81786d;
+    background: #f2efe9;
+}
+
+.customer-notification_popover header button svg {
+    width: 14px;
+}
+
+.customer-notification_list {
+    max-height: min(430px, 65vh);
+    overflow-y: auto;
+}
+
+.customer-notification_list>p {
+    margin: 0;
+    padding: 30px 15px;
+    color: #81786d;
+    font-size: .64rem;
+    text-align: center;
+}
+
+.customer-notification_list>p.is-error {
+    color: #a52f43;
+}
+
+.customer-notification_list article {
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    border-bottom: 1px solid #f0ece5;
+    text-align: left;
+}
+
+.customer-notification_list article.is-new {
+    position: relative;
+    border-left: 3px solid var(--customer-accent);
+    background: #fff9e9;
+}
+
+.customer-notification_list article.is-new::after {
+    content: "New";
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    color: #76520d;
+    background: #ffe3a0;
+    font-size: 0.48rem;
+    font-weight: 800;
+}
+
+.customer-notification_list article>span {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    color: var(--customer-accent);
+    background: #fff5dc;
+}
+
+.customer-notification_list article>span svg {
+    width: 15px;
+}
+
+.customer-notification_list article>div {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.customer-notification_list strong {
+    color: var(--customer-primary);
+    font-size: .65rem;
+}
+
+.customer-notification_list article p {
+    margin: 0;
+    color: #686158;
+    font-size: .6rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.customer-notification_list small {
+    color: #9a9186;
+    font-size: .51rem;
+}
+
+@media (max-width: 600px) {
+    .customer-notification_popover {
+        position: fixed;
+        top: 72px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-height: calc(100dvh - 88px);
+        border-radius: 13px;
+    }
+
+    .customer-notification_list {
+        max-height: calc(100dvh - 160px);
+    }
+
+    .customer-notification_list article {
+        padding: 12px;
+        grid-template-columns: 30px minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .customer-notification_list article>span {
+        width: 30px;
+        height: 30px;
+    }
+}

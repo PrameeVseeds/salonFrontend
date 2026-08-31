@@ -19,17 +19,38 @@ export const createCustomerAppointment = async (input: CreateCustomerAppointment
 export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/my/${id}/cancel`, { reason })).data;
 
-export const getAvailableAppointmentSlots = async (serviceIds: number | number[], employeeId: number | null, date: string): Promise<
-{ slots: string[]; message: string | null }
+export const getAvailableAppointmentSlots = async (serviceIds: number | number[], employeeId: number | null, date: string, subServiceIds: Array<number | null> = []): Promise<
+  {
+     slots: string[]; 
+     message: string | null; 
+     slotDetails: Record<string, 
+     { 
+      serviceLimit: number; 
+      bookedCount: number; 
+      availableEmployees: number; 
+      remainingCapacity: number; 
+      limitingReason: "service_capacity" | "employee_availability" | "both" | null 
+    }>
+   }
 > => {
   const selectedServiceIds = Array.isArray(serviceIds) ? serviceIds : [serviceIds];
-  const response = await customerAxiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[]; 
-    availabilityMessage?: string | null }>>(`${ENDPOINT}/available-slots`, {
-    params: { serviceIds: selectedServiceIds.join(","), ...(employeeId === null ? {} : { employeeId }), date },
+  const response = await customerAxiosClient.get<ApiResponse<{
+    availableSlots?: string[]; slots?: string[];
+    slotDetails?: Record<string, { 
+      serviceLimit: number; 
+      bookedCount: number; 
+      availableEmployees: number; 
+      remainingCapacity: number; 
+      limitingReason: "service_capacity" | "employee_availability" | "both" | null 
+    }>;
+    availabilityMessage?: string | null
+  }>>(`${ENDPOINT}/available-slots`, {
+    params: { serviceIds: selectedServiceIds.join(","), ...(subServiceIds.length ? { subServiceIds: subServiceIds.map((id) => id ?? "").join(",") } : {}), ...(employeeId === null ? {} : { employeeId }), date },
   });
   return {
     slots: response.data.data.availableSlots ?? response.data.data.slots ?? [],
     message: response.data.data.availabilityMessage ?? null,
+    slotDetails: response.data.data.slotDetails ?? {},
   };
 };
 
