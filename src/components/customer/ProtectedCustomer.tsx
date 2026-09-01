@@ -13,7 +13,7 @@ const ProtectedCustomer = ({ children }: { children: ReactNode }) => {
     getCustomerProfile().then(() => setState("ready")).catch(() => { logoutCustomer(); setState("guest"); });
   }, []);
   if (state === "guest")
-    return <Navigate to={`/?returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`} replace />;
+    return <Navigate to={`/login?returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`} replace />;
 
   if (state === "loading")
     return <main className="customer-dashboard-loading">

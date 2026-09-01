@@ -39,8 +39,8 @@ const CustomerForgotPasswordPage = () => {
       <button className="customer-auth_primary" disabled={busy || !email}>{busy ? "Sending..." : "Send reset instructions"}</button>
     </form>
     <p className="customer-auth_switch">{email ?
-      <Link to="/">Back to sign in</Link> : <>Enter your email on the
-        <Link to="/">login page</Link>
+      <Link to="/login">Back to sign in</Link> : <>Enter your email on the
+        <Link to="/login">login page</Link>
         first.</>}</p>
   </CustomerAuthShell>;
 };

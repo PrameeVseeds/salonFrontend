@@ -1,9 +1,11 @@
 import type { RouteObject } from "react-router-dom";
+import { lazy } from "react";
 import ProtectedDashboard from "../components/admin/ProtectedDashboard";
-import AdminManagementPage from "../pages/admin/AdminManagementPage";
-import SalonSettingsPage from "../pages/admin/SalonSettingsPage";
-import SuperAdminDashboardPage from "../pages/admin/SuperAdminDashboardPage";
-import ThemeSettingsPage from "../pages/admin/ThemeSettingsPage";
+
+const AdminManagementPage = lazy(() => import("../pages/admin/AdminManagementPage"));
+const SalonSettingsPage = lazy(() => import("../pages/admin/SalonSettingsPage"));
+const SuperAdminDashboardPage = lazy(() => import("../pages/admin/SuperAdminDashboardPage"));
+const ThemeSettingsPage = lazy(() => import("../pages/admin/ThemeSettingsPage"));
 
 export const superAdminRoutes: RouteObject[] = [
   {

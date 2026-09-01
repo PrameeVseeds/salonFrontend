@@ -1,19 +1,23 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy } from "react";
 import { adminRoutes } from "./adminRoutes";
 import { superAdminRoutes } from "./superAdminRoutes";
-import CustomerLoginPage from "../pages/customer/CustomerLoginPage";
-import CustomerRegisterPage from "../pages/customer/CustomerRegisterPage";
-import CustomerForgotPasswordPage from "../pages/customer/CustomerForgotPasswordPage";
-import CustomerDashboardPage from "../pages/customer/CustomerDashboardPage";
 import ProtectedCustomer from "../components/customer/ProtectedCustomer";
-import CustomerServicesPage from "../pages/customer/CustomerServicesPage";
-import CustomerGalleryPage from "../pages/customer/CustomerGalleryPage";
-import CustomerAppointmentsPage from "../pages/customer/CustomerAppointmentsPage";
+
+const CustomerLoginPage = lazy(() => import("../pages/customer/CustomerLoginPage"));
+const CustomerRegisterPage = lazy(() => import("../pages/customer/CustomerRegisterPage"));
+const CustomerForgotPasswordPage = lazy(() => import("../pages/customer/CustomerForgotPasswordPage"));
+const CustomerWelcomePage = lazy(() => import("../pages/customer/CustomerWelcomePage"));
+const CustomerDashboardPage = lazy(() => import("../pages/customer/CustomerDashboardPage"));
+const CustomerServicesPage = lazy(() => import("../pages/customer/CustomerServicesPage"));
+const CustomerGalleryPage = lazy(() => import("../pages/customer/CustomerGalleryPage"));
+const CustomerAppointmentsPage = lazy(() => import("../pages/customer/CustomerAppointmentsPage"));
 
 export const appRoutes = createBrowserRouter([
   ...adminRoutes,
   ...superAdminRoutes,
-  { path: "/", element: <CustomerLoginPage /> },
+  { path: "/", element: <CustomerWelcomePage /> },
+  { path: "/login", element: <CustomerLoginPage /> },
   { path: "/register", element: <CustomerRegisterPage /> },
   { path: "/forgot-password", element: <CustomerForgotPasswordPage /> },
   { path: "/dashboard", element: <ProtectedCustomer><CustomerDashboardPage /></ProtectedCustomer> },

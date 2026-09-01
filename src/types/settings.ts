@@ -4,6 +4,7 @@ export interface SalonSettings {
     phone: string;
     email: string;
     address: string;
+    mapUrl: string | null;
     logoUrl: string | null;
     facebookUrl: string | null;
     instagramUrl: string | null;
