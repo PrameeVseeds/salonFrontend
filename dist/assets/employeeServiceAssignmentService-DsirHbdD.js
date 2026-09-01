@@ -1,0 +1,1 @@
+import{r as e}from"./jsx-runtime-kFg1Zpjm.js";import{t}from"./axiosClient-DZu-VbZ3.js";var n=e=>`/employees/${e}/services`,r=async t=>(await e.get(n(t))).data,i=async e=>(await t.get(n(e))).data,a=async(t,r)=>(await e.post(`${n(t)}/${r}`)).data,o=async(t,r)=>(await e.delete(`${n(t)}/${r}`)).data;export{o as i,r as n,i as r,a as t};

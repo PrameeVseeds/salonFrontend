@@ -1,0 +1,1 @@
+import{c as e}from"./jsx-runtime-kFg1Zpjm.js";var t=e.create({baseURL:`http://localhost:5000/api`});export{t};

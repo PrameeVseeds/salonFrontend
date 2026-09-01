@@ -1,0 +1,1 @@
+var e=`customerToken`,t=()=>localStorage.getItem(e),n=t=>{localStorage.setItem(e,t)},r=()=>{localStorage.removeItem(e)},i=()=>t()!==null;export{n as i,i as n,r,t};

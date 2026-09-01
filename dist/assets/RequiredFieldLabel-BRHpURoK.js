@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-kFg1Zpjm.js";import{t}from"./asterisk-ig_IfxQh.js";var n=e(),r=({children:e,className:r})=>(0,n.jsxs)(`span`,{className:r,children:[e,(0,n.jsx)(t,{"aria-label":`required`})]});export{r as t};

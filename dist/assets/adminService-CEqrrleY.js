@@ -1,0 +1,1 @@
+import{r as e}from"./jsx-runtime-kFg1Zpjm.js";var t=`/admins`,n=async n=>(await e.post(`${t}/create`,n)).data,r=async()=>(await e.get(t)).data,i=async(n,r)=>(await e.put(`${t}/${n}`,r)).data,a=async(n,r)=>(await e.patch(`${t}/${n}/status`,r)).data,o=async n=>(await e.delete(`${t}/${n}`)).data;export{a,i,o as n,r,n as t};
