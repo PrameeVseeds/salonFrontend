@@ -1,4 +1,4 @@
-import { Asterisk, Building2, Save, Upload } from "lucide-react";
+import { Asterisk, Building2, ExternalLink, MapPin, Save, Upload } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   getSalonSettings,
@@ -11,6 +11,7 @@ import type {
 } from "../../types/settings";
 import { getApiErrorMessage, hasApiStatus } from "../../utils/apiError";
 import { markFieldsTouched } from "../../utils/form";
+import { getGoogleMapsEmbedUrl, getGoogleMapsOpenUrl, isGoogleMapsUrl } from "../../utils/googleMaps";
 import "./salonSettingsPage.css";
 
 const defaults: UpdateSalonSettingsInput = {
@@ -18,6 +19,7 @@ const defaults: UpdateSalonSettingsInput = {
   phone: "",
   email: "admin@salon.com",
   address: "",
+  mapUrl: null,
   facebookUrl: null,
   instagramUrl: null,
   whatsappNumber: null,
@@ -56,6 +58,7 @@ const SalonSettingsPage = () => {
       phone: value.phone,
       email: value.email,
       address: value.address,
+      mapUrl: value.mapUrl ?? null,
       facebookUrl: value.facebookUrl,
       instagramUrl: value.instagramUrl,
       whatsappNumber: value.whatsappNumber,
@@ -123,10 +126,15 @@ const SalonSettingsPage = () => {
         ? "Enter zero or a positive whole number."
         : undefined,
   };
+  const mapUrlError = form.mapUrl && !isGoogleMapsUrl(form.mapUrl)
+    ? "Enter a valid HTTPS Google Maps link."
+    : undefined;
+  const mapEmbedUrl = getGoogleMapsEmbedUrl(form.mapUrl, form.address);
+  const mapOpenUrl = getGoogleMapsOpenUrl(form.mapUrl, form.address);
   const save = async (e: FormEvent) => {
     e.preventDefault();
     setTouched(markFieldsTouched(requiredSettingFields));
-    if (requiredSettingFields.some((field) => fieldErrors[field])) {
+    if (requiredSettingFields.some((field) => fieldErrors[field]) || mapUrlError) {
       setError(null);
       setSuccess(null);
       return;
@@ -240,6 +248,20 @@ const SalonSettingsPage = () => {
             />
             {touched.address && fieldErrors.address &&
               <small className="settings-field-error">{fieldErrors.address}</small>}
+          </label>
+          <label className="is-wide">
+            <span>Google Maps link</span>
+            <input
+              type="url"
+              placeholder="https://maps.app.goo.gl/..."
+              value={form.mapUrl ?? ""}
+              onChange={(e) => update("mapUrl", e.target.value || null)}
+              aria-invalid={Boolean(mapUrlError)}
+            />
+            <span className="settings-field-hint">
+              Paste a Google Maps share or embed link. Customers will see this location as a map.
+            </span>
+            {mapUrlError && <small className="settings-field-error">{mapUrlError}</small>}
           </label>
           <label>
             <span>Facebook URL</span>
@@ -373,6 +395,31 @@ const SalonSettingsPage = () => {
             <Upload />
             {busy ? "Uploading..." : "Upload logo"}
           </button>
+        </section>
+        <section className="settings-card settings-location">
+          <div className="settings-card_title">
+            <MapPin />
+            <div>
+              <h2>Salon location</h2>
+              <p>Preview of the location customers will see.</p>
+            </div>
+          </div>
+          {mapEmbedUrl ? <>
+            <iframe
+              title={`${form.salonName || "Salon"} location`}
+              src={mapEmbedUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <p>{form.address}</p>
+            {mapOpenUrl && <a href={mapOpenUrl}
+              target="_blank" rel="noreferrer">
+              Open in Google Maps <ExternalLink />
+            </a>}
+          </> : <div className="settings-location_empty">
+            <MapPin />
+            <span>Enter the salon address or a Google Maps link to preview its location.</span>
+          </div>}
         </section>
       </div>
     </div>

@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 import { usePublicTheme } from "./hooks/usePublicTheme";
 import { appRoutes } from "./routes/appRoutes";
+import PwaLifecycle from "./components/pwa/PwaLifecycle";
 
 const pageTitles: Record<string, string> = {
-    "/": "Customer Login",
+    "/": "Welcome",
+    "/login": "Customer Login",
     "/register": "Create Account",
     "/forgot-password": "Forgot Password",
     "/dashboard": "Home",
@@ -22,6 +24,7 @@ const pageTitles: Record<string, string> = {
     "/admin/customers": "Customer Management",
     "/admin/gallery": "Gallery Management",
     "/admin/services": "Service Management",
+    "/admin/service-categories": "Service Categories",
     "/admin/employee-services": "Employee Service Assignments",
     "/admin/working-hours": "Working Hours",
     "/admin/employee-leaves": "Employee Leaves",
@@ -58,13 +61,18 @@ function App() {
             favicon.rel = "icon";
             document.head.appendChild(favicon);
         }
-        favicon.href = brand.logoUrl || "/favicon.svg";
+        favicon.href = brand.logoUrl || "/pwa-icon-192.png";
 
         const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
         if (themeColor) themeColor.content = theme.secondaryColor;
     }, [brand.logoUrl, brand.salonName, pathname, theme.secondaryColor]);
 
-    return <RouterProvider router={appRoutes} />;
+    return <>
+        <Suspense fallback={<div className="route-loading" role="status" aria-label="Loading page"><span /></div>}>
+            <RouterProvider router={appRoutes} />
+        </Suspense>
+        <PwaLifecycle />
+    </>;
 }
 
 export default App;

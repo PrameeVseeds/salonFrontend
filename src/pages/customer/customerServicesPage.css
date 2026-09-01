@@ -83,6 +83,43 @@
   gap: 12px;
 }
 
+.customer-services-groups {
+  display: grid;
+  gap: 42px;
+}
+
+.customer-services-category>header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 17px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #e2ddd4;
+}
+
+.customer-services-category>header p {
+  margin: 0 0 5px;
+  color: var(--customer-accent);
+  font-size: .6rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.customer-services-category>header h2 {
+  margin: 0;
+  color: var(--customer-primary);
+  font-family: Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+
+.customer-services-category>header>span {
+  color: #847c71;
+  font-size: .68rem;
+}
+
 .customer-services-list article {
   display: grid;
   grid-template-columns: 105px minmax(0, 1fr);
@@ -110,7 +147,7 @@
   width: 25px;
 }
 
-.customer-services-list article > div:last-child {
+.customer-services-list article>div:last-child {
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -209,5 +246,121 @@
 
   .customer-services-content {
     padding-top: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .customer-services-content {
+    width: min(100% - 64px, 1180px);
+    padding: 52px 0 64px;
+  }
+
+  .customer-services-heading h1 {
+    font-size: 2.35rem;
+  }
+
+  .customer-services-heading p {
+    font-size: 0.72rem;
+  }
+
+  .customer-services-heading span {
+    font-size: 0.86rem;
+  }
+
+  .customer-services-search {
+    width: min(100%, 680px);
+    height: 52px;
+    margin: 30px 0 24px;
+  }
+
+  .customer-services-search input {
+    font-size: 0.82rem;
+  }
+
+  .customer-services-list {
+    gap: 18px;
+  }
+
+  .customer-services-list article {
+    grid-template-columns: 150px minmax(0, 1fr);
+    min-height: 170px;
+    border-radius: 17px;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .customer-services-list article:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 32px rgb(43 41 36 / 10%);
+  }
+
+  .customer-services-list article>div:last-child {
+    padding: 20px;
+  }
+
+  .customer-services-list h2 {
+    font-size: 1rem;
+  }
+
+  .customer-services-list p {
+    font-size: 0.72rem;
+  }
+
+  .customer-services-list footer span {
+    font-size: 0.67rem;
+  }
+
+  .customer-services-list footer strong {
+    font-size: 0.8rem;
+  }
+
+  .customer-service-book {
+    min-height: 38px;
+    font-size: 0.68rem;
+  }
+}
+
+@media (min-width: 1800px) {
+  .customer-services-content {
+    width: min(100% - 96px, 1600px);
+    padding: 68px 0 80px;
+  }
+
+  .customer-services-heading h1 {
+    font-size: 3rem;
+  }
+
+  .customer-services-heading p {
+    font-size: 0.82rem;
+  }
+
+  .customer-services-heading span {
+    font-size: 1rem;
+  }
+
+  .customer-services-search {
+    width: min(100%, 820px);
+    height: 58px;
+  }
+
+  .customer-services-search input {
+    font-size: 0.92rem;
+  }
+
+  .customer-services-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .customer-services-list article {
+    grid-template-columns: 180px minmax(0, 1fr);
+    min-height: 200px;
+  }
+
+  .customer-services-list h2 {
+    font-size: 1.12rem;
+  }
+
+  .customer-services-list p {
+    font-size: 0.8rem;
   }
 }

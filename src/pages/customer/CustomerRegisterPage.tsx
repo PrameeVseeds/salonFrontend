@@ -49,7 +49,7 @@ const CustomerRegisterPage = () => {
         phone: form.phone.trim(),
         email: form.email.trim()
       });
-      navigate("/", { replace: true, state: { email: form.email.trim(), pendingProfileImage: profileImage } });
+      navigate("/login", { replace: true, state: { email: form.email.trim(), pendingProfileImage: profileImage } });
     }
     catch (requestError) {
       setError(getApiErrorMessage(
@@ -133,7 +133,7 @@ const CustomerRegisterPage = () => {
         <p className="customer-auth_message is-error" role="alert">{error}</p>}
       <button className="customer-auth_primary" disabled={busy}>{busy ? "Creating account..." : "Create account"}</button>
     </form>
-    <p className="customer-auth_switch">Already have an account? <Link to="/">Sign in</Link></p>
+    <p className="customer-auth_switch">Already have an account? <Link to="/login">Sign in</Link></p>
   </CustomerAuthShell>;
 };
 

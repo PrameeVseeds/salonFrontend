@@ -56,7 +56,7 @@ const CustomerDashboardPage = () => {
         setAppointments(bookings.value.data.appointments);
       if (serviceList.status === "fulfilled")
         setServices(
-          serviceList.value.data.services.filter((service) => service.isActive),
+          serviceList.value.data.services.filter((service) => service.isActive && service.categoryIsActive),
         );
       if (galleryList.status === "fulfilled")
         setGallery(
@@ -239,7 +239,14 @@ const CustomerDashboardPage = () => {
                       {appointment.employeeName ?? "Any professional"}
                     </span>
                   </div>
-                  <ChevronRight />
+                  <button
+                    type="button"
+                    className="customer-booking-details-link"
+                    aria-label={`View details for ${appointment.serviceName ?? "appointment"}`}
+                    onClick={() => navigate(`/appointments?appointment=${appointment.id}`)}
+                  >
+                    <ChevronRight />
+                  </button>
                 </article>
               ))}
             </div>

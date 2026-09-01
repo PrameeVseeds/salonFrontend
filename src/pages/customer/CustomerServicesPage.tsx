@@ -26,7 +26,7 @@ import "./customerServicesPage.css";
 
 type CatalogItem = {
   id: number; parentId: number; parentName: string | null; name: string;
-  description: string; durationMinutes: number; price: number; imageUrl: string;
+  categoryId: number; categoryName: string; description: string; durationMinutes: number; price: number; imageUrl: string;
 };
 
 const CustomerServicesPage = () => {
@@ -44,7 +44,7 @@ const CustomerServicesPage = () => {
         if (serviceResult.status === "fulfilled")
           setServices(
             serviceResult.value.data.services.filter(
-              (service) => service.isActive,
+              (service) => service.isActive && service.categoryIsActive,
             ),
           );
 
@@ -68,6 +68,14 @@ const CustomerServicesPage = () => {
       ),
     [query, services],
   );
+  const grouped = useMemo(() => {
+    const groups = new Map<string, CatalogItem[]>();
+    visible.forEach((service) => {
+      const name = service.categoryName || "Other services";
+      groups.set(name, [...(groups.get(name) ?? []), service]);
+    });
+    return [...groups.entries()];
+  }, [visible]);
   return (
     <main className="customer-services-page" style={style}>
       <header className="customer-dashboard_header">
@@ -134,8 +142,11 @@ const CustomerServicesPage = () => {
         {loading ? (
           <div className="customer-services-loading" />
         ) : visible.length ? (
-          <section className="customer-services-list">
-            {visible.map((service) => (
+          <div className="customer-services-groups">
+            {grouped.map(([category, categoryServices]) => <section className="customer-services-category" key={category}>
+              <header><div><p>Service category</p><h2>{category}</h2></div><span>{categoryServices.length} service{categoryServices.length === 1 ? "" : "s"}</span></header>
+              <div className="customer-services-list">
+              {categoryServices.map((service) => (
               <article key={service.id}>
                 <div className="customer-services-image">
                   {service.imageUrl ? (
@@ -160,8 +171,10 @@ const CustomerServicesPage = () => {
                     </button>
                 </div>
               </article>
-            ))}
-          </section>
+              ))}
+              </div>
+            </section>)}
+          </div>
         ) : (
           <div className="customer-services-empty">
             <Search />

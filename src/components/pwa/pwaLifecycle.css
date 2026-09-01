@@ -1,0 +1,103 @@
+.pwa-notices {
+  position: fixed;
+  z-index: 1000;
+  right: 18px;
+  bottom: 18px;
+  width: min(390px, calc(100vw - 36px));
+  display: grid;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.pwa-notice {
+  min-height: 66px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ddd5c8;
+  border-radius: 13px;
+  color: #2b2924;
+  background: #fff;
+  box-shadow: 0 16px 38px rgb(34 29 21 / 18%);
+  pointer-events: auto;
+}
+
+.pwa-notice>svg {
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+  border-radius: 9px;
+  color: #9a6b12;
+  background: #fff3d3;
+  box-sizing: border-box;
+}
+
+.pwa-notice>span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.pwa-notice strong {
+  font-size: .76rem;
+}
+
+.pwa-notice small {
+  color: #746c61;
+  font-size: .63rem;
+  line-height: 1.4;
+}
+
+.pwa-notice>button:not(.pwa-notice-close) {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #2b2924;
+  font: inherit;
+  font-size: .65rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.pwa-notice-close {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  color: #777066;
+  background: #f2eee7;
+  cursor: pointer;
+}
+
+.pwa-notice-close svg {
+  width: 14px;
+}
+
+.pwa-notice.is-offline {
+  border-color: #e9c6cc;
+}
+
+.pwa-notice.is-offline>svg {
+  color: #a52f43;
+  background: #fff0f2;
+}
+
+@media (max-width: 600px) {
+  .pwa-notices {
+    right: 12px;
+    bottom: calc(82px + env(safe-area-inset-bottom));
+    width: calc(100vw - 24px);
+  }
+
+  .pwa-notice {
+    grid-template-columns: 32px minmax(0, 1fr) auto auto;
+    gap: 8px;
+  }
+}

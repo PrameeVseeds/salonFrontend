@@ -11,6 +11,7 @@ import {
   Scissors,
   Settings2,
   Sparkles,
+  Tags,
   ListChecks,
   Images,
   UserRoundCog,
@@ -145,6 +146,14 @@ const DashboardShell = ({ user, children }: DashboardShellProps) => {
           >
             <ListChecks aria-hidden="true" />
             Employee services
+          </NavLink>
+          <NavLink
+            to="/admin/service-categories"
+            title="Service categories"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <Tags aria-hidden="true" />
+            Service categories
           </NavLink>
           <NavLink
             to="/admin/services"

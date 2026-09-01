@@ -1,23 +1,26 @@
 import type { RouteObject } from "react-router-dom";
+import { lazy } from "react";
 import ProtectedDashboard from "../components/admin/ProtectedDashboard";
-import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
-import AdminLoginPage from "../pages/admin/AdminLoginPage";
-import AdminProfilePage from "../pages/admin/AdminProfilePage";
-import EmployeeLeaveManagementPage from "../pages/admin/EmployeeLeaveManagementPage";
-import EmployeeManagementPage from "../pages/admin/EmployeeManagementPage";
-import EmployeeServiceAssignmentPage from "../pages/admin/EmployeeServiceAssignmentPage";
-import SalonSettingsPage from "../pages/admin/SalonSettingsPage";
-import ScheduleSettingsPage from "../pages/admin/ScheduleSettingsPage";
-import ServiceManagementPage from "../pages/admin/ServiceManagementPage";
-import ThemeSettingsPage from "../pages/admin/ThemeSettingsPage";
-import WorkingHoursPage from "../pages/admin/WorkingHoursPage";
-import GalleryManagementPage from "../pages/admin/GalleryManagementPage";
 import type { AdminRole } from "../types/admin";
-import AdminForgotPasswordPage from "../pages/admin/AdminForgotPasswordPage";
-import AdminResetPasswordPage from "../pages/admin/AdminResetPasswordPage";
-import AppointmentManagementPage from "../pages/admin/AppointmentManagementPage";
-import CustomerManagementPage from "../pages/admin/CustomerManagementPage";
-import TodayAppointmentsPage from "../pages/admin/TodayAppointmentsPage";
+
+const AdminDashboardPage = lazy(() => import("../pages/admin/AdminDashboardPage"));
+const AdminLoginPage = lazy(() => import("../pages/admin/AdminLoginPage"));
+const AdminProfilePage = lazy(() => import("../pages/admin/AdminProfilePage"));
+const EmployeeLeaveManagementPage = lazy(() => import("../pages/admin/EmployeeLeaveManagementPage"));
+const EmployeeManagementPage = lazy(() => import("../pages/admin/EmployeeManagementPage"));
+const EmployeeServiceAssignmentPage = lazy(() => import("../pages/admin/EmployeeServiceAssignmentPage"));
+const SalonSettingsPage = lazy(() => import("../pages/admin/SalonSettingsPage"));
+const ScheduleSettingsPage = lazy(() => import("../pages/admin/ScheduleSettingsPage"));
+const ServiceManagementPage = lazy(() => import("../pages/admin/ServiceManagementPage"));
+const ServiceCategoryManagementPage = lazy(() => import("../pages/admin/ServiceCategoryManagementPage"));
+const ThemeSettingsPage = lazy(() => import("../pages/admin/ThemeSettingsPage"));
+const WorkingHoursPage = lazy(() => import("../pages/admin/WorkingHoursPage"));
+const GalleryManagementPage = lazy(() => import("../pages/admin/GalleryManagementPage"));
+const AdminForgotPasswordPage = lazy(() => import("../pages/admin/AdminForgotPasswordPage"));
+const AdminResetPasswordPage = lazy(() => import("../pages/admin/AdminResetPasswordPage"));
+const AppointmentManagementPage = lazy(() => import("../pages/admin/AppointmentManagementPage"));
+const CustomerManagementPage = lazy(() => import("../pages/admin/CustomerManagementPage"));
+const TodayAppointmentsPage = lazy(() => import("../pages/admin/TodayAppointmentsPage"));
 
 const sharedDashboardRoles: AdminRole[] = ["admin", "super_admin"];
 
@@ -70,6 +73,14 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <ProtectedDashboard allowedRole={sharedDashboardRoles}>
         {() => <GalleryManagementPage />}
+      </ProtectedDashboard>
+    ),
+  },
+  {
+    path: "/admin/service-categories",
+    element: (
+      <ProtectedDashboard allowedRole={sharedDashboardRoles}>
+        {() => <ServiceCategoryManagementPage />}
       </ProtectedDashboard>
     ),
   },
