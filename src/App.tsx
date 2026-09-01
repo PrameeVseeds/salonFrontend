@@ -24,6 +24,7 @@ const pageTitles: Record<string, string> = {
     "/admin/customers": "Customer Management",
     "/admin/gallery": "Gallery Management",
     "/admin/services": "Service Management",
+    "/admin/service-categories": "Service Categories",
     "/admin/employee-services": "Employee Service Assignments",
     "/admin/working-hours": "Working Hours",
     "/admin/employee-leaves": "Employee Leaves",

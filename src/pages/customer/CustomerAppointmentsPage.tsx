@@ -164,7 +164,7 @@ const CustomerAppointmentsPage = () => {
         setCustomer(profile.value.data.customer);
       if (serviceResult.status === "fulfilled")
         setServices(
-          serviceResult.value.data.services.filter((item) => item.isActive),
+          serviceResult.value.data.services.filter((item) => item.isActive && item.categoryIsActive),
         );
       if (employeeResult.status === "fulfilled")
         setEmployees(

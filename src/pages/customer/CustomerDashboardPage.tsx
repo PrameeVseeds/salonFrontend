@@ -56,7 +56,7 @@ const CustomerDashboardPage = () => {
         setAppointments(bookings.value.data.appointments);
       if (serviceList.status === "fulfilled")
         setServices(
-          serviceList.value.data.services.filter((service) => service.isActive),
+          serviceList.value.data.services.filter((service) => service.isActive && service.categoryIsActive),
         );
       if (galleryList.status === "fulfilled")
         setGallery(

@@ -1,5 +1,8 @@
 export interface SalonService {
     id: number;
+    categoryId: number;
+    categoryName: string;
+    categoryIsActive: boolean;
     name: string;
     description: string;
     durationMinutes: number;
@@ -34,6 +37,7 @@ export interface SaveSubServiceInput {
 }
 
 export interface SaveServiceInput {
+    categoryId: number;
     name: string;
     description: string;
     durationMinutes: number;
@@ -45,3 +49,22 @@ export interface SaveServiceInput {
 
 export interface ServiceResponseData { service: SalonService; }
 export interface ServicesResponseData { services: SalonService[]; }
+
+export interface ServiceCategory {
+    id: number;
+    name: string;
+    description: string;
+    isActive: boolean;
+    serviceCount: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface SaveServiceCategoryInput {
+    name: string;
+    description: string;
+    isActive: boolean;
+}
+
+export interface ServiceCategoryResponseData { category: ServiceCategory; }
+export interface ServiceCategoriesResponseData { categories: ServiceCategory[]; }

@@ -126,6 +126,17 @@
   background: #fcecef;
 }
 
+.service-card_body>.service-category-badge {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #80611f;
+  background: #f6eedc;
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
 .service-card_body h3 {
   margin: 10px 0 5px;
   color: #292824;
@@ -292,6 +303,7 @@
 }
 
 .service-modal input,
+.service-modal select,
 .service-modal textarea {
   width: 100%;
   padding: 0 12px;
@@ -304,6 +316,11 @@
 
 .service-modal input {
   height: 45px;
+}
+
+.service-modal select {
+  height: 45px;
+  background: #fff;
 }
 
 .service-modal textarea {

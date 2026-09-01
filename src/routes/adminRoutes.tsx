@@ -12,6 +12,7 @@ const EmployeeServiceAssignmentPage = lazy(() => import("../pages/admin/Employee
 const SalonSettingsPage = lazy(() => import("../pages/admin/SalonSettingsPage"));
 const ScheduleSettingsPage = lazy(() => import("../pages/admin/ScheduleSettingsPage"));
 const ServiceManagementPage = lazy(() => import("../pages/admin/ServiceManagementPage"));
+const ServiceCategoryManagementPage = lazy(() => import("../pages/admin/ServiceCategoryManagementPage"));
 const ThemeSettingsPage = lazy(() => import("../pages/admin/ThemeSettingsPage"));
 const WorkingHoursPage = lazy(() => import("../pages/admin/WorkingHoursPage"));
 const GalleryManagementPage = lazy(() => import("../pages/admin/GalleryManagementPage"));
@@ -72,6 +73,14 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <ProtectedDashboard allowedRole={sharedDashboardRoles}>
         {() => <GalleryManagementPage />}
+      </ProtectedDashboard>
+    ),
+  },
+  {
+    path: "/admin/service-categories",
+    element: (
+      <ProtectedDashboard allowedRole={sharedDashboardRoles}>
+        {() => <ServiceCategoryManagementPage />}
       </ProtectedDashboard>
     ),
   },

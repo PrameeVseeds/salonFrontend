@@ -22,13 +22,14 @@ import {
   updateSubService,
   uploadSalonServiceImage,
 } from "../../services/salonService";
-import type { SalonService, SubService } from "../../types/service";
+import { getServiceCategories } from "../../services/serviceCategoryService";
+import type { SalonService, ServiceCategory, SubService } from "../../types/service";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { markFieldsTouched } from "../../utils/form";
 import "./serviceManagementPage.css";
 
-type RequiredField = "name" | "duration" | "description" | "price" | "image";
-const requiredFields: RequiredField[] = ["name", "duration", "description", "price", "image"];
+type RequiredField = "category" | "name" | "duration" | "description" | "price" | "image";
+const requiredFields: RequiredField[] = ["category", "name", "duration", "description", "price", "image"];
 
 const RequiredLabel = ({ children }: { children: string }) => (
   <span className="service-required-label">
@@ -39,10 +40,12 @@ const RequiredLabel = ({ children }: { children: string }) => (
 
 const ServiceManagementPage = () => {
   const [services, setServices] = useState<SalonService[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<SalonService | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState("");
   const [price, setPrice] = useState("");
@@ -68,8 +71,11 @@ const ServiceManagementPage = () => {
   const [subError, setSubError] = useState<string | null>(null);
 
   useEffect(() => {
-    getServices()
-      .then(({ data }) => setServices(data.services))
+    Promise.all([getServices(), getServiceCategories()])
+      .then(([serviceResponse, categoryResponse]) => {
+        setServices(serviceResponse.data.services);
+        setCategories(categoryResponse.data.categories);
+      })
       .catch((e) => setError(getApiErrorMessage(e)));
   }, []);
   const visible = services.filter((service) =>
@@ -88,6 +94,7 @@ const ServiceManagementPage = () => {
   const openCreate = () => {
     setEditing(null);
     setName("");
+    setCategoryId(categories.find((category) => category.isActive)?.id.toString() ?? "");
     setDescription("");
     setDuration("");
     setPrice("");
@@ -104,6 +111,7 @@ const ServiceManagementPage = () => {
   const openEdit = (service: SalonService) => {
     setEditing(service);
     setName(service.name);
+    setCategoryId(String(service.categoryId));
     setDescription(service.description ?? "");
     setDuration(String(service.durationMinutes));
     setPrice(String(service.price));
@@ -120,6 +128,7 @@ const ServiceManagementPage = () => {
   const touch = (field: RequiredField) =>
     setTouched((current) => ({ ...current, [field]: true }));
   const fieldErrors: Partial<Record<RequiredField, string>> = {
+    category: !categoryId ? "Category is required." : undefined,
     name: !name.trim() ? "Name is required." : undefined,
     duration: !duration
       ? "Duration is required."
@@ -174,6 +183,7 @@ const ServiceManagementPage = () => {
         savedImageUrl = uploaded.data.imageUrl;
       }
       const input = {
+        categoryId: Number(categoryId),
         name: name.trim(),
         description: description.trim(),
         durationMinutes: minutes,
@@ -311,6 +321,7 @@ const ServiceManagementPage = () => {
                 >
                   {service.isActive ? "Active" : "Inactive"}
                 </span>
+                <small className="service-category-badge">{service.categoryName}</small>
                 <h3>{service.name}</h3>
                 <p>{service.description}</p>
                 <dl>
@@ -392,6 +403,14 @@ const ServiceManagementPage = () => {
                   aria-invalid={Boolean(touched.name && fieldErrors.name)} />
                 {touched.name && fieldErrors.name &&
                   <small className="service-field-error">{fieldErrors.name}</small>}
+              </label>
+              <label>
+                <RequiredLabel>Category</RequiredLabel>
+                <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)} onBlur={() => touch("category")} aria-invalid={Boolean(touched.category && fieldErrors.category)}>
+                  <option value="">Select a category</option>
+                  {categories.filter((category) => category.isActive || category.id === editing?.categoryId).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                </select>
+                {touched.category && fieldErrors.category && <small className="service-field-error">{fieldErrors.category}</small>}
               </label>
               <label>
                 <RequiredLabel>Duration (minutes)</RequiredLabel>

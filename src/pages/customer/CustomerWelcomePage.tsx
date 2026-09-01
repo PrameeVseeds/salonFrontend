@@ -56,7 +56,7 @@ const CustomerWelcomePage = () => {
         setSettings(settingsResult.value.data.settings);
       if (servicesResult.status === "fulfilled")
         setServices(
-          servicesResult.value.data.services.filter((item) => item.isActive),
+          servicesResult.value.data.services.filter((item) => item.isActive && item.categoryIsActive),
         );
       if (galleryResult.status === "fulfilled")
         setGallery(
