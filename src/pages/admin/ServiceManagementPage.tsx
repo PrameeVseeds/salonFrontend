@@ -22,6 +22,7 @@ import {
   updateSubService,
   uploadSalonServiceImage,
 } from "../../services/salonService";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { getServiceCategories } from "../../services/serviceCategoryService";
 import type { SalonService, ServiceCategory, SubService } from "../../types/service";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -69,6 +70,12 @@ const ServiceManagementPage = () => {
   const [subIsActive, setSubIsActive] = useState(true);
   const [subTouched, setSubTouched] = useState(false);
   const [subError, setSubError] = useState<string | null>(null);
+  const [deletingService, setDeletingService] = useState<SalonService | null>(null);
+  const [deletingSubService, setDeletingSubService] = useState<{
+    service: SalonService;
+    subService: SubService;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     Promise.all([getServices(), getServiceCategories()])
@@ -225,15 +232,20 @@ const ServiceManagementPage = () => {
       setError(getApiErrorMessage(e));
     }
   };
-  const remove = async (service: SalonService) => {
-    if (!window.confirm(`Delete ${service.name}?`)) return;
+  const remove = async () => {
+    if (!deletingService) return;
+    setIsDeleting(true);
+    setError(null);
     try {
-      await deleteSalonService(service.id);
+      await deleteSalonService(deletingService.id);
       setServices((current) =>
-        current.filter((item) => item.id !== service.id),
+        current.filter((item) => item.id !== deletingService.id),
       );
+      setDeletingService(null);
     } catch (e) {
       setError(getApiErrorMessage(e));
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -269,10 +281,19 @@ const ServiceManagementPage = () => {
       await reloadServices(); setBusy(false); closeSubServiceForm();
     } catch (e) { setSubError(getApiErrorMessage(e)); } finally { setBusy(false); }
   };
-  const removeSubService = async (service: SalonService, id: number) => {
-    if (!window.confirm("Delete this sub-service?")) return;
-    try { await deleteSubService(service.id, id); await reloadServices(); }
-    catch (e) { setError(getApiErrorMessage(e)); }
+  const removeSubService = async () => {
+    if (!deletingSubService) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      await deleteSubService(deletingSubService.service.id, deletingSubService.subService.id);
+      await reloadServices();
+      setDeletingSubService(null);
+    } catch (e) {
+      setError(getApiErrorMessage(e));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -347,7 +368,7 @@ const ServiceManagementPage = () => {
                     <img src={item.imageUrl} alt="" />
                     <span><b>{item.name}</b><small>{item.durationMinutes} min · Rs. {Number(item.price).toFixed(2)}</small></span>
                     <button type="button" title="Edit sub-service" onClick={() => openSubServiceForm(service, item)}><Pencil /></button>
-                    <button type="button" title="Delete sub-service" onClick={() => void removeSubService(service, item.id)}><Trash2 /></button>
+                    <button type="button" title="Delete sub-service" disabled={isDeleting} onClick={() => setDeletingSubService({ service, subService: item })}><Trash2 /></button>
                   </div>) : <p>No sub-services. Customers can book the parent service.</p>}
                 </section>
                 <footer>
@@ -362,7 +383,8 @@ const ServiceManagementPage = () => {
                   </button>
                   <button
                     className="is-delete"
-                    onClick={() => void remove(service)}
+                    disabled={isDeleting}
+                    onClick={() => setDeletingService(service)}
                     title="Delete"
                   >
                     <Trash2 />
@@ -576,6 +598,26 @@ const ServiceManagementPage = () => {
           </section>
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(deletingService)}
+        title="Delete service?"
+        message={<>“{deletingService?.name}” will be permanently removed, including its sub-services.</>}
+        confirmLabel="Delete service"
+        busy={isDeleting}
+        busyLabel="Deleting..."
+        onCancel={() => setDeletingService(null)}
+        onConfirm={() => void remove()}
+      />
+      <ConfirmDialog
+        open={Boolean(deletingSubService)}
+        title="Delete sub-service?"
+        message={<>“{deletingSubService?.subService.name}” will be permanently removed.</>}
+        confirmLabel="Delete sub-service"
+        busy={isDeleting}
+        busyLabel="Deleting..."
+        onCancel={() => setDeletingSubService(null)}
+        onConfirm={() => void removeSubService()}
+      />
     </div>
   );
 };
