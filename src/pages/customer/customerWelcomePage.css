@@ -551,7 +551,8 @@
 }
 
 .welcome-gallery .welcome-section-heading>span {
-  color: rgba(255, 255, 255, .65);
+  color: #5f594f;
+  font-weight: 500;
 }
 
 .welcome-gallery-grid {
