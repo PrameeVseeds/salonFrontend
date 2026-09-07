@@ -239,6 +239,158 @@
   padding-left: 33px;
 }
 
+.appointment-heading-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.appointment-create {
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: linear-gradient(100deg, #c4932f, #d2a43e) !important;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.appointment-create svg {
+  width: 17px;
+  height: 17px;
+}
+
+.appointment-admin-mark {
+  display: inline-block !important;
+  width: fit-content;
+  margin: 4px 0 0;
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #765018 !important;
+  background: #fff3d6;
+  font-size: 0.59rem !important;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.appointment-admin-booking-note {
+  margin: 0;
+  padding: 0 22px;
+  color: #756b61;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.appointment-admin-booking-modal {
+  width: min(680px, 100%);
+  padding: 0;
+}
+
+.appointment-admin-booking-modal > header {
+  padding: 20px 22px;
+}
+
+.appointment-admin-booking-modal > header h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.appointment-admin-booking-modal > header p {
+  margin-top: 3px;
+  font-size: 0.7rem;
+}
+
+.appointment-admin-booking-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px 22px 22px;
+}
+
+.appointment-admin-booking-form label {
+  display: grid;
+  gap: 5px;
+  color: #594e61;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.appointment-admin-booking-form label > span small {
+  color: #91897e;
+  font-weight: 500;
+}
+
+.appointment-admin-booking-form input,
+.appointment-admin-booking-form select,
+.appointment-admin-booking-form textarea {
+  width: 100%;
+  min-height: 45px;
+  padding: 0 12px;
+  border: 1px solid #ddd6c9;
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.appointment-admin-date-picker {
+  height: 45px;
+  border-color: #ddd6c9;
+}
+
+.appointment-slot-message {
+  margin: -5px 0 0;
+  color: #8a6218;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.appointment-admin-booking-form textarea {
+  min-height: 70px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.appointment-admin-booking-form .is-wide {
+  grid-column: 1 / -1;
+}
+
+.appointment-admin-booking-form footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.appointment-admin-booking-form footer button {
+  height: 42px;
+  padding: 0 15px;
+  border: 1px solid #ddd6c9;
+  border-radius: 8px;
+  color: #37342e;
+  background: #fff;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.appointment-admin-booking-form footer button[type="submit"] {
+  border: 0;
+  color: #fff;
+  background: #b88624;
+}
+
+.appointment-admin-booking-form footer button[type="submit"]:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .appointment-date-picker {
   position: relative;
   display: flex;
@@ -564,6 +716,18 @@
 
   .appointment-modal dl>.is-wide {
     grid-column: auto;
+  }
+
+  .appointment-admin-booking-form {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-admin-booking-form .is-wide {
+    grid-column: auto;
+  }
+
+  .appointment-admin-booking-form footer button {
+    flex: 1;
   }
 }
 

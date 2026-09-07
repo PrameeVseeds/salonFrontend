@@ -1,10 +1,12 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
+import { axiosClient } from "../api/axiosClient";
 import { customerAxiosClient } from "../api/customerAxiosClient";
 import type { ApiResponse } from "../types/api";
 import type {
   AppointmentListResponseData,
   AppointmentResponseData,
   AppointmentFilters,
+  CreateAdminAppointmentInput,
   CreateCustomerAppointmentInput,
 } from "../types/appointment";
 
@@ -15,6 +17,9 @@ export const getCustomerAppointments = async (): Promise<ApiResponse<Appointment
 
 export const createCustomerAppointment = async (input: CreateCustomerAppointmentInput): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.post<ApiResponse<AppointmentResponseData>>(ENDPOINT, input)).data;
+
+export const createAdminAppointment = async (input: CreateAdminAppointmentInput): Promise<ApiResponse<AppointmentResponseData>> =>
+  (await adminAxiosClient.post<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/admin`, input)).data;
 
 export const cancelCustomerAppointment = async (id: number, reason: string): Promise<ApiResponse<AppointmentResponseData>> =>
   (await customerAxiosClient.patch<ApiResponse<AppointmentResponseData>>(`${ENDPOINT}/my/${id}/cancel`, { reason })).data;
@@ -52,6 +57,20 @@ export const getAvailableAppointmentSlots = async (serviceIds: number | number[]
     message: response.data.data.availabilityMessage ?? null,
     slotDetails: response.data.data.slotDetails ?? {},
   };
+};
+
+export const getAvailableAdminAppointmentSlots = async (
+  serviceId: number,
+  employeeId: number | null,
+  date: string,
+): Promise<string[]> => {
+  // Slot availability is public; using the admin client here sends an admin JWT
+  // to the customer-only endpoint and results in a 403 response.
+  const response = await axiosClient.get<ApiResponse<{ availableSlots?: string[]; slots?: string[] }>>(
+    `${ENDPOINT}/available-slots`,
+    { params: { serviceIds: String(serviceId), ...(employeeId === null ? {} : { employeeId }), date } },
+  );
+  return response.data.data.availableSlots ?? response.data.data.slots ?? [];
 };
 
 export const getAppointments = async (filters: AppointmentFilters = {}): Promise<ApiResponse<AppointmentListResponseData>> =>

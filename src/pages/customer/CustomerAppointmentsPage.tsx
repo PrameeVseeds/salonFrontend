@@ -36,6 +36,11 @@ import "./customerAppointmentsPage.css";
 const localDateKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 const today = localDateKey(new Date());
+const latestBookingDate = (() => {
+  const date = new Date();
+  date.setDate(date.getDate() + 3);
+  return localDateKey(date);
+})();
 const CustomerAppointmentsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -1022,6 +1027,7 @@ const CustomerAppointmentsPage = () => {
                   type="date"
                   aria-label="Appointment date"
                   min={today}
+                  max={latestBookingDate}
                   value={form.appointmentDate}
                   onChange={(e) =>
                     loadSlots(form.serviceIds, employeeChoice, e.target.value)
