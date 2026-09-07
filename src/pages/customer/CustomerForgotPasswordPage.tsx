@@ -1,3 +1,4 @@
+import { Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerAuthShell from "../../components/customer/CustomerAuthShell";
@@ -6,7 +7,8 @@ import { getApiErrorMessage } from "../../utils/apiError";
 
 const CustomerForgotPasswordPage = () => {
   const location = useLocation();
-  const email = typeof location.state === "object" && location.state !== null && "email" in location.state && typeof location.state.email === "string" ? location.state.email.trim() : "";
+  const initialEmail = typeof location.state === "object" && location.state !== null && "email" in location.state && typeof location.state.email === "string" ? location.state.email.trim() : "";
+  const [email, setEmail] = useState(initialEmail);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const submit = async (event: FormEvent) => {
@@ -36,12 +38,9 @@ const CustomerForgotPasswordPage = () => {
     <form className="customer-auth_form" onSubmit={(event) => void submit(event)}>
       {message &&
         <p className={`customer-auth_message is-${message.type}`} role="status">{message.text}</p>}
-      <button className="customer-auth_primary" disabled={busy || !email}>{busy ? "Sending..." : "Send reset instructions"}</button>
+      <button className="customer-auth_primary" disabled={busy || !email.trim()}>{busy ? "Sending..." : "Send reset instructions"}</button>
     </form>
-    <p className="customer-auth_switch">{email ?
-      <Link to="/login">Back to sign in</Link> : <>Enter your email on the
-        <Link to="/login">login page</Link>
-        first.</>}</p>
+    <p className="customer-auth_switch"><Link to="/login">Back to sign in</Link></p>
   </CustomerAuthShell>;
 };
 

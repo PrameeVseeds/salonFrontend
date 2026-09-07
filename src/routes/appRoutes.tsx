@@ -7,6 +7,7 @@ import ProtectedCustomer from "../components/customer/ProtectedCustomer";
 const CustomerLoginPage = lazy(() => import("../pages/customer/CustomerLoginPage"));
 const CustomerRegisterPage = lazy(() => import("../pages/customer/CustomerRegisterPage"));
 const CustomerForgotPasswordPage = lazy(() => import("../pages/customer/CustomerForgotPasswordPage"));
+const CustomerResetPasswordPage = lazy(() => import("../pages/customer/CustomerResetPasswordPage"));
 const CustomerWelcomePage = lazy(() => import("../pages/customer/CustomerWelcomePage"));
 const CustomerDashboardPage = lazy(() => import("../pages/customer/CustomerDashboardPage"));
 const CustomerServicesPage = lazy(() => import("../pages/customer/CustomerServicesPage"));
@@ -20,6 +21,7 @@ export const appRoutes = createBrowserRouter([
   { path: "/login", element: <CustomerLoginPage /> },
   { path: "/register", element: <CustomerRegisterPage /> },
   { path: "/forgot-password", element: <CustomerForgotPasswordPage /> },
+  { path: "/reset-password", element: <CustomerResetPasswordPage /> },
   { path: "/dashboard", element: <ProtectedCustomer><CustomerDashboardPage /></ProtectedCustomer> },
   { path: "/services", element: <ProtectedCustomer><CustomerServicesPage /></ProtectedCustomer> },
   { path: "/gallery", element: <ProtectedCustomer><CustomerGalleryPage /></ProtectedCustomer> },
