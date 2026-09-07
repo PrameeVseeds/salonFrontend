@@ -239,6 +239,48 @@
   padding-left: 33px;
 }
 
+.appointment-date-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ded6e3;
+  border-radius: 7px;
+  background: #fff;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.appointment-date-picker>span {
+  color: #4f4854;
+  font-size: 0.72rem;
+}
+
+.appointment-date-picker>span.is-placeholder {
+  color: #898075;
+}
+
+.appointment-date-picker>input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+  border: 0;
+  pointer-events: none;
+}
+
+.appointment-date-picker:focus,
+.appointment-date-picker:focus-within {
+  outline: none;
+  border-color: #bd861b;
+  box-shadow: 0 0 0 3px rgb(189 134 27 / 14%);
+}
+
 .appointment-filters>button {
   height: 36px;
   justify-content: center;

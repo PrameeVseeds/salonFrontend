@@ -1,5 +1,5 @@
 import { Ban, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock3, Eye, Play, RefreshCw, Search, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { assignAppointmentEmployee, cancelAppointment, completeAppointment, getAppointments, getAvailableAppointmentEmployees, startAppointment } from "../../services/appointmentService";
 import { getEmployees } from "../../services/employeeService";
 import { getAssignedEmployeeServices } from "../../services/employeeServiceAssignmentService";
@@ -12,17 +12,10 @@ type StatusFilter = AppointmentStatus | "Active" | "";
 const statuses: StatusFilter[] = ["Active", "", "Scheduled", "In Progress", "Completed", "Cancelled"];
 const APPOINTMENT_GROUPS_PER_PAGE = 10;
 
-const formatDateInput = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 8);
-  return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)]
-    .filter(Boolean)
-    .join("-");
-};
-
 const toApiDate = (value: string): string | undefined => {
-  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return undefined;
-  const [, day, month, year] = match;
+  const [, year, month, day] = match;
   const candidate = new Date(`${year}-${month}-${day}T00:00:00Z`);
   if (candidate.getUTCFullYear() !== Number(year) || candidate.getUTCMonth() + 1 !== Number(month)
     || candidate.getUTCDate() !== Number(day)) return undefined;
@@ -46,6 +39,18 @@ const AppointmentManagementPage = () => {
   const [eligibleEmployees, setEligibleEmployees] = useState<Record<number, Employee[]>>({});
   const [availableEmployeeIds, setAvailableEmployeeIds] = useState<Record<string, number[]>>({});
   const [currentPage, setCurrentPage] = useState(1);
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const openDatePicker = () => {
+    const input = dateInputRef.current;
+    if (!input) return;
+    try {
+      input.showPicker();
+    } catch {
+      input.focus();
+      input.click();
+    }
+  };
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -308,15 +313,31 @@ const AppointmentManagementPage = () => {
           </label>
           <label>
             <span>Date</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={10}
-              placeholder="dd-mm-yyyy"
-              value={date}
-              onChange={(event) => setDate(formatDateInput(event.target.value))}
-              aria-label="Date in day-month-year format"
-            />
+            <div
+              className="appointment-date-picker"
+              role="button"
+              tabIndex={0}
+              aria-label="Select appointment date"
+              onClick={openDatePicker}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openDatePicker();
+                }
+              }}
+            >
+              <span className={date ? "" : "is-placeholder"}>
+                {date ? date.split("-").reverse().join("-") : "dd-mm-yyyy"}
+              </span>
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={date}
+                onChange={(event) => setDate(event.target.value)}
+                tabIndex={-1}
+                aria-hidden="true"
+              />
+            </div>
           </label>
           <label>
             <span>Status</span>
