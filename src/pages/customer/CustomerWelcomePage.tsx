@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import fallbackHero from "../../assets/hero.png";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import { getPublicGalleryImages } from "../../services/galleryService";
@@ -129,9 +129,9 @@ const CustomerWelcomePage = () => {
           <a href="#contact" onClick={closeMenu}>
             Contact
           </a>
-          <button type="button" onClick={openInstallModal}>
-            Install app
-          </button>
+          <Link to="/login" onClick={closeMenu}>
+            Login
+          </Link>
         </nav>
       </header>
 
@@ -312,7 +312,6 @@ const CustomerWelcomePage = () => {
             <h3>Quick Links</h3>
             <a href="#home">Home</a>
             <a href="#about">About Us</a>
-            <a href="#services">Services</a>
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact Us</a>
           </div>
