@@ -1,0 +1,259 @@
+.ai-consultation-page {
+    min-height: 100svh;
+    padding-bottom: 96px;
+    background: #f6f4ef
+}
+
+.ai-consultation-content {
+    width: min(100% - 36px, 860px);
+    margin: auto;
+    padding: 28px 0;
+    color: #57534e
+}
+
+.ai-consultation-content>p {
+    margin: 0;
+    color: var(--customer-accent);
+    font-size: .65rem;
+    font-weight: 800;
+    text-transform: uppercase
+}
+
+.ai-consultation-content>h1 {
+    margin: 5px 0;
+    color: var(--customer-primary);
+    font-size: 1.8rem
+}
+
+.ai-consultation-content>span {
+    font-size: .75rem
+}
+
+.ai-consultation-content form,
+.results {
+    display: grid;
+    gap: 14px;
+    margin-top: 22px
+}
+
+.ai-consultation-content section,
+.results {
+    padding: 17px;
+    border: 1px solid #e5e0d6;
+    border-radius: 14px;
+    background: #fff
+}
+
+.ai-consultation-content h2 {
+    margin: 0 0 12px;
+    color: var(--customer-primary);
+    font-size: .9rem
+}
+
+.upload {
+    min-height: 170px;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 7px;
+    border: 1px dashed #cfc6b5;
+    border-radius: 11px;
+    cursor: pointer
+}
+
+.upload svg {
+    color: var(--customer-accent)
+}
+
+.upload small {
+    font-size: .65rem
+}
+
+.upload input {
+    position: absolute;
+    opacity: 0
+}
+
+.preview {
+    display: grid;
+    gap: 8px
+}
+
+.preview img {
+    width: 100%;
+    max-height: 330px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #eee
+}
+
+.preview button {
+    justify-self: start;
+    border: 0;
+    background: none;
+    color: #a43d32;
+    font: inherit;
+    font-size: .7rem
+}
+
+.preview svg {
+    width: 14px;
+    vertical-align: middle
+}
+
+.option {
+    display: inline-block;
+    margin: 0 8px 9px 0
+}
+
+.option input {
+    position: absolute;
+    opacity: 0
+}
+
+.option span {
+    display: block;
+    padding: 10px;
+    border: 1px solid #e5e0d6;
+    border-radius: 9px;
+    font-size: .72rem;
+    font-weight: 700
+}
+
+.option input:checked+span {
+    border-color: var(--customer-accent);
+    background: #fbf6e9
+}
+
+.preferences {
+    display: grid;
+    gap: 7px;
+    margin-top: 10px;
+    font-size: .72rem;
+    font-weight: 700
+}
+
+.preferences textarea {
+    min-height: 85px;
+    padding: 9px;
+    border: 1px solid #e5e0d6;
+    border-radius: 9px;
+    font: inherit;
+    font-size: .7rem
+}
+
+.ai-consultation-content aside {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #eeeae1;
+    font-size: .67rem;
+    line-height: 1.5
+}
+
+.ai-consultation-content aside svg {
+    width: 18px;
+    flex: none;
+    color: var(--customer-accent)
+}
+
+.error {
+    margin: 0;
+    padding: 10px;
+    border-radius: 9px;
+    color: #972f25;
+    background: #fee9e7;
+    font-size: .7rem
+}
+
+.submit {
+    min-height: 45px;
+    border: 0;
+    border-radius: 10px;
+    color: white;
+    background: var(--customer-primary);
+    font: inherit;
+    font-weight: 800
+}
+
+.results header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--customer-accent)
+}
+
+.results section {
+    margin-top: 12px;
+    background: #f6f4ef
+}
+
+.results article {
+    padding: 10px 0;
+    border-top: 1px solid #e5e0d6;
+    font-size: .7rem
+}
+
+.results h3 {
+    margin: 0;
+    color: var(--customer-primary);
+    font-size: .78rem
+}
+
+.results article p,
+.results article span,
+.results li,
+.results>p {
+    font-size: .69rem;
+    line-height: 1.5
+}
+
+.results article span {
+    display: block
+}
+
+.results ul {
+    margin: 0;
+    padding-left: 18px
+}
+
+.recommendation-image-container {
+  width: 100%;
+  max-height: 250px;
+  margin: 0.75rem 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+}
+
+.recommendation-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.results article .preview-unavailable {
+    margin: .75rem 0;
+    padding: .6rem .7rem;
+    border-radius: 7px;
+    color: #6b5b3f;
+    background: #fbf6e9;
+}
+
+@media(min-width:700px) {
+    .ai-consultation-content {
+        padding-top: 40px
+    }
+
+    .ai-consultation-content form {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .ai-consultation-content form>aside,
+    .ai-consultation-content form>.error,
+    .ai-consultation-content form>.submit {
+        grid-column: 1/-1
+    }
+}

@@ -5,7 +5,8 @@ import { appRoutes } from "./routes/appRoutes";
 import PwaLifecycle from "./components/pwa/PwaLifecycle";
 
 const pageTitles: Record<string, string> = {
-    "/": "Welcome",
+    // "/": "Welcome",
+    "/": "Haircuts, Hair Styling & Grooming in Ja-Ela",
     "/login": "Customer Login",
     "/register": "Create Account",
     "/forgot-password": "Forgot Password",
@@ -38,11 +39,46 @@ const pageTitles: Record<string, string> = {
     "/super-admin/settings": "Salon Settings",
 };
 
+const pageDescriptions: Record<string, string> = {
+    "/":
+        "A-Line Salon in Ja-Ela offers professional haircuts, hair styling, beard trimming, hair colouring and facial services.",
+
+    "/services":
+        "Explore haircuts, hair styling, beard trimming, hair colouring and facial services available at A-Line Salon in Ja-Ela.",
+
+    "/gallery":
+        "View the latest hairstyles, grooming services and salon work from A-Line Salon in Ja-Ela.",
+
+    "/book-appointment":
+        "Book your next haircut, hair styling, beard trimming, hair colouring or facial appointment at A-Line Salon in Ja-Ela.",
+
+    "/login":
+        "Sign in to your A-Line Salon customer account to manage your appointments and bookings.",
+
+    "/register":
+        "Create an A-Line Salon customer account to book and manage your salon appointments.",
+
+    "/appointments":
+        "View and manage your appointments with A-Line Salon in Ja-Ela.",
+
+    "/dashboard":
+        "Manage your A-Line Salon customer account, bookings and appointments.",
+};
+
 const titleForPath = (pathname: string): string => {
     const normalizedPath = pathname === "/"
         ? pathname
         : pathname.replace(/\/+$/, "");
     return pageTitles[normalizedPath] ?? "Salon Management";
+};
+
+const descriptionForPath = (pathname: string): string => {
+    const normalizedPath = pathname === "/"
+        ? pathname
+        : pathname.replace(/\/+$/, "");
+
+    return pageDescriptions[normalizedPath]
+        ?? "A-Line Salon in Ja-Ela offers professional haircuts, hair styling, beard trimming, hair colouring and facial services.";
 };
 
 function App() {
@@ -54,6 +90,20 @@ function App() {
     useEffect(() => {
         const salonName = brand.salonName.trim() || "Salon";
         document.title = `${titleForPath(pathname)} | ${salonName}`;
+
+        const description = descriptionForPath(pathname);
+
+        let metaDescription = document.querySelector<HTMLMetaElement>(
+            'meta[name="description"]'
+        );
+
+        if (!metaDescription) {
+            metaDescription = document.createElement("meta");
+            metaDescription.name = "description";
+            document.head.appendChild(metaDescription);
+        }
+
+        metaDescription.content = description;
 
         let favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
         if (!favicon) {

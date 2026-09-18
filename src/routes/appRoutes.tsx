@@ -12,6 +12,7 @@ const CustomerDashboardPage = lazy(() => import("../pages/customer/CustomerDashb
 const CustomerServicesPage = lazy(() => import("../pages/customer/CustomerServicesPage"));
 const CustomerGalleryPage = lazy(() => import("../pages/customer/CustomerGalleryPage"));
 const CustomerAppointmentsPage = lazy(() => import("../pages/customer/CustomerAppointmentsPage"));
+const AiConsultationPage = lazy(() => import("../pages/customer/AiConsultationPage"));
 
 export const appRoutes = createBrowserRouter([
   ...adminRoutes,
@@ -25,4 +26,5 @@ export const appRoutes = createBrowserRouter([
   { path: "/gallery", element: <ProtectedCustomer><CustomerGalleryPage /></ProtectedCustomer> },
   { path: "/appointments", element: <ProtectedCustomer><CustomerAppointmentsPage /></ProtectedCustomer> },
   { path: "/book-appointment", element: <ProtectedCustomer><CustomerAppointmentsPage /></ProtectedCustomer> },
+  { path: "/ai-consultation", element: <ProtectedCustomer><AiConsultationPage /></ProtectedCustomer> },
 ]);

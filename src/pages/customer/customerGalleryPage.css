@@ -262,21 +262,31 @@
 }
 
 @media (min-width: 1800px) {
+    .customer-gallery-heading {
+        display: grid;
+        gap: 6px;
+    }
+
     .customer-gallery-content {
         width: min(100% - 96px, 1600px);
         padding: 68px 0 80px;
     }
 
     .customer-gallery-heading h1 {
+        margin: 0;
         font-size: 3rem;
+        line-height: 1.05;
     }
 
     .customer-gallery-heading p {
         font-size: 0.82rem;
+        line-height: 1.2;
     }
 
     .customer-gallery-heading span {
+        display: block;
         font-size: 1rem;
+        line-height: 1.35;
     }
 
     .customer-gallery-filters button {

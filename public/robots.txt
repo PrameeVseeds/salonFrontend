@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /dashboard
+Disallow: /appointments
+Disallow: /book-appointment
+Disallow: /ai-consultation
+
+Disallow: /admin/
+Disallow: /super-admin/
+
+Sitemap: https://a-line-salon.com/sitemap.xml

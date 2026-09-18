@@ -12,10 +12,8 @@ import { Navigate } from "react-router-dom";
 import fallbackHero from "../../assets/hero.png";
 import { usePublicTheme } from "../../hooks/usePublicTheme";
 import { getPublicGalleryImages } from "../../services/galleryService";
-import { getPublicServices } from "../../services/salonService";
 import { getPublicSalonSettings } from "../../services/settingsService";
 import type { GalleryImage } from "../../types/gallery";
-import type { SalonService } from "../../types/service";
 import type { SalonSettings } from "../../types/settings";
 import { hasCustomerToken } from "../../utils/customerToken";
 import { getGoogleMapsEmbedUrl } from "../../utils/googleMaps";
@@ -36,7 +34,6 @@ const isInstalledApp = () =>
 const CustomerWelcomePage = () => {
   const { theme, brand, style } = usePublicTheme();
   const [settings, setSettings] = useState<SalonSettings | null>(null);
-  const [services, setServices] = useState<SalonService[]>([]);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [installPrompt, setInstallPromptState] =
@@ -49,15 +46,10 @@ const CustomerWelcomePage = () => {
   useEffect(() => {
     Promise.allSettled([
       getPublicSalonSettings(),
-      getPublicServices(),
       getPublicGalleryImages(),
-    ]).then(([settingsResult, servicesResult, galleryResult]) => {
+    ]).then(([settingsResult, galleryResult]) => {
       if (settingsResult.status === "fulfilled")
         setSettings(settingsResult.value.data.settings);
-      if (servicesResult.status === "fulfilled")
-        setServices(
-          servicesResult.value.data.services.filter((item) => item.isActive && item.categoryIsActive),
-        );
       if (galleryResult.status === "fulfilled")
         setGallery(
           galleryResult.value.data.galleryImages.filter(
@@ -137,7 +129,16 @@ const CustomerWelcomePage = () => {
 
       <section className="welcome-hero" id="home">
         {theme.heroMediaUrl && theme.heroMediaType === "Video" ? (
-          <video src={theme.heroMediaUrl} autoPlay muted loop playsInline />
+          // <video src={theme.heroMediaUrl} autoPlay muted loop playsInline />
+          <video
+            src={theme.heroMediaUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label={`${salonName} salon`}
+            title={`${salonName} salon in Ja-Ela`}
+          />
         ) : (
           <img src={heroImage} alt={`${salonName} salon`} />
         )}
@@ -145,8 +146,7 @@ const CustomerWelcomePage = () => {
         <div className="welcome-hero-copy">
           <p>Welcome to {salonName}</p>
           <h1>
-            Beauty, crafted   just for you.
-
+            Haircuts, Hair Styling & Grooming in Ja-Ela
           </h1>
           <span>
             Relax, refresh, and discover a look that makes you feel completely
@@ -311,18 +311,8 @@ const CustomerWelcomePage = () => {
           <div className="welcome-footer-links">
             <h3>Quick Links</h3>
             <a href="#home">Home</a>
-            <a href="#about">About Us</a>
-            <a href="#services">Services</a>
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact Us</a>
-          </div>
-          <div className="welcome-footer-links">
-            <h3>Our Services</h3>
-            {services.slice(0, 5).map((service) => (
-              <a key={service.id} href="#services">
-                {service.name}
-              </a>
-            ))}
           </div>
           <div className="welcome-footer-links welcome-footer-contact">
             <h3>Contact Info</h3>

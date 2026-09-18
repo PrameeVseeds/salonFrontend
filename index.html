@@ -1,21 +1,85 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/pwa-icon-192.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="application-name" content="Salon Management & Booking" />
-    <meta name="theme-color" content="#1C1C1A" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Salon" />
-    <title>Customer Login | Salon A - Line</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/pwa-icon-192.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="application-name" content="A-Line Salon" />
+  <meta name="description"
+    content="A-Line Salon in Ja-Ela offers professional haircuts, hair styling, beard trimming, hair colouring and facial services." />
+  <link rel="canonical" href="https://a-line-salon.com/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="A-Line Salon | Haircuts, Hair Styling & Grooming in Ja-Ela" />
+  <meta property="og:description"
+    content="A-Line Salon in Ja-Ela offers professional haircuts, hair styling, beard trimming, hair colouring and facial services." />
+  <meta property="og:url" content="https://a-line-salon.com/" />
+  <meta property="og:image" content="https://a-line-salon.com/pwa-icon-192.png" />
+  <meta property="og:site_name" content="A-Line Salon" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="A-Line Salon | Haircuts, Hair Styling & Grooming in Ja-Ela" />
+  <meta name="twitter:description"
+    content="A-Line Salon in Ja-Ela offers professional haircuts, hair styling, beard trimming, hair colouring and facial services." />
+  <meta name="twitter:image" content="https://a-line-salon.com/pwa-icon-192.png" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HairSalon",
+  "name": "Salon A - Line",
+  "url": "https://a-line-salon.com/",
+  "image": "https://a-line-salon.com/pwa-icon-192.png",
+  "telephone": "+94726681000",
+  "email": "alinesalon02@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Ja-ela - Ganemulla Rd",
+    "addressLocality": "Ja-Ela",
+    "addressCountry": "LK"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 7.0684135,
+    "longitude": 79.8954062
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "09:30",
+      "closes": "22:00"
+    }
+  ],
+  "sameAs": [
+    "https://www.facebook.com/people/Salon-A-Line/100093489395078/"
+  ]
+}
+</script>
+
+  <meta name="theme-color" content="#1C1C1A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Salon" />
+  <title>A-Line Salon | Haircuts, Hair Styling & Grooming in Ja-Ela</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

@@ -1,10 +1,10 @@
-import { CalendarDays, Home, Images, Sparkles } from "lucide-react";
+import { CalendarDays, Home, Images, Scissors, Sparkles } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const CustomerBottomNav = ({
   active,
 }: {
-  active: "home" | "bookings" | "services" | "gallery";
+  active: "home" | "bookings" | "services" | "gallery" | "consultation";
 }) => (
   <nav className="customer-bottom-nav" aria-label="Customer navigation">
     <NavLink className={active === "home" ? "is-active" : ""} to="/dashboard">
@@ -31,6 +31,10 @@ const CustomerBottomNav = ({
     >
       <Images />
       <span>Gallery</span>
+    </NavLink>
+    <NavLink className={active === "consultation" ? "is-active" : ""} to="/ai-consultation">
+      <Scissors />
+      <span>AI style</span>
     </NavLink>
   </nav>
 );

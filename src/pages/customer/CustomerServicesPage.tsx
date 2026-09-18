@@ -150,7 +150,7 @@ const CustomerServicesPage = () => {
               <article key={service.id}>
                 <div className="customer-services-image">
                   {service.imageUrl ? (
-                    <img src={service.imageUrl} alt="" />
+                    <img src={service.imageUrl} alt={`${service.name} at ${brand.salonName}`} />
                   ) : (
                     <Sparkles />
                   )}
