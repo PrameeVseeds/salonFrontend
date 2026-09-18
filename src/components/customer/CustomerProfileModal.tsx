@@ -1,6 +1,6 @@
 import { Camera, Eye, EyeOff, LockKeyhole, Save, UserRound, X } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
-import { changeCustomerPassword, updateCustomerProfile, updateCustomerProfileImage } from "../../services/customerAuthService";
+import { changeCustomerPassword, updateCustomerProfile, updateCustomerProfileImage, updateWhatsAppPreference } from "../../services/customerAuthService";
 import type { Customer } from "../../types/customer";
 import { getApiErrorMessage } from "../../utils/apiError";
 import "./customerProfileModal.css";
@@ -99,6 +99,19 @@ const CustomerProfileModal = ({ open, initialTab, customer, onUpdated, onClose }
     setMessage(null);
   };
 
+  const saveWhatsAppPreference = async (whatsappOptIn: boolean) => {
+    setBusy(true); setMessage(null);
+    try {
+      const { data } = await updateWhatsAppPreference(whatsappOptIn);
+      onUpdated(data.customer);
+      setMessage({ type: "success", text: "WhatsApp reminder preference updated." });
+    } catch (error) {
+      setMessage({ type: "error", text: getApiErrorMessage(error, "Unable to update WhatsApp reminder preference.") });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return <div className="customer-profile-modal" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) onClose(); }}>
     <section role="dialog" aria-modal="true" aria-labelledby="customer-profile-title">
       <header>
@@ -151,6 +164,18 @@ const CustomerProfileModal = ({ open, initialTab, customer, onUpdated, onClose }
         <label>
           <span>Email address</span>
           <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+        </label>
+        <label className="customer-profile-whatsapp">
+          <input
+            type="checkbox"
+            checked={customer.whatsappOptIn}
+            disabled={busy}
+            onChange={(event) => void saveWhatsAppPreference(event.target.checked)}
+          />
+          <span>
+            <strong>Receive appointment reminders through WhatsApp</strong>
+            <small>Allow the salon to send appointment reminders to your WhatsApp number.</small>
+          </span>
         </label>
         {message && <p className={`is-${message.type}`}>{message.text}</p>}
         <button className="customer-profile-save" disabled={busy}>

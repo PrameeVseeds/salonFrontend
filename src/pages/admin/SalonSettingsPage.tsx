@@ -29,6 +29,7 @@ const defaults: UpdateSalonSettingsInput = {
   appointmentBufferMinutes: 0,
   appointmentGracePeriodMinutes: 5,
   appointmentReminderMinutes: 15,
+  enableWhatsAppAppointmentReminders: true,
 };
 const getError = (error: unknown) =>
   getApiErrorMessage(error, "Unable to save settings.");
@@ -68,6 +69,7 @@ const SalonSettingsPage = () => {
       appointmentBufferMinutes: value.appointmentBufferMinutes,
       appointmentGracePeriodMinutes: value.appointmentGracePeriodMinutes,
       appointmentReminderMinutes: value.appointmentReminderMinutes,
+      enableWhatsAppAppointmentReminders: value.enableWhatsAppAppointmentReminders,
     });
     setBookingInterval(String(value.bookingIntervalMinutes));
     setAppointmentBuffer(String(value.appointmentBufferMinutes));
@@ -350,6 +352,14 @@ const SalonSettingsPage = () => {
               }
             />
             <span>Allow customers to choose an employee</span>
+          </label>
+          <label className="settings-toggle">
+            <input
+              type="checkbox"
+              checked={form.enableWhatsAppAppointmentReminders}
+              onChange={(e) => update("enableWhatsAppAppointmentReminders", e.target.checked)}
+            />
+            <span>Receive appointment reminders through WhatsApp</span>
           </label>
           <label className="settings-toggle">
             <input

@@ -233,6 +233,34 @@
     background: #effaf3;
 }
 
+.customer-profile-modal form > label.customer-profile-whatsapp {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f8f6f1;
+}
+
+.customer-profile-modal .customer-profile-whatsapp input[type="checkbox"] {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.customer-profile-whatsapp span {
+    display: grid;
+    gap: 3px;
+}
+
+.customer-profile-whatsapp small {
+    color: #6f675d;
+}
+
 .customer-profile-save {
     min-height: 44px;
     display: flex;

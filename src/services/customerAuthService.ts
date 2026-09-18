@@ -33,6 +33,14 @@ Promise<ApiResponse<customerType.CustomerResponseData>> => {
     return response.data;
 };
 
+export const updateWhatsAppPreference = async (whatsappOptIn: boolean):
+Promise<ApiResponse<customerType.CustomerResponseData>> => {
+    const response = await customerAxiosClient.patch<ApiResponse<customerType.CustomerResponseData>>(
+        `${CUSTOMER_ENDPOINT}/profile/whatsapp-preference`, { whatsappOptIn },
+    );
+    return response.data;
+};
+
 export const changeCustomerPassword = async (input: customerType.ChangeCustomerPasswordInput,): 
 Promise<ApiMessageResponse> => {
     const response = await customerAxiosClient.patch<ApiMessageResponse>

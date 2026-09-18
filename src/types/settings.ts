@@ -15,6 +15,7 @@ export interface SalonSettings {
     appointmentBufferMinutes: number;
     appointmentGracePeriodMinutes: number;
     appointmentReminderMinutes: number;
+    enableWhatsAppAppointmentReminders: boolean;
     createdAt: string;
     updatedAt: string;
 }
