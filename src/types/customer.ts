@@ -3,6 +3,7 @@ export interface Customer {
   firstName: string;
   lastName: string;
   phone: string;
+  whatsappOptIn: boolean;
   email: string;
   profileImage: string | null;
   isActive: boolean;
