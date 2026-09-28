@@ -1,4 +1,4 @@
-import { UserRoundCheck } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import EmployeeServiceCard from "../../components/admin/employee-services/EmployeeServiceCard";
 import EmployeeServiceControls from "../../components/admin/employee-services/EmployeeServiceControls";
@@ -12,6 +12,7 @@ const EmployeeServiceAssignmentPage = () => {
     employees,
     services,
     assigned,
+    assignedEmployeesByService,
     assignedIds,
     visibleServices,
     employeeId,
@@ -31,6 +32,8 @@ const EmployeeServiceAssignmentPage = () => {
   const [serviceToRemove, setServiceToRemove] = useState<SalonService | null>(
     null,
   );
+  const [expandedServiceId, setExpandedServiceId] = useState<number | null>(null);
+  const [isOverviewExpanded, setIsOverviewExpanded] = useState(true);
 
   return (
     <div className="assignment-page">
@@ -48,14 +51,72 @@ const EmployeeServiceAssignmentPage = () => {
         onEmployeeBlur={() => setTouched(true)}
         onQueryChange={setQuery}
       />
+      <section className={`assignment-overview${isOverviewExpanded ? " is-expanded" : ""}`}>
+        <button
+          type="button"
+          className="assignment-overview_header"
+          aria-expanded={isOverviewExpanded}
+          aria-controls="service-assignment-overview-list"
+          onClick={() => setIsOverviewExpanded((expanded) => !expanded)}
+        >
+          <div>
+            <h2>Services and assigned employees</h2>
+            <p>See which employees are assigned to each service.</p>
+          </div>
+          <span className="assignment-overview_header-meta">
+            {services.length} services
+            <ChevronDown aria-hidden="true" />
+          </span>
+        </button>
+        {isOverviewExpanded && (services.length ? (
+          <div className="assignment-overview_list" id="service-assignment-overview-list">
+            {visibleServices.map((service) => {
+              const assignedEmployees = assignedEmployeesByService[service.id] ?? [];
+              const isExpanded = expandedServiceId === service.id;
+              return (
+                <article className={isExpanded ? "is-expanded" : ""} key={service.id}>
+                  <button
+                    type="button"
+                    className="assignment-overview_trigger"
+                    aria-expanded={isExpanded}
+                    aria-controls={`service-assignees-${service.id}`}
+                    onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                  >
+                    <span className="assignment-overview_service">
+                      <strong>{service.name}</strong>
+                      <small>{service.durationMinutes} min · Rs. {Number(service.price).toFixed(2)}</small>
+                    </span>
+                    <span className="assignment-overview_summary">
+                      {assignedEmployees.length
+                        ? assignedEmployees.length + " employee" + (assignedEmployees.length === 1 ? "" : "s")
+                        : "No employees assigned"}
+                      <ChevronDown aria-hidden="true" />
+                    </span>
+                  </button>
+                  {isExpanded && (
+                    <div className="assignment-overview_employees" id={`service-assignees-${service.id}`}>
+                      {assignedEmployees.length ? assignedEmployees.map((employee) => (
+                        <span key={employee.id}>
+                          {employee.firstName} {employee.lastName}{employee.isActive ? "" : " · Inactive"}
+                        </span>
+                      )) : <small>No employees assigned to this service.</small>}
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+            {!visibleServices.length && <p className="assignment-no-results">No services found.</p>}
+          </div>
+        ) : (
+          <p className="assignment-overview_loading" id="service-assignment-overview-list">{error ?? "Loading services and assignments..."}</p>
+        ))}
+      </section>
       {error && <p className="assignment-message is-error">{error}</p>}
       {success && <p className="assignment-message is-success">{success}</p>}
       {!employeeId ? (
-        <section className="assignment-empty">
-          <UserRoundCheck />
-          <h2>Select an employee</h2>
-          <p>Choose an employee to view and manage their assigned services.</p>
-        </section>
+        <p className="assignment-selection-hint">
+          Select an employee above to add or remove their service assignments.
+        </p>
       ) : (
         <section className="assignment-content">
           <header>

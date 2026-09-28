@@ -61,6 +61,7 @@ const CustomerAppointmentsPage = () => {
     alreadyBooked: number;
     selectedSlot?: string;
     selectedCount?: number;
+    employeeSlots?: Record<number, string>;
   } | null>(null);
   const [slotEmployees, setSlotEmployees] = useState<Record<string, number>>(
     {},
@@ -540,6 +541,39 @@ const CustomerAppointmentsPage = () => {
     }
   };
 
+  const bookEmployeeSplit = async (employeeSlots: Record<number, string>) => {
+    setBusy(true);
+    setMessage(null);
+    const booked: Appointment[] = [];
+    try {
+      for (let index = 0; index < appointmentCount; index += 1) {
+        const choice = getBookingChoice(index);
+        const { data } = await createCustomerAppointment({
+          serviceId: Number(choice.serviceIds[0]),
+          serviceIds: choice.serviceIds.map(Number),
+          subServiceIds: choice.subServiceIds,
+          employeeId: choice.employeeId ? Number(choice.employeeId) : null,
+          appointmentDate: form.appointmentDate,
+          startTime: employeeSlots[index] ?? form.startTime,
+          notes: form.notes.trim() || null,
+        });
+        booked.push(data.appointment);
+      }
+      setAppointments((current) => [...current, ...booked]);
+      resetBookingForm();
+      setMessage({ type: "success", text: booked.length + " appointments booked successfully." });
+    } catch (error) {
+      if (booked.length) setAppointments((current) => [...current, ...booked]);
+      setMessage({
+        type: "error",
+        text: (booked.length ? booked.length + " appointment(s) were booked. " : "") + getApiErrorMessage(error, "Availability changed before the bookings could be completed."),
+      });
+    } finally {
+      setBusy(false);
+      setSlotSuggestion(null);
+    }
+  };
+
   const book = async (event: FormEvent) => {
     event.preventDefault();
     const choices = appointmentCount === 1
@@ -561,9 +595,45 @@ const CustomerAppointmentsPage = () => {
         Please change that appointment or select another time.` });
         return;
       }
-      const selectedProfessionals = choices.map((choice) => choice.employeeId).filter(Boolean);
-      if (new Set(selectedProfessionals).size !== selectedProfessionals.length) {
-        setMessage({ type: "error", text: "The same professional cannot be selected for two appointments at the same time. Choose another professional or use Any available professional." });
+      const employeeGroups = new Map<string, number[]>();
+      choices.forEach((choice, index) => {
+        if (choice.employeeId)
+          employeeGroups.set(choice.employeeId, [...(employeeGroups.get(choice.employeeId) ?? []), index]);
+      });
+      const duplicateIndices = [...employeeGroups.entries()].flatMap(([employeeId, indices]) =>
+        indices.length > 1 ? indices.slice(1).map((index) => ({ employeeId, index })) : [],
+      );
+      if (duplicateIndices.length) {
+        const minutes = (slot: string) => {
+          const [hours = 0, mins = 0] = slot.split(":").map(Number);
+          return hours * 60 + mins;
+        };
+        const selectedMinutes = minutes(form.startTime);
+        const employeeSlots: Record<number, string> = {};
+        for (const duplicate of duplicateIndices) {
+          const used = new Set([
+            form.startTime,
+            ...Object.entries(employeeSlots)
+              .filter(([index]) => choices[Number(index)]?.employeeId === duplicate.employeeId)
+              .map(([, slot]) => slot),
+          ]);
+          const nearest = checks[duplicate.index]!.slots
+            .filter((slot) => !used.has(slot) && Date.parse(form.appointmentDate + "T" + slot) > Date.now())
+            .sort((first, second) => Math.abs(minutes(first) - selectedMinutes) - Math.abs(minutes(second) - selectedMinutes))[0];
+          if (!nearest) {
+            setMessage({ type: "error", text: "No nearby time is available for the selected professional. Choose another date or professional." });
+            return;
+          }
+          employeeSlots[duplicate.index] = nearest;
+        }
+        setSlotSuggestion({
+          slot: Object.values(employeeSlots)[0]!,
+          remaining: Object.keys(employeeSlots).length,
+          alreadyBooked: 0,
+          selectedSlot: form.startTime,
+          selectedCount: appointmentCount - Object.keys(employeeSlots).length,
+          employeeSlots,
+        });
         return;
       }
       const groupedCounts = new Map<string, { count: number; checkIndex: number }>();
@@ -594,28 +664,34 @@ const CustomerAppointmentsPage = () => {
       const remaining = appointmentCount - selectedCapacity;
       const [hours = 0, minutes = 0] = form.startTime.split(":").map(Number);
       const selectedMinutes = hours * 60 + minutes;
-      const nearest = availableSlots
-        .filter((slot) => slot !== form.startTime && (slotCapacities[slot] ?? 0) >= remaining)
+      const nearestSlots = availableSlots
+        .filter((slot) => slot !== form.startTime && (slotCapacities[slot] ?? 0) >= 1
+          && Date.parse(form.appointmentDate + "T" + slot) > Date.now())
         .sort((first, second) => {
           const distance = (slot: string) => {
             const [slotHours = 0, slotMinutes = 0] = slot.split(":").map(Number);
             return Math.abs(slotHours * 60 + slotMinutes - selectedMinutes);
           };
           return distance(first) - distance(second);
-        })[0];
-      if (!nearest) {
+        })
+        .slice(0, remaining);
+      if (nearestSlots.length < remaining) {
         setMessage({
           type: "error", text:
-            "No nearby slot can hold the remaining appointments. Please select another time or reduce the appointment count."
+            "There are not enough nearby times for all appointments. Please select another time or reduce the appointment count."
         });
         return;
       }
+      const employeeSlots = Object.fromEntries(
+        nearestSlots.map((slot, index) => [selectedCapacity + index, slot]),
+      );
       setSlotSuggestion({
-        slot: nearest,
+        slot: nearestSlots[0]!,
         remaining,
         alreadyBooked: 0,
         selectedSlot: form.startTime,
         selectedCount: selectedCapacity,
+        employeeSlots,
       });
       return;
     }
@@ -1324,7 +1400,26 @@ const CustomerAppointmentsPage = () => {
         open={slotSuggestion !== null}
         title="Use the nearest available time?"
         message={slotSuggestion
-          ? slotSuggestion.selectedSlot && slotSuggestion.selectedCount
+          ? slotSuggestion.employeeSlots
+            ? <div className="customer-slot-proposal">
+              <span className="customer-slot-proposal_notice">Nothing has been booked yet</span>
+              <div className="customer-slot-proposal_plan">
+                <span>
+                  <small>Selected time</small>
+                  <b>{slotSuggestion.selectedSlot?.slice(0, 5)}</b>
+                  <em>{slotSuggestion.selectedCount} appointment{slotSuggestion.selectedCount === 1 ? "" : "s"}</em>
+                </span>
+                <i>+</i>
+                <span className="is-nearest">
+                  <small>Nearest available times</small>
+                  {Object.entries(slotSuggestion.employeeSlots).map(([index, time]) => (
+                    <b key={index}>Appointment {Number(index) + 1}: {time.slice(0, 5)}</b>
+                  ))}
+                </span>
+              </div>
+              <small className="customer-slot-proposal_date">{form.appointmentDate.split("-").reverse().join("-")}</small>
+            </div>
+            : slotSuggestion.selectedSlot && slotSuggestion.selectedCount
             ? (() => {
               const detail = slotDetails[slotSuggestion.selectedSlot!];
               const requested = slotSuggestion.selectedCount! + slotSuggestion.remaining;
@@ -1387,7 +1482,9 @@ const CustomerAppointmentsPage = () => {
         onConfirm={() => {
           if (!slotSuggestion)
             return;
-          if (slotSuggestion.selectedSlot && slotSuggestion.selectedCount)
+          if (slotSuggestion.employeeSlots)
+            void bookEmployeeSplit(slotSuggestion.employeeSlots);
+          else if (slotSuggestion.selectedSlot && slotSuggestion.selectedCount)
             void bookApprovedSplit(slotSuggestion.selectedCount, slotSuggestion.selectedSlot, slotSuggestion.remaining,
               slotSuggestion.slot);
           else
