@@ -451,13 +451,17 @@ const CustomerAppointmentsPage = () => {
       .sort((first, second) => Math.abs(toMinutes(first) - origin) - Math.abs(toMinutes(second) - origin))[0] ?? null;
   };
 
+  const getBookingChoice = (index: number) => appointmentCount === 1
+    ? { serviceIds: form.serviceIds, subServiceIds: form.subServiceIds, employeeId: form.employeeId }
+    : appointmentChoices[index] ?? { serviceIds: form.serviceIds, subServiceIds: form.subServiceIds, employeeId: "" };
+
   const attemptBooking = async (count: number, slot: string, alreadyBooked = 0) => {
     setBusy(true);
     setMessage(null);
     const booked: Appointment[] = [];
     try {
       for (let index = 0; index < count; index += 1) {
-        const choice = appointmentChoices[index] ?? { serviceIds: form.serviceIds, subServiceIds: form.subServiceIds, employeeId: form.employeeId };
+        const choice = getBookingChoice(alreadyBooked + index);
         const { data } = await createCustomerAppointment({
           serviceId: Number(choice.serviceIds[0]),
           serviceIds: choice.serviceIds.map(Number),
@@ -538,7 +542,9 @@ const CustomerAppointmentsPage = () => {
 
   const book = async (event: FormEvent) => {
     event.preventDefault();
-    const choices = appointmentChoices.slice(0, appointmentCount);
+    const choices = appointmentCount === 1
+      ? [{ serviceIds: form.serviceIds, subServiceIds: form.subServiceIds, employeeId: form.employeeId }]
+      : appointmentChoices.slice(0, appointmentCount);
     if (choices.some((choice) => !choice.serviceIds.length)) {
       setMessage({ type: "error", text: "Please select at least one service for every appointment." });
       return;
