@@ -61,8 +61,30 @@
 }
 
 .dashboard-sidebar nav {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   gap: 6px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #8f7134 #292825;
+  overscroll-behavior-y: contain;
+}
+
+.dashboard-sidebar nav::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-sidebar nav::-webkit-scrollbar-track {
+  background: #292825;
+}
+
+.dashboard-sidebar nav::-webkit-scrollbar-thumb {
+  border: 2px solid #292825;
+  border-radius: 999px;
+  background: #8f7134;
 }
 
 .dashboard-menu-toggle,

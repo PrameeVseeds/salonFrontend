@@ -10,6 +10,7 @@ const pageTitles: Record<string, string> = {
     "/login": "Customer Login",
     "/register": "Create Account",
     "/forgot-password": "Forgot Password",
+    "/reset-password": "Reset Password",
     "/dashboard": "Home",
     "/services": "Services",
     "/gallery": "Gallery",

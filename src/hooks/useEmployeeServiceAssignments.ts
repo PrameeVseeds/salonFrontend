@@ -11,6 +11,7 @@ export const useEmployeeServiceAssignments = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [services, setServices] = useState<SalonService[]>([]);
   const [assigned, setAssigned] = useState<SalonService[]>([]);
+  const [assignedEmployeesByService, setAssignedEmployeesByService] = useState<Record<number, Employee[]>>({});
   const [employeeId, setEmployeeId] = useState("");
   const [query, setQuery] = useState("");
   const [touched, setTouched] = useState(false);
@@ -22,8 +23,24 @@ export const useEmployeeServiceAssignments = () => {
   useEffect(() => {
     Promise.all([getEmployees(), getServices()])
       .then(([employeeResponse, serviceResponse]) => {
-        setEmployees(employeeResponse.data.employees);
+        const loadedEmployees = employeeResponse.data.employees;
+        setEmployees(loadedEmployees);
         setServices(serviceResponse.data.services);
+        void Promise.allSettled(loadedEmployees.map(async (employee) => ({
+          employee,
+          services: (await getAssignedEmployeeServices(employee.id)).data.services,
+        }))).then((results) => {
+          const assignments: Record<number, Employee[]> = {};
+          results.forEach((result) => {
+            if (result.status !== "fulfilled") return;
+            result.value.services.forEach((service) => {
+              assignments[service.id] = [...(assignments[service.id] ?? []), result.value.employee];
+            });
+          });
+          setAssignedEmployeesByService(assignments);
+          if (results.some((result) => result.status === "rejected"))
+            setError("Some employee service assignments could not be loaded.");
+        });
       })
       .catch((requestError) => setError(getApiErrorMessage(requestError)));
   }, []);
@@ -57,6 +74,11 @@ export const useEmployeeServiceAssignments = () => {
     try {
       await assignServiceToEmployee(Number(employeeId), service.id);
       setAssigned((current) => [...current, service]);
+      if (selectedEmployee)
+        setAssignedEmployeesByService((current) => ({
+          ...current,
+          [service.id]: [...(current[service.id] ?? []), selectedEmployee],
+        }));
       setSuccess(`${service.name} assigned successfully.`);
     } catch (requestError) {
       setError(getApiErrorMessage(requestError));
@@ -75,6 +97,10 @@ export const useEmployeeServiceAssignments = () => {
       setAssigned((current) =>
         current.filter((item) => item.id !== service.id),
       );
+      setAssignedEmployeesByService((current) => ({
+        ...current,
+        [service.id]: (current[service.id] ?? []).filter((employee) => employee.id !== Number(employeeId)),
+      }));
       setSuccess(`${service.name} removed successfully.`);
       return true;
     } catch (requestError) {
@@ -106,6 +132,7 @@ export const useEmployeeServiceAssignments = () => {
     employees,
     services,
     assigned,
+    assignedEmployeesByService,
     assignedIds,
     visibleServices,
     employeeId,
