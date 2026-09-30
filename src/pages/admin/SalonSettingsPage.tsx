@@ -30,6 +30,9 @@ const defaults: UpdateSalonSettingsInput = {
   appointmentGracePeriodMinutes: 5,
   appointmentReminderMinutes: 15,
   enableWhatsAppAppointmentReminders: true,
+  appointmentConfirmationMessage: "Hi [Customer Name]! 👋 Your appointment at [Salon Name] has been successfully confirmed for [Date] at [Time]. We look forward to seeing you! Thank you for choosing us. 💙\n\nආයුබෝවන් [Customer Name]! 👋 [Salon Name] වෙත ඔබ වෙන්කරගත් ඒපොයින්ට්මන්ට් එක [Date] දින [Time] ට සාර්ථකව තහවුරු කර ඇත. ඔබව සාදරයෙන් බලාපොරොත්තු වෙමු! අපව තෝරාගැනීම පිළිබඳව ස්තූතියි. 💙",
+  appointmentReminderMessage: "Hi [Customer Name]! 👋 Just a friendly reminder that your appointment at [Salon Name] is scheduled for [Time] today, which is in [Minutes] minutes. We look forward to seeing you soon!\n\nආයුබෝවන් [Customer Name]! 👋 මෙය ඔබගේ ඒපොයින්ට්මන්ට් එක පිළිබඳ සුහද මතක් කිරීමකි. [Salon Name] හි ඔබගේ ඒපොයින්ට්මන්ට් එක අද [Time] ට, එනම් තවත් විනාඩි [Minutes]කින් යෙදී ඇත. ඔබව ඉක්මනින් හමුවීමට අපි බලාපොරොත්තු වෙමු!",
+  appointmentCancellationMessage: "Hi [Customer Name], your scheduled appointment time ([Time]) has now passed, so your appointment at [Salon Name] has been automatically cancelled. If you would like to book a new appointment, please visit our website. We look forward to serving you again!\n\nආයුබෝවන් [Customer Name], ඔබගේ නියමිත ඒපොයින්ට්මන්ට් වේලාව ([Time]) මේ වන විට පසුවී ඇති බැවින්, [Salon Name] හි ඔබගේ ඒපොයින්ට්මන්ට් එක ස්වයංක්‍රීයව අවලංගු කර ඇත. නැවත ඒපොයින්ට්මන්ට් එකක් වෙන්කර ගැනීමට කරුණාකර අපගේ වෙබ් අඩවියට පිවිසෙන්න. ඔබට නැවතත් සේවය කිරීමට අපි බලාපොරොත්තු වෙමු!",
 };
 const getError = (error: unknown) =>
   getApiErrorMessage(error, "Unable to save settings.");
@@ -55,26 +58,29 @@ const SalonSettingsPage = () => {
   const apply = (value: SalonSettings) => {
     setSettings(value);
     setForm({
-      salonName: value.salonName,
-      phone: value.phone,
-      email: value.email,
-      address: value.address,
+      salonName: value.salonName ?? defaults.salonName,
+      phone: value.phone ?? defaults.phone,
+      email: value.email ?? defaults.email,
+      address: value.address ?? defaults.address,
       mapUrl: value.mapUrl ?? null,
-      facebookUrl: value.facebookUrl,
-      instagramUrl: value.instagramUrl,
-      whatsappNumber: value.whatsappNumber,
-      allowCustomerChooseEmployee: value.allowCustomerChooseEmployee,
-      enableOnlinePayment: value.enableOnlinePayment,
-      bookingIntervalMinutes: value.bookingIntervalMinutes,
-      appointmentBufferMinutes: value.appointmentBufferMinutes,
-      appointmentGracePeriodMinutes: value.appointmentGracePeriodMinutes,
-      appointmentReminderMinutes: value.appointmentReminderMinutes,
-      enableWhatsAppAppointmentReminders: value.enableWhatsAppAppointmentReminders,
+      facebookUrl: value.facebookUrl ?? defaults.facebookUrl,
+      instagramUrl: value.instagramUrl ?? defaults.instagramUrl,
+      whatsappNumber: value.whatsappNumber ?? defaults.whatsappNumber,
+      allowCustomerChooseEmployee: value.allowCustomerChooseEmployee ?? defaults.allowCustomerChooseEmployee,
+      enableOnlinePayment: value.enableOnlinePayment ?? defaults.enableOnlinePayment,
+      bookingIntervalMinutes: value.bookingIntervalMinutes ?? defaults.bookingIntervalMinutes,
+      appointmentBufferMinutes: value.appointmentBufferMinutes ?? defaults.appointmentBufferMinutes,
+      appointmentGracePeriodMinutes: value.appointmentGracePeriodMinutes ?? defaults.appointmentGracePeriodMinutes,
+      appointmentReminderMinutes: value.appointmentReminderMinutes ?? defaults.appointmentReminderMinutes,
+      enableWhatsAppAppointmentReminders: value.enableWhatsAppAppointmentReminders ?? defaults.enableWhatsAppAppointmentReminders,
+      appointmentConfirmationMessage: value.appointmentConfirmationMessage || defaults.appointmentConfirmationMessage,
+      appointmentReminderMessage: value.appointmentReminderMessage || defaults.appointmentReminderMessage,
+      appointmentCancellationMessage: value.appointmentCancellationMessage || defaults.appointmentCancellationMessage,
     });
-    setBookingInterval(String(value.bookingIntervalMinutes));
-    setAppointmentBuffer(String(value.appointmentBufferMinutes));
-    setAppointmentGracePeriod(String(value.appointmentGracePeriodMinutes));
-    setAppointmentReminder(String(value.appointmentReminderMinutes));
+    setBookingInterval(String(value.bookingIntervalMinutes ?? defaults.bookingIntervalMinutes));
+    setAppointmentBuffer(String(value.appointmentBufferMinutes ?? defaults.appointmentBufferMinutes));
+    setAppointmentGracePeriod(String(value.appointmentGracePeriodMinutes ?? defaults.appointmentGracePeriodMinutes));
+    setAppointmentReminder(String(value.appointmentReminderMinutes ?? defaults.appointmentReminderMinutes));
   };
   useEffect(() => {
     getSalonSettings()
@@ -360,6 +366,36 @@ const SalonSettingsPage = () => {
               onChange={(e) => update("enableWhatsAppAppointmentReminders", e.target.checked)}
             />
             <span>Receive appointment reminders through WhatsApp</span>
+          </label>
+          <label className="is-wide">
+            <span>Appointment confirmation message</span>
+            <textarea
+              rows={5}
+              maxLength={5000}
+              value={form.appointmentConfirmationMessage}
+              onChange={(e) => update("appointmentConfirmationMessage", e.target.value)}
+            />
+            <small className="settings-field-hint">Sent when an appointment is booked. Available placeholders: [Customer Name], [Salon Name], [Date], [Time]. English and Sinhala text can be entered together.</small>
+          </label>
+          <label className="is-wide">
+            <span>Appointment reminder message</span>
+            <textarea
+              rows={5}
+              maxLength={5000}
+              value={form.appointmentReminderMessage}
+              onChange={(e) => update("appointmentReminderMessage", e.target.value)}
+            />
+            <small className="settings-field-hint">Sent before the appointment. Available placeholders: [Customer Name], [Salon Name], [Date], [Time], [Minutes].</small>
+          </label>
+          <label className="is-wide">
+            <span>Automatic cancellation message</span>
+            <textarea
+              rows={5}
+              maxLength={5000}
+              value={form.appointmentCancellationMessage}
+              onChange={(e) => update("appointmentCancellationMessage", e.target.value)}
+            />
+            <small className="settings-field-hint">Sent when an appointment is automatically cancelled. Available placeholders: [Customer Name], [Salon Name], [Date], [Time].</small>
           </label>
           <label className="settings-toggle">
             <input

@@ -90,7 +90,7 @@ const CustomerRegisterPage = () => {
         </label>
       </div>
       <label>
-        <span>Phone number</span>
+        <span>Phone number (Whatsapp)</span>
         <div className="customer-auth_input">
           <Phone />
           <input type="tel" autoComplete="tel" value={form.phone}
