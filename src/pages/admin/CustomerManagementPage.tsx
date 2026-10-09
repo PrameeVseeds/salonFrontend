@@ -1,4 +1,4 @@
-import { Eye, Power, Search, UserRound, Users, X } from "lucide-react";
+import { Eye, Power, Search, Trash2, UserRound, Users, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { useCustomerManagement } from "../../hooks/useCustomerManagement";
@@ -8,12 +8,13 @@ import "./customerManagementPage.css";
 type StatusFilter = "all" | "active" | "inactive";
 
 const CustomerManagementPage = () => {
-  const { customers, isLoading, updatingId, error, updateStatus } =
+  const { customers, isLoading, updatingId, deletingId, error, updateStatus, deleteCustomer } =
     useCustomerManagement();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<Customer | null>(null);
   const [statusTarget, setStatusTarget] = useState<Customer | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
 
   const visibleCustomers = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -39,6 +40,15 @@ const CustomerManagementPage = () => {
         setSelected({ ...selected, isActive: !selected.isActive });
       }
       setStatusTarget(null);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const deleted = await deleteCustomer(deleteTarget);
+    if (deleted) {
+      if (selected?.id === deleteTarget.id) setSelected(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -191,6 +201,18 @@ const CustomerManagementPage = () => {
                         >
                           <Power />
                         </button>
+                        {!customer.isActive && (
+                          <button
+                            type="button"
+                            className="is-delete"
+                            onClick={() => setDeleteTarget(customer)}
+                            title="Delete inactive customer"
+                            aria-label={`Delete ${customer.firstName} ${customer.lastName}`}
+                            disabled={deletingId === customer.id}
+                          >
+                            <Trash2 />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -293,6 +315,21 @@ const CustomerManagementPage = () => {
         busy={updatingId !== null}
         onConfirm={() => void confirmStatusChange()}
         onCancel={() => setStatusTarget(null)}
+      />
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Delete inactive customer?"
+        message={
+          deleteTarget
+            ? `${deleteTarget.firstName} ${deleteTarget.lastName} will be permanently deleted. Customers with appointment history cannot be deleted.${error ? ` ${error}` : ""}`
+            : ""
+        }
+        confirmLabel="Delete customer"
+        busyLabel="Deleting..."
+        tone="danger"
+        busy={deletingId !== null}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

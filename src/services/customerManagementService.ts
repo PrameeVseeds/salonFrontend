@@ -1,5 +1,5 @@
 import { adminAxiosClient } from "../api/adminAxiosClient";
-import type { ApiResponse } from "../types/api";
+import type { ApiMessageResponse, ApiResponse } from "../types/api";
 import type {
   CustomerResponseData,
   CustomersResponseData,
@@ -29,5 +29,12 @@ export const updateManagedCustomerStatus = async (customerId: number, isActive: 
     await adminAxiosClient.patch<ApiResponse<CustomerResponseData>>(
       `${CUSTOMERS_ENDPOINT}/${customerId}/status`,
       { isActive },
+    )
+  ).data;
+
+export const deleteManagedCustomer = async (customerId: number): Promise<ApiMessageResponse> =>
+  (
+    await adminAxiosClient.delete<ApiMessageResponse>(
+      `${CUSTOMERS_ENDPOINT}/${customerId}`,
     )
   ).data;

@@ -252,6 +252,17 @@
   background: #eaf8ef;
 }
 
+.customer-actions button.is-delete {
+  color: #b22f45;
+  border-color: #f0ccd3;
+  background: #fff0f2;
+}
+
+.customer-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .customer-actions svg {
   width: 14px;
 }

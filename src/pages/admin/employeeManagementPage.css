@@ -322,6 +322,63 @@
   color: #fff;
   background: #b88624;
 }
+.employee-delete-modal {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #160a2066;
+  backdrop-filter: blur(4px);
+}
+.employee-delete-modal > section {
+  width: min(100%, 420px);
+  padding: 26px;
+  border: 1px solid #e8e1d7;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 24px 70px #160a2040;
+  text-align: center;
+}
+.employee-delete-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  color: #b22f45;
+  background: #fff0f2;
+}
+.employee-delete-icon svg { width: 21px; }
+.employee-delete-modal h2 { margin: 0; color: #2d2b26; font-size: 1.05rem; }
+.employee-delete-modal section > p {
+  margin: 9px auto 20px;
+  color: #746d63;
+  font-size: .76rem;
+  line-height: 1.5;
+}
+.employee-delete-modal section > .employee-delete-error {
+  padding: 10px;
+  border-radius: 8px;
+  color: #a03246;
+  background: #fff0f2;
+}
+.employee-delete-modal footer { display: flex; justify-content: center; gap: 9px; }
+.employee-delete-modal footer button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #ddd6c9;
+  border-radius: 8px;
+  color: #514b42;
+  background: #fff;
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 700;
+}
+.employee-delete-modal footer .is-danger { border-color: #c83c54; color: #fff; background: #c83c54; }
+.employee-delete-modal button:disabled { cursor: not-allowed; opacity: .6; }
 @media (max-width: 1000px) {
   .employee-panel table {
     min-width: 560px;

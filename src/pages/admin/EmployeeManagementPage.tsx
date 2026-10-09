@@ -30,6 +30,8 @@ const EmployeeManagementPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Employee | null>(null);
+  const [deleting, setDeleting] = useState<Employee | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const [open, setOpen] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -159,16 +161,20 @@ const EmployeeManagementPage = () => {
       setError(getApiErrorMessage(requestError));
     }
   };
-  const remove = async (employee: Employee) => {
-    if (!window.confirm(`Delete ${employee.firstName} ${employee.lastName}?`))
-      return;
+  const remove = async () => {
+    if (!deleting || deleteBusy) return;
+    setDeleteBusy(true);
+    setError(null);
     try {
-      await deleteEmployee(employee.id);
+      await deleteEmployee(deleting.id);
       setEmployees((current) =>
-        current.filter((item) => item.id !== employee.id),
+        current.filter((item) => item.id !== deleting.id),
       );
+      setDeleting(null);
     } catch (requestError) {
       setError(getApiErrorMessage(requestError));
+    } finally {
+      setDeleteBusy(false);
     }
   };
 
@@ -267,7 +273,10 @@ const EmployeeManagementPage = () => {
                       </button>
                       <button
                         className="is-delete"
-                        onClick={() => void remove(employee)}
+                        onClick={() => {
+                          setError(null);
+                          setDeleting(employee);
+                        }}
                         title="Delete employee"
                       >
                         <Trash2 />
@@ -403,6 +412,35 @@ const EmployeeManagementPage = () => {
                 </button>
               </footer>
             </form>
+          </section>
+        </div>
+      )}
+      {deleting && (
+        <div
+          className="employee-delete-modal"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deleteBusy)
+              setDeleting(null);
+          }}
+        >
+          <section
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="employee-delete-title"
+            aria-describedby="employee-delete-description"
+          >
+            <span className="employee-delete-icon"><Trash2 /></span>
+            <h2 id="employee-delete-title">Delete employee?</h2>
+            <p id="employee-delete-description">
+              Delete {deleting.firstName} {deleting.lastName}? This action cannot be undone.
+            </p>
+            {error && <p className="employee-delete-error" role="alert">{error}</p>}
+            <footer>
+              <button type="button" disabled={deleteBusy} onClick={() => setDeleting(null)}>Cancel</button>
+              <button className="is-danger" type="button" disabled={deleteBusy} onClick={() => void remove()}>
+                {deleteBusy ? "Deleting..." : "Delete employee"}
+              </button>
+            </footer>
           </section>
         </div>
       )}
